@@ -1,39 +1,122 @@
 <div align="center">
 
-# ◈ Pa'Casa
+# Pa'Casa
 
-### Five thoughtful screens. Two layout families. Any supported surface.
+**Tu voz. Tus respuestas. A tu ritmo.**
 
-**Expo Universal UI · Rive · Kinetrell · Viro / Eskiu · Next.js 16.4 · VisionCamera 5**
+Spanish-first questions, translation, and careful form assistance,
+built for older adults who would rather speak than navigate an English form.
 
-[Explore the five screens](#the-experience-at-a-glance) · [Read the docs](docs/README.md) · [Understand the architecture](docs/ARCHITECTURE.md) · [Camera Lab](docs/CAMERA_AND_XR.md)
-
----
-
-**Phone** · **iPad** · **Foldables / Duo** · **Web** · **Quest** · **PICO** · **visionOS** · **Android XR**
-
-*Target platforms, not a claim that every backend or device has passed hardware verification.*
+[Product & assistant contract](docs/PACASA_ASSISTANT.md) ·
+[Architecture](docs/ARCHITECTURE.md) ·
+[Platform matrix](docs/PLATFORMS.md) ·
+[Original spatial lab](#spatial-lab)
 
 </div>
 
-> [!IMPORTANT]
-> This is a **five-screen reference application**, not a showcase full of unfinished features. Native controls and spatial rendering are composable; **Game Layout is a distinct layout family**. Camera Lab is a **native-only modal opened by the raised central scan button**, not a sixth route. VisionCamera supplies the camera on every native target, headsets included. The web build has no camera and no Scan action. No simulated camera, prerecorded video, or substitute phone stream.
+## Product navigation
 
-## Project identity
+| Surface | Where | Purpose |
+| --- | --- | --- |
+| Inicio | `/` | Start a conversation or translation |
+| Mi Plan | `/mi-plan` | Prepare a step-by-step plan without claiming data was saved |
+| Citas | `/citas` | Prepare for an appointment (no calendar connection yet) |
+| Apoyo | `/apoyo` | Help, limitations, accessible language |
+| **Pa'Casa** raised center button | Root-level overlay, **not a tab** | **Preguntar** (Chat) and **Traducir** (English ↔ Spanish) |
 
-- App display name: **Pa'Casa**
-- Repository: [mikevocalz/PaCasa](https://github.com/mikevocalz/PaCasa)
-- Package / Expo slug / URL scheme: `pacasa`
-- iOS bundle ID and Android package: `dev.pacasa.app`
-- Source: [universal-spatial-starter](https://github.com/mikevocalz/universal-spatial-starter), commit `0acf742bdaad6c584187269ecbdebba44754b923`.
+The center action is visible in the phone dock (native and narrow web), in
+the physical-right rail on tablets/foldables/headsets, and in the desktop
+web header. Closing the full-screen assistant returns to the prior tab.
 
-The starter's screens, assets, Zustand stores, native plugins and platform behavior are preserved. Quest retains `expo-horizon-core`, `orientation: 'default'`, and the 1280×800dp window. Set up Pa'Casa-specific service credentials from `.env.example` before using external integrations.
+The former center **Scan** button is no longer part of global navigation.
+The existing Camera Lab is accessible from inside the native assistant,
+explicitly labelled as a preview: **it does not yet read forms.**
+
+The assistant currently supports a text request/response contract and local
+voice-note recording/review on native. It does **not** invent translation
+results, automatically transcribe recordings, fill an English PDF or submit
+documents. The text service requires a separately hosted backend URL and
+informed user opt-in. Conversations are ephemeral and cleared on close.
+See [the implementation contract](docs/PACASA_ASSISTANT.md) before enabling
+live services.
+
+## Goal and non-goals
+
+Future healthcare form flow:
+
+```text
+English form/PDF → extracted fields → Spanish-first voice or typed interview
+→ field-by-field review and confirmation → populated English form → review/PDF
+```
+
+The user must confirm every answer. No external form submission, account
+creation, or persistence of personal answers is in scope for this initial MVP.
+Healthcare information deserves extra privacy and security review before
+any production processing.
+
+## Platform and architecture
+
+This repository retains the existing Expo SDK 58 / Next.js 16 universal
+monorepo, Solito routing, Uniwind/Tailwind 4, Zustand application state,
+Kinetrell motion, Rive and Viro/Eskiu capabilities.
+
+```text
+apps/mobile         Expo (native phones, tablets, foldables, headset flavors)
+apps/web            Next.js, Base44 static export
+apps/storybook      UI component stories
+packages/app        Product screens, global shell, ephemeral assistant
+packages/ui         Cross-platform semantic components and VoiceRecorder
+packages/theme      Shared tokens
+packages/camera     Native Camera Lab (existing detector, not form OCR)
+packages/spatial    Native/XR-capability infrastructure
+```
+
+Respect `AGENTS.md`: use Zustand rather than React `useState`;
+only ordinary native phones get bottom tabs, with physical-right rails on
+foldables/tablets/headsets. Web has no rail; it has a header and compact
+bottom navigation. Keep the Quest window and existing native plugin
+contracts intact.
+
+## Build
+
+```bash
+corepack enable
+pnpm install --frozen-lockfile
+pnpm --filter web dev
+pnpm --filter mobile dev
+pnpm --filter storybook dev
+pnpm verify:routes
+pnpm typecheck
+pnpm test
+```
+
+Native microphone recording requires a development build; Expo Go alone
+cannot validate the full native dependency graph. For voice recording,
+microphone permission is requested only on the user's Record action.
+Camera permission is separate.
+
+### AI endpoint
+
+```env
+NEXT_PUBLIC_PACASA_ASSISTANT_URL=https://your-secure-api.example/assistant
+EXPO_PUBLIC_PACASA_ASSISTANT_URL=https://your-secure-api.example/assistant
+```
+
+These are **public endpoint URLs**, not secrets. Set actual values only
+in private environment configuration; the values above are illustrative.
+A secure service must be deployed separately: Base44's static Next export
+does not host Next API routes. The UI disables sending and displays an
+honest message when the service is absent.
+
+Never put Gemini, OpenUI Gateway or other model API keys in public env vars.
 
 ## Base44
 
-[Live Pa'Casa app](https://pacasa-83490010.base44.app) · [Base44 dashboard](https://app.base44.com/apps/6aca5ff33ab16f3383490010/editor/workspace/overview)
+[Live deployment](https://pacasa-83490010.base44.app) ·
+[Project dashboard](https://app.base44.com/apps/6aca5ff33ab16f3383490010/editor/workspace/overview)
 
-The source lives in this repository. Base44 hosts the exported web app; native Android/iOS/headset binaries are built separately with Expo.
+The repo is the source of truth. Base44 hosts the exported **web** build;
+Expo produces independent native builds.
 
 ```bash
 pnpm base44:setup
@@ -43,106 +126,27 @@ pnpm build:base44
 pnpm base44:deploy
 ```
 
-Run the link command only on a new checkout. The local Base44 link and credentials are not committed. The CLI has its own npm installation because its Deno URL dependency is incompatible with this workspace's pnpm dependency policy. The static export disables Next server caching only for the Base44 build; normal Next development and hosting remain available. Because Base44 serves the root HTML for deep links, the home entry recovers known routes through their exported Next payloads after hydration.
+Never commit Base44 credentials or local link state.
 
-## The experience at a glance
+## Spatial lab
 
-| Route | Showcase concept | Surface composition | Mobile affordance |
-| --- | --- | --- | --- |
-| `/` | **01 · Showcase** — discover the system | Motion-led index of demos | Raised **Scan** action in central dock |
-| `/native` | **02 · Native Workspace** — productive multitasking | Native rail/list + content + inspector | List/detail transition and inspector sheet |
-| `/hybrid` | **03 · Hybrid Rive** — native + interactive art | Native controls + Rive center + native inspector | Immersive Rive stage within adaptive pane |
-| `/game` | **04 · Game Workspace** — a small playable loop | Controls + Rive game stage + HUD | Thumb-friendly game controls and session timer |
-| `/immersive` | **05 · Immersive Workspace** — engine-hosted space | Native utility panel + Viro/Three.js stage + Rive HUD | Safe 2D stage when not in XR; immersive renderer only when real |
+The previous five-screen starter remains accessible as a development
+reference under `/lab`, `/native`, `/hybrid`, `/game`, and
+`/immersive`. It is not part of the four-tab product navigation.
 
-### Two layouts, unlimited combinations
-
-```mermaid
-flowchart TB
-  App[Five-screen starter]
-  Standard[StandardWorkspace: navigation / content / inspector]
-  Game[GameWorkspace: controls / stage / HUD]
-  App --> Standard
-  App --> Game
-  Standard --> UI[Expo UI native / web]
-  Standard --> Rive[Rive runtime]
-  Game --> UI
-  Game --> Rive
-  Game --> XR[Viro / Three.js]
-  UI --> Host[Adaptive / OS spatial / engine surface host]
-  Rive --> Host
-  XR --> Host
-```
-
-The **layout** defines meaning and behavior. The **renderer** chooses pixels and input. The **host** decides whether that content occupies an adaptive pane, a Meta spatial window, a native Apple window, or a Viro engine surface. One does not impersonate another.
-
-## Design principles
-
-**Art-directed, not overdecorated.** Responsive typography; warm near-black and mineral-white surfaces; deliberate ultramarine/cobalt accents; generous whitespace; strong hover/focus states; meaningful depth. Use custom original vector/3D artwork where needed. No copied game branding, stock-photo placeholder grids, UI kits for decoration, Tamagui or Bento dependency.
-
-**Motion you can understand.** [Kinetrell](docs/KINETRELL_MOTION.md) owns cross-platform entrances, reflow, navigation and scroll choreography. [Rive](docs/RIVE.md) owns authored artboard interactions and state machines. Viro/Eskiu own world-space transforms. Only one system owns any animated property at a time.
-
-**Native-first mobile.** Bottom navigation on compact phones, a **raised 72dp camera action** visually centered over the dock, trailing Inspector as a bottom sheet, RTL-safe navigation, hinge-aware Duo/foldable placement, tablet rail, reduced-motion-aware transitions. The camera opens the *Camera Lab* overlay: a VisionCamera preview with on-device keyboard detection. [Mobile design](docs/MOBILE_AND_FOLDABLES.md).
-
-**One camera path.** Phones, tablets, Quest, PICO and Vision Pro all run Camera Lab through VisionCamera with the same on-device detector. If VisionCamera reports no camera, the overlay says so; it never substitutes simulated frames. [XR camera requirements](docs/CAMERA_AND_XR.md).
-
-## Package architecture
-
-```text
-apps/
-  mobile/                    Expo Router 58, mobile + native XR variants
-  web/                       Next.js 16.4, React Server Components + Cache Components
-  storybook/                 Component stories and interaction coverage
-packages/
-  app/                       Five routes + demo state only
-  ui/                        Universal controls, AdaptivePanes, inspector, camera dock
-  spatial/                   Shared contracts, capability negotiation, Rive/Viro hosts
-  motion/                    App-level Kinetrell recipes and tokens
-  camera/                    VisionCamera source, model pipeline, XR camera adapters
-  theme/                     Design tokens, type scale, illustration guidance
-  assets/                    Authorized sample assets + model manifest
-```
-
-> Repository structure above is the **target of the fork implementation**, not a claim that these folders already exist in NYC-Mon. Existing packages may be reorganized incrementally with compatibility exports. Preserve upstream attribution and third-party notices.
-
-## Quick start (after the fork is built)
-
-```bash
-corepack enable
-pnpm install --frozen-lockfile
-pnpm --filter mobile dev
-pnpm --filter web dev
-pnpm --filter storybook dev
-```
-
-Use **Expo development builds** for VisionCamera, native Rive, native XR SDKs and bridge testing—not Expo Go. Android Quest/PICO flavors and device-only permission requirements are explained in [Platforms](docs/PLATFORMS.md). The five demo routes should boot without login, keys or a production backend. Camera Lab runs a bundled on-device detector through VisionCamera on every native target and asks for camera permission only when the overlay opens.
-
-## Documentation
-
-| Start here | You will learn |
-| --- | --- |
-| [Docs index](docs/README.md) | The learning path and decision map |
-| [Architecture](docs/ARCHITECTURE.md) | Ownership of the scene, native resources and platform hosts |
-| [Layout System](docs/LAYOUT_SYSTEM.md) | Standard vs Game, panel roles, capability negotiation |
-| [Components & API](docs/COMPONENTS.md) | Component contracts, examples, events, errors |
-| [Kinetrell Motion](docs/KINETRELL_MOTION.md) | Shared motion language, screen recipes, timing, accessibility |
-| [Rive Integration](docs/RIVE.md) | Native/web artboards, state machines, lifecycle, typed bindings |
-| [Camera & XR](docs/CAMERA_AND_XR.md) | VisionCamera 5, native ARKit object tracking, Lite0, permissions and real XR requirements |
-| [Mobile & Foldables](docs/MOBILE_AND_FOLDABLES.md) | Raised scan action, Duo, rail, inspector and hinge rules |
-| [Platforms](docs/PLATFORMS.md) | Platform-specific adapter contract and verification status |
-| [Testing & Release](docs/TESTING.md) | Device matrix, performance, a11y and CI gates |
-| [Contribution Guide](CONTRIBUTING.md) | Changes, API-design discipline, review and attribution |
-
-## Where this came from
-
-The reference fork is derived from [NYC-Mon](https://github.com/mikevocalz/nyc-mon), with shared XR architecture from [viro-external](https://github.com/mikevocalz/viro-external), Expo adaptive patterns adapted from [Moyo Learn](https://github.com/mikevocalz/moyolearn), and motion from [Kinetrell](https://github.com/mikevocalz/Kinetrell). No NYC-Mon story, characters, game assets, or private data belong in this starter.
-
-**Key references:** [Expo UI](https://docs.expo.dev/versions/latest/sdk/ui/universal/) · [Expo Server Components](https://docs.expo.dev/guides/server-components/) · [Next.js Cache Components](https://nextjs.org/docs/app/getting-started/cache-components) · [Meta Layout](https://developers.meta.com/vr/documentation/android-apps/meta-vr-layout-sdk/) · [VisionCamera](https://visioncamera.margelo.com/docs/frame-output) · [Rive](https://rive.app/docs/llms.txt) · [Margelo API design](https://github.com/margelo/react-native-skills/tree/main/skills/api-design)
+See [spatial architecture](docs/ARCHITECTURE.md),
+[adaptive layouts](docs/RESPONSIVE-SHELL.md),
+[camera/XR limitations](docs/CAMERA_AND_XR.md), and
+[testing requirements](docs/TESTING.md).
 
 ## License
 
-MIT. See [LICENSE](LICENSE). Fonts, the detection model and vendored Viro files keep their own licenses, listed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+MIT. See [LICENSE](LICENSE) and [third-party notices](THIRD_PARTY_NOTICES.md).
 
----
+## Optional text assistant backend
 
-<div align="center"><strong>Designed to be read, explored, tested, and forked.</strong><br/>A small reference app with serious engineering boundaries.</div>
+`apps/assistant-api` is an independent development-only Gemini service.
+It generates real text translations and safe OpenUI bilingual display cards
+once a server-side `GEMINI_API_KEY` and the mobile/web endpoint URLs are
+configured. It is **not deployed or PHI-ready by default**.
+See [backend setup](apps/assistant-api/README.md).

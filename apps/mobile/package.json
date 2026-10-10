@@ -37,6 +37,9 @@
     "canvaskit-wasm": "catalog:",
     "expo": "catalog:",
     "expo-asset": "catalog:",
+    "@native-springs/shaders": "catalog:",
+    "expo-speech": "catalog:",
+    "expo-speech-recognition": "catalog:",
     "expo-build-properties": "catalog:",
     "expo-constants": "catalog:",
     "expo-drag-drop-content-view": "catalog:",
@@ -65,6 +68,7 @@
     "react-native-screens": "catalog:",
     "react-native-skia": "catalog:",
     "react-native-svg": "catalog:",
+    "react-native-nitro-fetch": "catalog:",
     "react-native-vision-camera": "catalog:",
     "react-native-vision-camera-resizer": "catalog:",
     "react-native-vision-camera-worklets": "catalog:",
@@ -73,7 +77,10 @@
     "react-native-worklets": "catalog:",
     "solito": "catalog:",
     "uniwind": "catalog:",
-    "zustand": "catalog:"
+    "zustand": "catalog:",
+    "@better-auth/expo": "catalog:",
+    "better-auth": "catalog:",
+    "expo-secure-store": "catalog:"
   },
   "devDependencies": {
     "@acme/config": "workspace:*",

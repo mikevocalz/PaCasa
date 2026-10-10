@@ -32,12 +32,12 @@ const recognitionCtor = () => {
 
 export const canListen = () => recognitionCtor() !== null;
 
-/** Listen for one Spanish answer. Returns a cancel function, or null. */
-export function listen(onResult, onEnd) {
+/** Listen once in the specified source language. Returns a cancel function, or null. */
+export function listen(onResult, onEnd, language = SPANISH) {
   const Ctor = recognitionCtor();
   if (!Ctor) return null;
   const recognition = new Ctor();
-  recognition.lang = SPANISH;
+  recognition.lang = language;
   recognition.interimResults = false;
   recognition.continuous = false;
   recognition.maxAlternatives = 1;

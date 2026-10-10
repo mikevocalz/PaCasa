@@ -1,5 +1,5 @@
 export interface RiveStageProps {
-  source: string;
+  source: string | number;
   artboard?: string;
   stateMachine?: string;
   autoplay?: boolean;

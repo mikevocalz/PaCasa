@@ -23,9 +23,14 @@
     "@acme/theme": "workspace:*",
     "@acme/ui": "workspace:*",
     "kinetrell": "catalog:",
+    "react-native-nitro-fetch": "catalog:",
     "react-native-safe-area-context": "catalog:",
     "solito": "catalog:",
-    "zustand": "catalog:"
+    "zustand": "catalog:",
+    "@acme/chat-ui": "workspace:*",
+    "@native-springs/shaders": "catalog:",
+    "expo-speech": "catalog:",
+    "expo-speech-recognition": "catalog:"
   },
   "devDependencies": {
     "@acme/config": "workspace:*",

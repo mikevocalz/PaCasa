@@ -3,11 +3,12 @@ import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 /**
- * The starter has exactly five product routes. Camera Lab is an overlay, not a
- * route. Fails when either app gains or loses a screen.
+ * Four product tab routes plus the five preserved starter/demo routes.
+ * Chat/Translate and Camera Lab are root overlays, not routes.
+ * Fails when web and native screens diverge.
  */
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const expected = ['/', '/game', '/hybrid', '/immersive', '/native'];
+const expected = ['/', '/apoyo', '/citas', '/game', '/hybrid', '/immersive', '/lab', '/mi-plan', '/native'];
 
 function walk(dir) {
   return readdirSync(dir).flatMap((name) => {

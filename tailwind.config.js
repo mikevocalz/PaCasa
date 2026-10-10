@@ -43,6 +43,15 @@ module.exports = {
         'fg-subtle': 'var(--fg-subtle)',
         accent: 'var(--accent)',
         'accent-soft': 'var(--accent-soft)',
+        // The names the shared account screens use, bound to the same palette.
+        background: 'var(--background)',
+        foreground: 'var(--foreground)',
+        card: 'var(--card)',
+        primary: 'var(--primary)',
+        'primary-foreground': 'var(--primary-foreground)',
+        'muted-foreground': 'var(--muted-foreground)',
+        border: 'var(--border)',
+        destructive: 'rgb(var(--destructive) / <alpha-value>)',
       },
       fontFamily: {
         display: ['var(--font-display)'],

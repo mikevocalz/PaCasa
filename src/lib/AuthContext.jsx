@@ -1,69 +1,84 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import {
+  getPortalSession,
+  hasRemoteAuth,
+  signInDemo as demoSignIn,
+  signInEmail,
+  signOut as gatewaySignOut,
+  signUpEmail,
+} from '@/lib/authGateway';
 
-const AuthContext = createContext();
+const AuthContext = createContext(null);
 
-/**
- * Pa'Casa is a public app: a patient walks up and starts. An unsigned-in
- * visitor is simply "not authenticated", never an error, so the tab screens
- * render either way. Only a real failure to reach the backend is surfaced.
- */
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+export function AuthProvider({ children }) {
+  const [portalSession, setPortalSession] = useState(null);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
   const [authError, setAuthError] = useState(null);
 
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const current = await base44.auth.me();
-        if (!cancelled && current) setUser(current);
-      } catch (error) {
-        // No session is the normal case for a public app; a 401/403 is not.
-        const status = error?.status ?? error?.response?.status;
-        if (!cancelled && (status === 401 || status === 403)) {
-          setAuthError({ type: 'user_not_registered', message: error.message });
-        }
-      } finally {
-        if (!cancelled) setIsLoadingAuth(false);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  const refresh = async () => {
+    setIsLoadingAuth(true);
+    setAuthError(null);
+    try {
+      const next = await getPortalSession();
+      setPortalSession(next);
+      return next;
+    } catch (error) {
+      setPortalSession(null);
+      setAuthError({ type: 'backend_error', message: error instanceof Error ? error.message : 'No se pudo conectar.' });
+      return null;
+    } finally {
+      setIsLoadingAuth(false);
+    }
+  };
 
-  const navigateToLogin = () => {
-    window.location.href = '/login';
+  useEffect(() => { void refresh(); }, []);
+
+  const login = async (credentials) => {
+    setAuthError(null);
+    const next = await signInEmail(credentials);
+    setPortalSession(next);
+    return next;
+  };
+
+  const signup = async (registration) => {
+    setAuthError(null);
+    const next = await signUpEmail(registration);
+    setPortalSession(next);
+    return next;
+  };
+
+  const loginDemo = async (role) => {
+    setAuthError(null);
+    const next = await demoSignIn(role);
+    setPortalSession(next);
+    return next;
   };
 
   const logout = async () => {
-    await base44.auth.logout();
-    window.location.href = '/';
+    await gatewaySignOut();
+    setPortalSession(null);
   };
 
-  return (
-    <AuthContext.Provider
-      value={{
-        user,
-        setUser,
-        isAuthenticated: Boolean(user),
-        isLoadingAuth,
-        authError,
-        navigateToLogin,
-        logout,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
-  );
-};
+  const value = useMemo(() => ({
+    user: portalSession?.user ?? null,
+    profile: portalSession?.profile ?? null,
+    organizations: portalSession?.organizations ?? [],
+    isAuthenticated: Boolean(portalSession?.user),
+    isLoadingAuth,
+    authError,
+    remoteAuthConfigured: hasRemoteAuth(),
+    login,
+    signup,
+    loginDemo,
+    logout,
+    refresh,
+  }), [portalSession, isLoadingAuth, authError]);
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+}
+
+export function useAuth() {
+  const value = useContext(AuthContext);
+  if (!value) throw new Error('useAuth must be used within AuthProvider');
+  return value;
+}

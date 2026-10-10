@@ -141,3 +141,40 @@ Until `VITE_PACASA_AUTH_URL` is configured, the UI exposes explicit demo-only pa
 9. Verify patient login routes to the patient portal.
 10. Verify seeded provider login routes to the provider portal.
 11. Verify a newly-created provider remains pending until approved.
+
+
+## Implemented in PR #4
+
+The integration is no longer only a scaffold:
+
+- Better Auth 1.7.7 is pinned in the workspace.
+- `@better-auth/expo` 1.7.7 is pinned for native.
+- Expo SecureStore is configured for native session/cookie storage.
+- `pg` + Kysely back Better Auth against Supabase Postgres.
+- Better Auth is mounted at `/api/auth/[...all]`.
+- `/api/portal/me` returns the server-owned Pa'Casa profile and organizations.
+- `/api/portal/onboard` creates patients as active and providers as pending.
+- Demo fixture emails automatically reconcile to the real Better Auth user id.
+- `pnpm --filter web auth:seed-demo` creates the six synthetic Better Auth identities.
+- Base44/Vite quick demo login uses the real seeded Better Auth accounts whenever `VITE_PACASA_AUTH_URL` is configured.
+
+### Demo credentials
+
+These accounts contain synthetic data only:
+
+- Patient: `rosa.patient@demo.pacasa.test`
+- Provider: `elena.ruiz@demo.pacasa.test`
+- Default demo password: `PaCasa-Demo-2026!`
+
+Override the password during seeding with `PACASA_DEMO_PASSWORD` if desired.
+
+### Cross-origin Base44 note
+
+For a Base44 origin that differs from the Better Auth API origin, set:
+
+```
+BETTER_AUTH_CROSS_ORIGIN=1
+BETTER_AUTH_TRUSTED_ORIGINS=https://<base44-origin>,https://<other-approved-origin>
+```
+
+This enables secure `SameSite=None` cookies plus a strict CORS allowlist. For a production Safari-safe deployment, prefer a same-origin reverse proxy or shared parent domain instead of permanent third-party cookies.

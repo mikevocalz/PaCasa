@@ -49,7 +49,7 @@ const FieldReview = defineComponent({
   name: 'FormFieldReview',
   description: descriptions.FormFieldReview,
   props: paCasaSchemas.field,
-  component: ({ props }) => {
+  component: function FormFieldReviewComponent({ props }) {
     const triggerAction = useTriggerAction();
     return (
       <View className="gap-3 border border-ink-600 bg-ink-900 p-4">
@@ -84,7 +84,7 @@ const Suggestion = defineComponent({
   name: 'FollowUpSuggestion',
   description: descriptions.FollowUpSuggestion,
   props: paCasaSchemas.suggestion,
-  component: ({ props }) => {
+  component: function FollowUpSuggestionComponent({ props }) {
     const triggerAction = useTriggerAction();
     return (
       <Pressable role="button" accessibilityLabel={'Sugerencia: ' + props.label}

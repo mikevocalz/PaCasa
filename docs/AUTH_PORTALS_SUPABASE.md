@@ -195,9 +195,7 @@ These accounts contain synthetic data only:
 
 - Patient: `rosa.patient@demo.pacasa.test`
 - Provider: `elena.ruiz@demo.pacasa.test`
-- Default demo password: `PaCasa-Demo-2026!`
-
-Override the password during seeding with `PACASA_DEMO_PASSWORD` if desired.
+Set the synthetic accounts' password with `PACASA_DEMO_PASSWORD` before seeding. Configure the same value as `VITE_PACASA_DEMO_PASSWORD` only for disposable demo deployments that enable one-click remote demo login.
 
 ### Cross-origin Base44 note
 

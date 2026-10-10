@@ -51,13 +51,17 @@ export async function signOut() {
   writeDemoSession(null);
 }
 
+const demoPassword = import.meta.env.VITE_PACASA_DEMO_PASSWORD;
 const DEMO_CREDENTIALS = {
-  patient: { email: 'rosa.patient@demo.pacasa.test', password: 'PaCasa-Demo-2026!' },
-  provider: { email: 'elena.ruiz@demo.pacasa.test', password: 'PaCasa-Demo-2026!' },
+  patient: { email: 'rosa.patient@demo.pacasa.test', password: demoPassword },
+  provider: { email: 'elena.ruiz@demo.pacasa.test', password: demoPassword },
 };
 
 export async function signInDemo(role) {
-  if (hasRemoteAuth()) return signInEmail(DEMO_CREDENTIALS[role] ?? DEMO_CREDENTIALS.patient);
+  if (hasRemoteAuth()) {
+    if (!demoPassword) throw new Error('La contraseña de demostración no está configurada.');
+    return signInEmail(DEMO_CREDENTIALS[role] ?? DEMO_CREDENTIALS.patient);
+  }
   const provider = role === 'provider';
   const session = {
     user: { id: provider ? 'demo-provider-elena' : 'demo-patient-rosa', name: provider ? 'Dra. Elena Ruiz' : 'Rosa Velázquez', email: provider ? 'elena.ruiz@demo.pacasa.test' : 'rosa.patient@demo.pacasa.test' },

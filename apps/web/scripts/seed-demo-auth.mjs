@@ -4,10 +4,10 @@ import { Pool } from 'pg';
 
 const connectionString = process.env.DATABASE_URL;
 const secret = process.env.BETTER_AUTH_SECRET;
-const password = process.env.PACASA_DEMO_PASSWORD ?? 'PaCasa-Demo-2026!';
+const password = process.env.PACASA_DEMO_PASSWORD;
 
-if (!connectionString || !secret) {
-  throw new Error('DATABASE_URL and BETTER_AUTH_SECRET are required.');
+if (!connectionString || !secret || !password) {
+  throw new Error('DATABASE_URL, BETTER_AUTH_SECRET, and PACASA_DEMO_PASSWORD are required.');
 }
 
 const pool = new Pool({ connectionString, max: 2 });

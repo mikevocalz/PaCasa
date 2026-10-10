@@ -68,6 +68,7 @@ const config: ExpoConfig & { newArchEnabled: true } = {
       },
     ],
     'expo-image',
+    'expo-secure-store',
     'react-native-webgpu',
     // Adds the device flavors (mobile, quest) and the Quest manifest: VR
     // intent category, headtracking, hand tracking and supported devices.

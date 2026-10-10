@@ -1,158 +1,54 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { base44 } from "@/api/base44Client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { LogIn, Mail, Lock, Loader2, ArrowRight } from "lucide-react";
-import AuthLayout from "@/components/AuthLayout";
-import GoogleIcon from "@/components/GoogleIcon";
-import { safeReturnTo } from "@/lib/authReturnTo";
-import { setDemoMode } from "@/session/store";
+import { useState } from 'react';
+import { Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { Stethoscope, UserRound } from 'lucide-react';
+import AuthLayout from '@/components/AuthLayout';
+import Button from '@/components/ui/Button';
+import Card from '@/components/ui/Card';
+import TextField from '@/components/ui/TextField';
+import { useAuth } from '@/lib/AuthContext';
 
 export default function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-  // Post-login destination (e.g. the MCP OAuth consent page sends users here
-  // with returnTo so the grant flow can resume). Same-origin paths only.
-  const returnTo = safeReturnTo();
+  const { isAuthenticated, profile, login, loginDemo, remoteAuthConfigured } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState(null);
+  const [pending, setPending] = useState(false);
 
-  /**
-   * The one-tap demo: no account, straight into the sample visit. That visit
-   * is held in memory for a single visit, so this enters the app without a page
-   * reload — a reload would start the session over.
-   */
-  const openDemo = () => {
-    setDemoMode(true);
-    navigate("/");
+  if (isAuthenticated && profile) return <Navigate to={profile.accountType === 'provider' ? '/provider' : '/'} replace />;
+
+  const afterLogin = (session) => {
+    const requested = location.state?.returnTo;
+    navigate(requested || (session.profile.accountType === 'provider' ? '/provider' : '/'), { replace: true });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
-    try {
-      await base44.auth.loginViaEmailPassword(email, password);
-      window.location.href = returnTo;
-    } catch (err) {
-      setError(err.message || "Invalid email or password");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleGoogle = () => {
-    base44.auth.loginWithProvider("google", returnTo);
+  const submit = async (event) => {
+    event.preventDefault();
+    setPending(true);
+    setError(null);
+    try { afterLogin(await login({ email, password })); }
+    catch (cause) { setError(cause instanceof Error ? cause.message : 'No se pudo iniciar sesión.'); }
+    finally { setPending(false); }
   };
 
   return (
-    <AuthLayout
-      icon={LogIn}
-      title="Welcome back"
-      subtitle="Log in to your account"
-      footer={
-        <>
-          Don't have an account?{" "}
-          <Link
-            to={"/register" + (returnTo !== "/" ? "?returnTo=" + encodeURIComponent(returnTo) : "")}
-            className="text-primary font-medium hover:underline"
-          >
-            Create one
-          </Link>
-        </>
-      }
-    >
-      <Button
-        variant="outline"
-        className="w-full h-12 text-sm font-medium mb-6"
-        onClick={handleGoogle}
-      >
-        <GoogleIcon className="w-5 h-5 mr-2" />
-        Continue with Google
-      </Button>
-
-      <div className="relative mb-6">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-border" />
-        </div>
-        <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-card px-3 text-muted-foreground">or</span>
-        </div>
-      </div>
-
-      {error && (
-        <div className="mb-4 p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
-          {error}
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
-          <div className="relative">
-            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
-            <Input
-              id="email"
-              type="email"
-              autoComplete="email"
-              autoFocus
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="pl-10 h-12"
-              required
-            />
-          </div>
-        </div>
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <Label htmlFor="password">Password</Label>
-            <Link to="/forgot-password" className="text-xs text-primary hover:underline">
-              Forgot password?
-            </Link>
-          </div>
-          <div className="relative">
-            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
-            <Input
-              id="password"
-              type="password"
-              autoComplete="current-password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="pl-10 h-12"
-              required
-            />
-          </div>
-        </div>
-        <Button type="submit" className="w-full h-12 font-medium" disabled={loading}>
-          {loading ? (
-            <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Logging in...
-            </>
-          ) : (
-            "Log in"
-          )}
-        </Button>
+    <AuthLayout title="Entre a su portal" subtitle="La misma cuenta de Pa’Casa abre una experiencia distinta para pacientes y proveedores." footer="Datos de demostración: las organizaciones y personas de ejemplo son ficticias.">
+      <form className="space-y-5" onSubmit={submit}>
+        <header className="space-y-2"><p className="text-sm font-semibold uppercase tracking-[0.14em] text-accent-soft">Iniciar sesión</p><h2 className="font-display text-2xl text-fg">Bienvenido de nuevo</h2></header>
+        {error ? <p role="alert" className="border border-red-500/50 bg-red-500/10 p-3 text-sm text-red-100">{error}</p> : null}
+        <TextField id="login-email" label="Correo electrónico" inputMode="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+        <TextField id="login-password" label="Contraseña" type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} />
+        <Button type="submit" className="w-full" disabled={pending || !email || !password}>{pending ? 'Entrando…' : 'Entrar'}</Button>
+        <p className="text-center text-sm text-fg-muted">¿No tiene cuenta? <a className="font-semibold text-accent-soft underline underline-offset-4" href="/signup">Crear una cuenta</a></p>
       </form>
-
-      <div className="mt-6 border-t border-border pt-6">
-        <p className="text-sm text-muted-foreground">
-          Just looking around? The sample visit opens without an account.
-        </p>
-        <Button
-          variant="outline"
-          className="mt-3 w-full h-12 text-sm font-medium"
-          onClick={openDemo}
-        >
-          <ArrowRight className="w-4 h-4 mr-2" />
-          Enter the demo visit
-        </Button>
-      </div>
+      <section className="mt-7 space-y-3 border-t border-line pt-6" aria-labelledby="demo-login-title">
+        <header className="space-y-1"><h3 id="demo-login-title" className="font-display text-lg text-fg">Entradas rápidas para la demo</h3><p className="text-sm leading-6 text-fg-subtle">{remoteAuthConfigured ? 'Use las cuentas sembradas en Supabase cuando el seed esté ejecutado.' : 'El backend aún no está conectado; estos botones abren una sesión demo temporal.'}</p></header>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Card as="article" className="space-y-3 p-4"><UserRound className="text-emerald-300" aria-hidden /><div><h4 className="font-semibold text-fg">Paciente</h4><p className="text-sm text-fg-subtle">Rosa Velázquez</p></div><Button tone="secondary" className="w-full" onClick={async () => afterLogin(await loginDemo('patient'))}>Entrar como paciente</Button></Card>
+          <Card as="article" className="space-y-3 p-4"><Stethoscope className="text-sky-300" aria-hidden /><div><h4 className="font-semibold text-fg">Proveedor</h4><p className="text-sm text-fg-subtle">Dra. Elena Ruiz</p></div><Button tone="secondary" className="w-full" onClick={async () => afterLogin(await loginDemo('provider'))}>Entrar como proveedor</Button></Card>
+        </div>
+      </section>
     </AuthLayout>
   );
 }

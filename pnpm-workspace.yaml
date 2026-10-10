@@ -38,7 +38,7 @@ allowBuilds:
   # kinetrell ships source for git consumers; its `prepare` runs tsdown to
   # emit dist/ (the exports map only resolves against built files).
   "kinetrell@https://codeload.github.com/mikevocalz/Kinetrell/tar.gz/344de51531ce050c4311d3feb70e4d596bdc8041": true
-  "@openuidev/lang-core@0.3.0": false
+  "@openuidev/lang-core": false
   "react-native-executorch@0.10.0": true
   unrs-resolver: true
   esbuild: true
@@ -98,6 +98,7 @@ catalog:
   expo-splash-screen: 58.0.7
   expo-status-bar: 58.0.3
   expo-system-ui: 58.0.5
+  expo-secure-store: 58.0.2
   expo-build-properties: 58.0.10
   # apps/mobile/babel.config.js names this preset, so the app must declare it;
   # the Gradle JS bundle step resolves it from the app, not through expo.
@@ -193,6 +194,13 @@ catalog:
   "@legendapp/list": 3.6.0
   "@legendapp/motion": 2.5.3
   zustand: 5.0.15
+
+  # auth / postgres
+  better-auth: 1.7.7
+  "@better-auth/expo": 1.7.7
+  kysely: 0.29.6
+  pg: 8.23.1
+  "@types/pg": 8.23.1
 
   storybook: 10.6.1
   "@storybook/react-vite": 10.6.1

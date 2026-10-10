@@ -73,6 +73,7 @@ const config: ExpoConfig & { newArchEnabled: true } = {
       },
     ],
     'expo-image',
+    'expo-secure-store',
     ['expo-speech-recognition', {
       microphonePermission: 'Pa’Casa utiliza el micrófono solo cuando tocas Médico o Paciente para traducir una frase.',
       speechRecognitionPermission: 'Pa’Casa transcribe frases para convertirlas entre inglés y español con consentimiento.',

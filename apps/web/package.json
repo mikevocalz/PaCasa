@@ -9,7 +9,11 @@
     "start": "node scripts/next.mjs start",
     "lint": "eslint",
     "test": "node --test",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "auth:seed-demo": "node scripts/seed-demo-auth.mjs",
+    "auth:migrate": "npx auth@1.7.7 migrate --config ./lib/auth.ts --yes",
+    "auth:check": "npx auth@1.7.7 check schema --config ./lib/auth.ts",
+    "auth:doctor": "node scripts/auth-doctor.mjs"
   },
   "dependencies": {
     "@acme/app": "workspace:*",
@@ -39,7 +43,11 @@
     "react-native-skia": "catalog:",
     "react-native-web": "catalog:",
     "solito": "catalog:",
-    "zustand": "catalog:"
+    "zustand": "catalog:",
+    "@better-auth/expo": "catalog:",
+    "better-auth": "catalog:",
+    "kysely": "catalog:",
+    "pg": "catalog:"
   },
   "devDependencies": {
     "@acme/config": "workspace:*",
@@ -55,6 +63,7 @@
     "tailwindcss": "catalog:",
     "typescript": "catalog:",
     "unplugin-typegpu": "catalog:",
-    "web-vitals": "6.2.3"
+    "web-vitals": "6.2.3",
+    "@types/pg": "catalog:"
   }
 }

@@ -10,7 +10,7 @@
     "lint": "eslint",
     "test": "node --test",
     "typecheck": "tsc --noEmit",
-    "auth:seed-demo": "node scripts/seed-demo-auth.ts"
+    "auth:seed-demo": "node scripts/seed-demo-auth.mjs"
   },
   "dependencies": {
     "@acme/app": "workspace:*",

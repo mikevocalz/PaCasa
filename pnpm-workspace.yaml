@@ -97,6 +97,7 @@ catalog:
   # apps/mobile/babel.config.js names this preset, so the app must declare it;
   # the Gradle JS bundle step resolves it from the app, not through expo.
   babel-preset-expo: 58.0.12
+  react-native-nitro-fetch: 1.8.0
   react-native-audio-api: audio-api-nightly
   react-native-keyboard-controller: 1.22.6
   react-native-nitro-modules: 0.37.1

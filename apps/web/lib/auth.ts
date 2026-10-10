@@ -11,6 +11,7 @@ const trustedOrigins = (process.env.BETTER_AUTH_TRUSTED_ORIGINS ?? '')
   .filter(Boolean);
 
 const runtimeConfigured = databaseConfigured && Boolean(process.env.BETTER_AUTH_SECRET);
+const crossOriginCookies = process.env.BETTER_AUTH_CROSS_ORIGIN === '1';
 
 export const authRuntimeConfigured = runtimeConfigured;
 
@@ -34,6 +35,15 @@ export const auth = betterAuth({
     database: {
       joins: true,
     },
-    useSecureCookies: process.env.NODE_ENV === 'production',
+    useSecureCookies: process.env.NODE_ENV === 'production' || crossOriginCookies,
+    ...(crossOriginCookies
+      ? {
+          defaultCookieAttributes: {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'none' as const,
+          },
+        }
+      : {}),
   },
 });

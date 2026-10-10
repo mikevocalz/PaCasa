@@ -24,8 +24,8 @@ const config: ExpoConfig & { newArchEnabled: true } = {
     // Camera Lab (@acme/camera). VisionCamera v5 ships no config plugin; its
     // Expo setup is this usage string plus the Android CAMERA permission,
     // which the @reactvision/react-viro plugin below already writes for AR
-    // mode (declaring it again here duplicates the manifest element). No
-    // Assistant VoiceRecorder records locally after the user's explicit tap.
+    // mode (declaring it again here duplicates the manifest element).
+    // Assistant VoiceRecorder asks for microphone access only on Record.
     infoPlist: {
       NSCameraUsageDescription:
         'Camera Lab uses the camera to find a keyboard in view. Frames are analyzed on this device and never saved.',

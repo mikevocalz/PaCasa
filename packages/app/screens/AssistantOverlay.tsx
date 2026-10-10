@@ -194,10 +194,13 @@ export function AssistantOverlay({ onScan }: { onScan: () => void }) {
             )}
 
             {Platform.OS !== 'web' ? (
-              <Pressable role="button" accessibilityLabel="Escanear formulario con la cámara" onPress={onScan}
+              <Pressable role="button" accessibilityLabel="Abrir Camera Lab; aún no lee formularios" onPress={onScan}
                 className="min-h-12 flex-row items-center justify-center gap-3 border border-ink-600 bg-ink-900 px-4">
                 <ScanLine size={21} className="text-silver-200" />
-                <Text className="text-base font-semibold text-silver-50">Escanear formulario</Text>
+                <View className="min-w-0 flex-1 gap-1">
+                  <Text className="text-base font-semibold text-silver-50">Abrir cámara</Text>
+                  <Text className="text-sm text-silver-300">Vista de prueba; todavía no lee formularios</Text>
+                </View>
               </Pressable>
             ) : null}
             <Text className="text-sm leading-6 text-silver-400">
@@ -228,7 +231,8 @@ export function AssistantOverlay({ onScan }: { onScan: () => void }) {
               maxLength={MAX_MESSAGE_CHARS}
               returnKeyType="send"
               placeholder={mode === 'chat' ? 'Escribe tu pregunta…' : 'Escribe la frase a traducir…'}
-              accessibilityLabel={mode === 'chat' ? 'Escribir pregunta' : 'Texto para traducir'}
+              aria-label={mode === 'chat' ? 'Escribir pregunta' : 'Texto para traducir'}
+              placeholderTextColor="#AAB0C4"
               className="min-h-14 w-full border border-ink-500 bg-ink-900 px-4 text-lg text-silver-50"
             />
             <Pressable

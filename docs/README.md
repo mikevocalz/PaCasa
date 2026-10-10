@@ -1,3 +1,7 @@
+# Pa'Casa product documentation
+
+**Start with [Chat / Translate assistant, privacy and backend contract](PACASA_ASSISTANT.md).** The remaining pages describe the preserved spatial starter and its platform rules.
+
 # Documentation map
 
 This documentation is written in **user journey order**, not in dependency order. Start with the intent, then read the component contract, then inspect the implementation adapters. Every page distinguishes **implemented in the source fork**, **to build**, and **requires device verification**.

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { Platform } from 'react-native';
+import { AppState, Platform } from 'react-native';
 import { ExpoSpeechRecognitionModule, useSpeechRecognitionEvent } from 'expo-speech-recognition';
 import * as Speech from 'expo-speech';
 import { assistantReplyFromResponse, makeAssistantRequest } from '../assistant/contract';
@@ -51,7 +51,10 @@ export function useTalkSession(active: boolean) {
   useEffect(() => {
     activeRef.current = active;
     if (!active) cancel();
-    return () => { activeRef.current = false; cancel(); };
+    const subscription = AppState.addEventListener('change', (next) => {
+      if (next !== 'active') cancel();
+    });
+    return () => { subscription.remove(); activeRef.current = false; cancel(); };
     // Resources are terminated when leaving this screen, not on each store update.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [active]);

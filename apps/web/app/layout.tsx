@@ -7,7 +7,8 @@ import './globals.css';
 // All five routes are statically rendered; Base44 uses Next static export.
 export const metadata: Metadata = {
   title: { default: "Pa'Casa", template: "%s | Pa'Casa" },
-  description: 'Five screens, two layouts: native UI, Rive and Viro on Expo and Next.js.',
+  description:
+    "Pa'Casa te ayuda en español a preparar tu visita a la clínica: llena formularios, revisa documentos y confirma tus respuestas antes de tu cita.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

@@ -211,9 +211,9 @@ const USAGE: Pair[] = [
   { id: 'past day', fg: 'text-muted', bg: ['surface-raised'], role: 'text', usedAt: [], reason: 'past days still call selectDate (BookingSurface.tsx:58); the day strip sits in the bg-surface-raised panel (BookingSurface.tsx:48)' },
   // The grid tab bar is a night facade in both themes (palette steps, no themed
   // tokens). The 95% bar is measured over a light page, its worst case.
-  { id: 'grid tab label idle', fg: 'silver-300', bg: ['concrete-50', 'ink-950/95'], role: 'text', usedAt: [], reason: 'bar is bg-ink-950/95 in both themes; measured over a light page' },
-  { id: 'grid tab label active', fg: 'orange-400', bg: ['concrete-50', 'ink-950/95', 'orange-500/15'], role: 'text', usedAt: [] },
-  { id: 'grid tab selected edge', fg: 'orange-500/60', bg: ['concrete-50', 'ink-950/95', 'orange-500/15'], role: 'ui', usedAt: [] },
+  { id: 'grid tab label idle', fg: 'silver-300', bg: ['orange-50', 'ink-950/95'], role: 'text', usedAt: [], reason: 'bar is bg-ink-950/95 in both themes; measured over the light page' },
+  { id: 'grid tab label active', fg: 'orange-400', bg: ['orange-50', 'ink-950/95', 'orange-500/15'], role: 'text', usedAt: [] },
+  { id: 'grid tab selected edge', fg: 'orange-500/60', bg: ['orange-50', 'ink-950/95', 'orange-500/15'], role: 'ui', usedAt: [] },
   { id: 'grid rail label idle', fg: 'silver-300', bg: ['ink-950'], role: 'text', usedAt: [] },
   { id: 'focus ring on offset band', fg: 'focus', bg: ['bg'], role: 'ui', usedAt: ['packages/ui/Button.tsx:23', 'packages/ui/IconButton.tsx:20', 'packages/ui/cards/NeonSwitch.tsx:19', 'packages/ui/cards/NeonCheckbox.tsx:13', 'packages/ui/cards/CardSlider.web.tsx:144'], reason: 'ring-offset-2 ring-offset-bg paints the page colour between the control and the ring' },
   { id: 'focus ring on night control', fg: 'focus', bg: ['ink-950'], role: 'ui', usedAt: ['packages/ui/SearchBar.tsx:26', 'packages/ui/SegmentedControl.web.tsx:16'], reason: 'no offset: the ring touches the night control face' },
@@ -238,7 +238,7 @@ const USAGE: Pair[] = [
       { id: `${t} ghost label on hover tint`, fg: `tone-${t}-text`, bg: ['surface-sunken', TONE_SOFT[t]!], role: 'text', usedAt: [...at, 'packages/ui/Button.tsx:132'], reason: 'tint layer fades in on group-hover; measured on the sunken page surface' },
     ];
   }),
-  { id: 'disabled ghost label on page', fg: 'ink-400', bg: ['concrete-50'], role: 'disabled', usedAt: ['packages/ui/Button.tsx:48', 'packages/ui/IconButton.tsx:79'], reason: 'inactive control: aria-disabled, no press handler' },
+  { id: 'disabled ghost label on page', fg: 'ink-400', bg: ['orange-50'], role: 'disabled', usedAt: ['packages/ui/Button.tsx:48', 'packages/ui/IconButton.tsx:79'], reason: 'inactive control: aria-disabled, no press handler' },
   // Validation and recorder errors sit under the field well on the page, not
   // on night: the themed danger (apple-600 daylit, apple-400 night).
   { id: 'field error message on page', fg: 'danger', bg: ['bg'], role: 'text', usedAt: ['packages/ui/cards/neon-field.ts:22', 'packages/ui/ErrorMessage.tsx:21', 'packages/ui/cards/NeonCheckbox.tsx:80', 'packages/ui/audio/VoiceRecorder.native.tsx:288'] },
@@ -259,9 +259,12 @@ const USAGE: Pair[] = [
   { id: 'system sheet close edge', fg: 'border-strong', bg: ['surface-raised'], role: 'ui', usedAt: ['packages/ui/BottomSheet.tsx:50'] },
   { id: 'system sheet close glyph', fg: 'text', bg: ['surface-raised'], role: 'ui', usedAt: ['packages/ui/BottomSheet.tsx:51'] },
 
-  // -- Button variant="cta": orange-500 face in both schemes, on-cta label
-  { id: 'cta button label', fg: 'on-cta', bg: ['cta'], role: 'text', usedAt: ['packages/ui/Button.tsx:117', 'packages/ui/control-look.ts:47'] },
-  { id: 'cta keyline on daylit page', fg: 'orange-950', bg: ['concrete-50'], role: 'ui', usedAt: ['packages/ui/neon/frame-colors.ts:10'], reason: 'the face (orange-500) is 2.38:1 on concrete-50, so the night keyline is the boundary by day' },
+  // -- Button variant="cta": control-look.ts still maps it to the tone-orange
+  // face in both schemes, so the real painted pair is on-cta on orange-500.
+  // The calm carolina `cta`/`cta-pressed` tokens (measured in the contract
+  // block above) are the face new patient screens name via bg-cta.
+  { id: 'cta button label', fg: 'on-cta', bg: ['orange-500'], role: 'text', usedAt: ['packages/ui/Button.tsx:117', 'packages/ui/control-look.ts:47'], reason: 'variant="cta" paints the legacy tone-orange face; on-cta also holds on the carolina cta token (8.14 light / 10+ dark)' },
+  { id: 'cta keyline on daylit page', fg: 'orange-950', bg: ['orange-50'], role: 'ui', usedAt: ['packages/ui/neon/frame-colors.ts:10'], reason: 'the orange face is 2.41:1 on the warm page, so the night keyline is the boundary by day' },
   { id: 'cta face on night page', fg: 'orange-500', bg: NIGHT, role: 'ui', usedAt: ['packages/ui/neon/frame-colors.ts:10'], reason: 'after dark the face itself is the boundary; its orange-950 keyline is not' },
 
   // -- Badge tone="neutral": the quiet status chip, themed (M05 pending badge)
@@ -311,8 +314,8 @@ const USAGE: Pair[] = [
   { id: 'card themed text on royal notch', fg: 'white', bg: ['royal-500'], role: 'text', usedAt: ['packages/ui/Card.tsx:36'] },
   { id: 'card themed text on brick notch', fg: 'white', bg: ['orange-800'], role: 'text', usedAt: ['packages/ui/Card.tsx:36'] },
   { id: 'home headline on ink panel', fg: 'orange-500', bg: ['ink-800'], role: 'large-text', usedAt: ['packages/ui/neon/SolidPanel.tsx:42'], reason: 'Heading display-sm (30px web, 26px native at rem 14) on the SolidPanel tone="ink" face, which is night in both themes' },
-  { id: 'orange eyebrow on glass card', fg: 'orange-500', bg: ['concrete-50', 'ink-950/85'], role: 'text', usedAt: ['packages/ui/future/GridCard.tsx:29', 'packages/ui/future/CircuitButton.tsx:49'], reason: 'measured over a light page, the worst case for the 85% night glass' },
-  { id: 'carolina eyebrow on glass card', fg: 'carolina-500', bg: ['concrete-50', 'ink-950/85'], role: 'text', usedAt: ['packages/ui/future/GridCard.tsx:30', 'packages/ui/future/CircuitButton.tsx:50'], reason: 'measured over a light page, the worst case for the 85% night glass' },
+  { id: 'orange eyebrow on glass card', fg: 'orange-500', bg: ['orange-50', 'ink-950/85'], role: 'text', usedAt: ['packages/ui/future/GridCard.tsx:29', 'packages/ui/future/CircuitButton.tsx:49'], reason: 'measured over the light page, the worst case for the 85% night glass' },
+  { id: 'carolina eyebrow on glass card', fg: 'carolina-500', bg: ['orange-50', 'ink-950/85'], role: 'text', usedAt: ['packages/ui/future/GridCard.tsx:30', 'packages/ui/future/CircuitButton.tsx:50'], reason: 'measured over the light page, the worst case for the 85% night glass' },
 
   // -- labels on tone faces ---------------------------------------------------
   { id: 'night on orange face', fg: 'ink-950', bg: ['orange-500'], role: 'text', usedAt: ['packages/ui/district/tones.ts:123', 'packages/ui/dropdown.ts:19'] },
@@ -360,29 +363,30 @@ const USAGE: Pair[] = [
   { id: 'outline knock-out', fg: 'surface', bg: ['surface'], role: 'decorative', usedAt: ['packages/ui/text-effects/OutlineText.tsx:63'], reason: 'fills the glyph face with the surface; the outline stroke carries the text' },
 
 
-  // -- daylit page (Decision #4): concrete neutrals, signage-black type -------
+  // -- daylit page (Decision #4, ADR 0002): warm paper neutrals (orange-50/100),
+  // signage-black type, calm royal links and a carolina CTA -------------------
   // Palette steps, so one `both` row each; the semantic light column resolves to
   // these and is measured again by the token contract above.
-  ...(['concrete-50', 'concrete-100', 'white'] as const).map((page): Pair => ({
+  ...(['orange-50', 'orange-100', 'white'] as const).map((page): Pair => ({
     id: `daylit: signage-black on ${page}`, fg: 'signage-black', bg: [page], role: 'text', usedAt: [],
   })),
-  ...(['concrete-50', 'concrete-100', 'white'] as const).map((page): Pair => ({
+  ...(['orange-50', 'orange-100', 'white'] as const).map((page): Pair => ({
     id: `daylit: muted concrete-600 on ${page}`, fg: 'concrete-600', bg: [page], role: 'text', usedAt: [],
   })),
-  ...(['concrete-50', 'concrete-100'] as const).map((page): Pair => ({
+  ...(['orange-50', 'orange-100'] as const).map((page): Pair => ({
     id: `daylit: secondary concrete-700 on ${page}`, fg: 'concrete-700', bg: [page], role: 'text', usedAt: [],
   })),
-  { id: 'daylit: large/ui grey concrete-500 on page', fg: 'concrete-500', bg: ['concrete-50'], role: 'large-text', usedAt: [], reason: 'never body text; large text and marks only' },
-  { id: 'daylit: CTA label', fg: 'signage-black', bg: ['orange-500'], role: 'text', usedAt: [] },
-  { id: 'daylit: CTA pressed label', fg: 'signage-black', bg: ['orange-400'], role: 'text', usedAt: [] },
-  ...(['concrete-50', 'concrete-100'] as const).flatMap((page): Pair[] => [
-    { id: `daylit: link/focus royal-500 on ${page}`, fg: 'royal-500', bg: [page], role: 'text', usedAt: [] },
+  { id: 'daylit: large/ui grey concrete-500 on page', fg: 'concrete-500', bg: ['orange-50'], role: 'large-text', usedAt: [], reason: 'never body text; large text and marks only' },
+  { id: 'daylit: CTA label', fg: 'signage-black', bg: ['carolina-500'], role: 'text', usedAt: [] },
+  { id: 'daylit: CTA pressed label', fg: 'signage-black', bg: ['carolina-600'], role: 'text', usedAt: [] },
+  ...(['orange-50', 'orange-100'] as const).flatMap((page): Pair[] => [
+    { id: `daylit: link royal-600 on ${page}`, fg: 'royal-600', bg: [page], role: 'text', usedAt: [] },
     { id: `daylit: danger apple-600 on ${page}`, fg: 'apple-600', bg: [page], role: 'text', usedAt: [] },
     { id: `daylit: success leaf-700 on ${page}`, fg: 'leaf-700', bg: [page], role: 'text', usedAt: [] },
     { id: `daylit: info carolina-800 on ${page}`, fg: 'carolina-800', bg: [page], role: 'text', usedAt: [] },
   ]),
-  { id: 'daylit: hairline concrete-200 on page', fg: 'concrete-200', bg: ['concrete-50'], role: 'decorative', usedAt: ['packages/theme/tokens.ts:150'], reason: '`border` on daylit: dividers and frames around controls whose label identifies them' },
-  { id: 'daylit: keyline concrete-400 on page', fg: 'concrete-400', bg: ['concrete-50'], role: 'decorative', usedAt: ['packages/theme/tokens.ts:78'], reason: 'decorative keylines (docs/DESIGN_SYSTEM.md concrete-400); no information' },
+  { id: 'daylit: hairline concrete-200 on page', fg: 'concrete-200', bg: ['orange-50'], role: 'decorative', usedAt: ['packages/theme/tokens.ts:150'], reason: '`border` on daylit: dividers and frames around controls whose label identifies them' },
+  { id: 'daylit: keyline concrete-400 on page', fg: 'concrete-400', bg: ['orange-50'], role: 'decorative', usedAt: ['packages/theme/tokens.ts:78'], reason: 'decorative keylines (docs/DESIGN_SYSTEM.md concrete-400); no information' },
 
   // -- H-Lynk Core (Decision #16): body plastic is scheme-invariant -----------
   { id: 'hlynk: LED on in the black head', fg: 'led-on', bg: ['hlynk-core-black'], role: 'ui', usedAt: [] },
@@ -393,7 +397,7 @@ const USAGE: Pair[] = [
   { id: 'hlynk: text on body', fg: 'hlynk-core-ink', bg: ['hlynk-core-body'], role: 'text', usedAt: [] },
   { id: 'hlynk: hatch rim on pad face', fg: 'hlynk-core-hatch-rim', bg: ['hlynk-core-black'], role: 'ui', usedAt: [] },
   { id: 'hlynk: hatch orange on night', fg: 'hlynk-core-hatch-rim', bg: NIGHT, role: 'text', usedAt: [] },
-  { id: 'hlynk: body on daylit page', fg: 'hlynk-core-body', bg: ['concrete-50'], role: 'decorative', usedAt: ['packages/theme/tokens.ts:188'], reason: 'the shell is not a control; its edge needs no ratio (measures 4.98 anyway)' },
+  { id: 'hlynk: body on daylit page', fg: 'hlynk-core-body', bg: ['orange-50'], role: 'decorative', usedAt: ['packages/theme/tokens.ts:188'], reason: 'the shell is not a control; its edge needs no ratio (measures 5.12 anyway)' },
   { id: 'hlynk: body on night page', fg: 'hlynk-core-body', bg: NIGHT, role: 'decorative', usedAt: ['packages/theme/tokens.ts:188'], reason: 'the shell is not a control; its edge needs no ratio (measures 3.70 anyway)' },
   { id: 'hlynk: LED off in the black head', fg: 'led-off', bg: ['hlynk-core-black'], role: 'decorative', usedAt: ['packages/theme/tokens.ts:174'], reason: 'the unlit lens; LED state is never conveyed by the LED alone (a text chip sits in the screen)' },
   { id: 'hlynk: disabled key glyph', fg: 'hlynk-core-glyph-disabled', bg: ['hlynk-core-black'], role: 'disabled', usedAt: ['packages/theme/tokens.ts:198'], reason: 'inactive key' },
@@ -441,12 +445,12 @@ export const FORBIDDEN: readonly Forbidden[] = [
   { id: 'white on orange', fg: 'white', bg: 'orange-500', role: 'text', rule: 'No white-on-orange labels. Orange faces take night text (on-primary in dark).' },
   { id: 'banner white on orange', fg: 'ink-50', bg: 'orange-500', role: 'text', rule: 'Same rule for the banner white.' },
   { id: 'white on apple', fg: 'white', bg: 'apple-500', role: 'text', rule: 'Apple faces take night text below 18.66px bold.' },
-  { id: 'orange on light', fg: 'orange-500', bg: 'ink-50', role: 'ui', rule: 'Brand orange is not text, icon or chart ink on a light surface; use primary (orange-700) there.' },
-  { id: 'carolina on light', fg: 'carolina-500', bg: 'ink-50', role: 'ui', rule: 'Carolina is a night colour; on light use info (carolina-800).' },
+  { id: 'orange on light', fg: 'orange-500', bg: 'ink-50', role: 'ui', rule: 'Brand orange is not text, icon or chart ink on a light surface; use accent (royal-600) or primary (royal-700) there.' },
+  { id: 'carolina on light', fg: 'carolina-500', bg: 'ink-50', role: 'ui', rule: 'carolina-500 is the daylit CTA face, not a text or mark colour; carolina text uses info (carolina-800).' },
   { id: 'leaf on light', fg: 'leaf-500', bg: 'ink-50', role: 'ui', rule: 'Leaf on light fails even 3:1; use success (leaf-700).' },
   { id: 'apple on light (text)', fg: 'apple-500', bg: 'ink-50', role: 'text', rule: 'Apple on light holds 3:1 for marks only; text uses danger (apple-600).' },
   { id: 'royal on night (text)', fg: 'royal-500', bg: 'ink-950', role: 'text', rule: 'Royal reads as structure on night, never as text; royal text uses royal-300.' },
-  { id: 'orange on daylit page', fg: 'orange-500', bg: 'concrete-50', role: 'ui', rule: 'Orange is a face on daylit (cta), never text, icon or line.' },
+  { id: 'orange on daylit page', fg: 'orange-500', bg: 'orange-50', role: 'ui', rule: 'Orange stays a legacy tone face on the warm daylit surfaces, never text, icon or line; the daylit CTA is carolina (`cta`).' },
   { id: 'LED on Core body', fg: 'led-on', bg: 'hlynk-core-body', role: 'ui', rule: 'The LED, emitters and the trackpad ring never touch bare body plastic; they sit on black.' },
   { id: 'apple-400 on Core body', fg: 'apple-400', bg: 'hlynk-core-body', role: 'ui', rule: 'Same for the lighter red.' },
   { id: 'black text on Core body', fg: 'signage-black', bg: 'hlynk-core-body', role: 'text', rule: 'Black is a control face on the body, never text. Text on the body is hlynk-core-ink (white).' },

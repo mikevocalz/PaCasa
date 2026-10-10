@@ -6,6 +6,7 @@ import { groundQuestion, translatePhrase, SUGGESTED_QUESTIONS } from '@/session/
 import { currentQuestion, formProgress, pendingAnswers, setAnswer, setConfirmed, useSession } from '@/session/store';
 import { canListen, canSpeak, listen, speak, stopSpeaking } from '@/session/voice';
 import { ActionButton, BigAction } from '@/components/patient-ui';
+import { DirectionsCard } from '@/components/DirectionsCard';
 
 const MODES = [
   { id: 'hablar', label: 'Hablar', icon: Mic },
@@ -317,6 +318,8 @@ function Preguntar({ form, next, onClose }) {
               ) : null}
             </div>
           ) : null}
+
+          {answer.directions ? <DirectionsCard block={answer.directions} /> : null}
 
           <div className="flex flex-wrap gap-3">
             {answer.readAloud && canSpeak() ? (

@@ -24,7 +24,7 @@ export function ImmersiveScreen({ enterImmersive }: ImmersiveScreenProps = {}) {
           setOpen(!open);
         }}
       />
-      <Text className="text-sm leading-6 text-silver-400">
+      <Text className="text-sm leading-6 text-text-muted">
         {host.metaSpatialWindows ? 'Tools are hosted beside the main spatial stage.' : 'Tools stay inline until a spatial window host is available.'}
       </Text>
     </Panel>
@@ -42,8 +42,8 @@ export function ImmersiveScreen({ enterImmersive }: ImmersiveScreenProps = {}) {
             <View className="h-8 w-8 bg-royal-400" />
           </View>
           <View className="max-w-md gap-2 bg-ink-950/80 p-3">
-            <Text className="text-center font-display text-lg text-silver-50">Orbit stage ready</Text>
-            <Text className="text-center text-sm leading-6 text-silver-400">Open Orbit Lab to place the interactive material study in three-dimensional space.</Text>
+            <Text className="text-center font-display text-lg text-text">Orbit stage ready</Text>
+            <Text className="text-center text-sm leading-6 text-text-muted">Open Orbit Lab to place the interactive material study in three-dimensional space.</Text>
           </View>
         </View>
       )}

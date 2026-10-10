@@ -4,20 +4,23 @@ import { useEffect, type ComponentType, type ReactNode } from 'react';
 import { I18nManager, Platform } from 'react-native';
 import { Link } from 'solito/link';
 import { usePathname } from 'solito/navigation';
-import { CameraLab } from '@acme/camera';
+import { brandLogo } from '@acme/assets/brand';
 import { navChrome } from '@acme/theme';
-import { Modal, SafeArea, useAdaptiveNavigationPlacement, useSafeInsets, useInstanceStore, useStore } from '@acme/ui';
-import { Box, Gamepad2, Layers, Menu, Navigation, ScanLine, Star, X } from '@acme/ui/icons';
+import { Image, Modal, SafeArea, useAdaptiveNavigationPlacement, useSafeInsets, useInstanceStore, useStore } from '@acme/ui';
+import { ClipboardList, FileText, HelpCircle, Home, ListChecks, Menu, Mic, X } from '@acme/ui/icons';
 import { Header, Nav, Pressable, ScrollView, Text, View } from '@acme/ui/tw';
-import { useCameraLabStore } from '../state';
+import { useLiveOverlay } from '../session/live-overlay';
+import { PaCasaLiveOverlay } from './PaCasaLiveOverlay';
 
+/** The four primary patient workflows; Ayuda stays a secondary link. */
 const DESTINATIONS = [
-  { href: '/', label: 'Showcase', short: 'Home', icon: Star },
-  { href: '/native', label: 'Native', short: 'Native', icon: Box },
-  { href: '/hybrid', label: 'Hybrid', short: 'Hybrid', icon: Layers },
-  { href: '/game', label: 'Game', short: 'Game', icon: Gamepad2 },
-  { href: '/immersive', label: 'Immersive', short: '3D', icon: Navigation },
+  { href: '/', label: 'Inicio', short: 'Inicio', icon: Home },
+  { href: '/native', label: 'Formularios', short: 'Formularios', icon: ClipboardList },
+  { href: '/hybrid', label: 'Documentos', short: 'Documentos', icon: FileText },
+  { href: '/game', label: 'Revisar', short: 'Revisar', icon: ListChecks },
 ] as const;
+
+const SECONDARY_DESTINATION = { href: '/immersive', label: 'Ayuda', icon: HelpCircle } as const;
 
 const navSize = (value: string) => Number.parseFloat(value);
 const RAIL_WIDTH = navSize(navChrome.rail);
@@ -49,19 +52,19 @@ function Destination({
         <View
           aria-current={active ? 'page' : undefined}
           aria-label={label}
-          className={`relative min-h-12 items-center justify-center gap-1 border border-transparent ${rail && expanded ? 'flex-row px-5' : rail ? 'py-2' : 'px-0'} ${active ? 'bg-ink-800/90 shadow-card' : 'hover:border-ink-700 hover:bg-ink-900'}`}
+          className={`relative min-h-12 items-center justify-center gap-1 border border-transparent ${rail && expanded ? 'flex-row px-5' : rail ? 'py-2' : 'px-0'} ${active ? 'bg-surface-sunken' : 'hover:border-border hover:bg-surface-raised'}`}
         >
           {active ? (
             <View
               aria-hidden
               style={rail ? { height: INDICATOR_SIZE } : { width: INDICATOR_SIZE }}
-              className={rail ? 'absolute bottom-1 right-0 top-1 w-1 bg-royal-400 shadow-glow-royal' : 'absolute top-0 h-1 bg-royal-400 shadow-glow-royal'}
+              className={rail ? 'absolute bottom-1 right-0 top-1 w-1 bg-accent' : 'absolute top-0 h-1 bg-accent'}
             />
           ) : null}
-          <Icon size={rail ? 24 : 21} strokeWidth={active ? 2.5 : 1.75} className={active ? 'text-royal-400' : 'text-silver-400'} />
+          <Icon size={rail ? 24 : 21} strokeWidth={active ? 2.5 : 1.75} className={active ? 'text-accent' : 'text-text-muted'} />
           <Text
             numberOfLines={1}
-            className={`${rail && expanded ? 'flex-1 text-sm' : rail ? 'text-xs' : 'whitespace-nowrap text-xs'} ${active ? 'font-semibold text-silver-50' : 'text-silver-400'}`}
+            className={`${rail && expanded ? 'flex-1 text-sm' : rail ? 'text-xs' : 'whitespace-nowrap text-xs'} ${active ? 'font-semibold text-text' : 'text-text-muted'}`}
           >
             {rail ? label : short}
           </Text>
@@ -71,23 +74,33 @@ function Destination({
   );
 }
 
-function ScanButton({ rail }: { rail: boolean }) {
-  const setOpen = useCameraLabStore((state) => state.setOpen);
+// The lockup artwork is a dark wordmark on transparency (992x518 source,
+// ~1.9:1): on the daylit header it sits bare — the plate is only needed if a
+// night chrome ships again.
+function BrandLockup() {
   return (
-    <Pressable
-      role="button"
-      aria-label="Scan with Camera Lab"
-      onPress={() => setOpen(true)}
-      style={rail ? undefined : { width: ACTION_SIZE, height: ACTION_SIZE, marginTop: -ACTION_RAISE }}
-      className={`items-center justify-center border border-royal-300 bg-royal-500 shadow-glow-royal active:bg-royal-600 focus-visible:outline-2 focus-visible:outline-silver-50 ${rail ? 'min-h-14 w-full gap-1' : 'shrink-0 border-4 border-ink-950'}`}
-    >
-      <ScanLine size={24} strokeWidth={2.25} className="text-silver-50" />
-      <Text className="text-xs font-semibold text-silver-50">Scan</Text>
-    </Pressable>
+    <View className="h-11 flex-row items-center justify-center px-2">
+      <Image src={brandLogo} alt="Pa'Casa" width={72} height={38} framed={false} />
+    </View>
   );
 }
 
-const HAS_CAMERA = Platform.OS !== 'web';
+/** The raised signature action: opens Pa'Casa Live over whatever screen is showing. */
+function PaCasaButton({ rail }: { rail: boolean }) {
+  const pathname = usePathname() ?? '/';
+  return (
+    <Pressable
+      role="button"
+      aria-label="Pa'Casa: hablar con la app"
+      onPress={() => useLiveOverlay.getState().openLive(pathname, 'hablar')}
+      style={rail ? undefined : { width: ACTION_SIZE, height: ACTION_SIZE, marginTop: -ACTION_RAISE }}
+      className={`items-center justify-center border bg-cta shadow-raised active:bg-cta-pressed focus-visible:outline-2 focus-visible:outline-focus ${rail ? 'min-h-14 w-full gap-1 rounded-soft border-transparent' : 'shrink-0 border-4 border-surface'}`}
+    >
+      <Mic size={24} strokeWidth={2.25} className="text-on-cta" />
+      <Text className="text-xs font-semibold text-on-cta">Pa&apos;Casa</Text>
+    </Pressable>
+  );
+}
 
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname() ?? '/';
@@ -95,17 +108,25 @@ export function AppShell({ children }: { children: ReactNode }) {
   const menuOpen = useStore(menuStore, (state) => state.open);
   const closeMenu = () => menuStore.setState({ open: false });
   useEffect(() => { menuStore.setState({ open: false }); }, [pathname, menuStore]);
+  // Escape dismisses the menu on web; Android back goes through onRequestClose.
+  useEffect(() => {
+    if (!menuOpen || Platform.OS !== 'web') return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') closeMenu();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [menuOpen]);
   const placement = useAdaptiveNavigationPlacement();
   const insets = useSafeInsets();
-  const open = useCameraLabStore((state) => state.open);
-  const setOpen = useCameraLabStore((state) => state.setOpen);
   const isActive = (href: string) => (href === '/' ? pathname === '/' : pathname.startsWith(href));
+  const openLive = () => useLiveOverlay.getState().openLive(pathname, 'hablar');
   const railWidth = placement.hardwareWidth || (placement.expanded ? EXPANDED_RAIL_WIDTH : RAIL_WIDTH) + insets.right;
   const navigation = (
     <Nav
-      aria-label="Demos"
+      aria-label="Secciones"
       style={placement.rail ? { width: railWidth, paddingRight: placement.hardwareWidth ? 0 : insets.right, flexShrink: 0 } : { height: 72, flexShrink: 0 }}
-      className={placement.rail ? 'h-full border-l border-ink-700 bg-ink-950/95 shadow-overlay' : 'flex-row items-center border-t border-ink-700 bg-ink-950/95 px-1 pb-2 shadow-overlay'}
+      className={placement.rail ? 'h-full border-l border-border bg-surface' : 'flex-row items-center border-t border-border bg-surface px-1 pb-2'}
     >
       <ScrollView
         horizontal={!placement.rail}
@@ -114,7 +135,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         showsHorizontalScrollIndicator={false}
         contentContainerClassName={placement.rail ? 'grow items-stretch justify-center gap-2 px-2 py-4' : 'flex-1 flex-row items-center'}
       >
-      {(HAS_CAMERA && !placement.rail ? DESTINATIONS.slice(0, 3) : DESTINATIONS).map((destination) => (
+      {(placement.rail ? DESTINATIONS : DESTINATIONS.slice(0, 2)).map((destination) => (
         <Destination
           key={destination.href}
           {...destination}
@@ -123,17 +144,15 @@ export function AppShell({ children }: { children: ReactNode }) {
           expanded={placement.expanded}
         />
       ))}
-      {HAS_CAMERA ? (
-        placement.rail ? (
-          <View className="mt-3 w-full">
-            <ScanButton rail />
-          </View>
-        ) : (
-          <ScanButton rail={false} />
-        )
-      ) : null}
-      {HAS_CAMERA && !placement.rail
-        ? DESTINATIONS.slice(3).map((destination) => (
+      {placement.rail ? (
+        <View className="mt-3 w-full">
+          <PaCasaButton rail />
+        </View>
+      ) : (
+        <PaCasaButton rail={false} />
+      )}
+      {!placement.rail
+        ? DESTINATIONS.slice(2).map((destination) => (
             <Destination
               key={destination.href}
               {...destination}
@@ -148,57 +167,82 @@ export function AppShell({ children }: { children: ReactNode }) {
   );
 
   return (
-    <SafeArea edges={['top', 'bottom']} style={{ direction: 'ltr' }} className={`min-h-0 flex-1 bg-ink-950 ${placement.rail ? 'flex-row' : ''}`}>
+    <SafeArea edges={['top', 'bottom']} style={{ direction: 'ltr' }} className={`min-h-0 flex-1 bg-surface ${placement.rail ? 'flex-row' : ''}`}>
       <SafeArea edges={placement.rail ? ['left'] : ['left', 'right']} style={{ direction: I18nManager.isRTL ? 'rtl' : 'ltr' }} className="min-h-0 min-w-0 flex-1">
-        <Header className="h-16 shrink-0 flex-row items-center justify-between gap-3 border-b border-ink-800 bg-ink-950 px-4">
-          <Link href="/" aria-label="Pa&apos;Casa home">
-            <View className="flex-row items-center gap-3">
-              <View className="h-8 w-8 items-center justify-center border border-royal-400 bg-royal-500">
-                <Text className="font-display text-lg text-silver-50">P</Text>
-              </View>
-              <Text className="font-display text-lg text-silver-50">Pa&apos;Casa</Text>
-            </View>
+        <Header className="h-16 shrink-0 flex-row items-center justify-between gap-3 border-b border-border bg-surface px-4">
+          <Link href="/" aria-label="Pa&apos;Casa, inicio">
+            <BrandLockup />
           </Link>
           {Platform.OS === 'web' ? (
             <Nav aria-label="Header navigation" className="hidden flex-row items-center gap-1 md:flex">
               {DESTINATIONS.map((destination) => (
                 <Link key={destination.href} href={destination.href} aria-current={isActive(destination.href) ? 'page' : undefined}>
-                  <View className={`min-h-11 justify-center border-b-2 px-3 ${isActive(destination.href) ? 'border-royal-400 bg-royal-500/10' : 'border-transparent hover:bg-ink-800'}`}>
-                    <Text className={`text-sm font-semibold ${isActive(destination.href) ? 'text-silver-50' : 'text-silver-400'}`}>{destination.label}</Text>
+                  <View className={`min-h-11 justify-center border-b-2 px-3 ${isActive(destination.href) ? 'border-border-strong bg-surface-sunken' : 'border-transparent hover:bg-surface-sunken'}`}>
+                    <Text className={`text-sm font-semibold ${isActive(destination.href) ? 'text-text' : 'text-text-muted'}`}>{destination.label}</Text>
                   </View>
                 </Link>
               ))}
+              <Link href={SECONDARY_DESTINATION.href} aria-current={isActive(SECONDARY_DESTINATION.href) ? 'page' : undefined}>
+                <View className={`min-h-11 justify-center border-b-2 px-3 ${isActive(SECONDARY_DESTINATION.href) ? 'border-border-strong bg-surface-sunken' : 'border-transparent hover:bg-surface-sunken'}`}>
+                  <Text className={`text-sm font-medium ${isActive(SECONDARY_DESTINATION.href) ? 'text-text' : 'text-text-muted'}`}>{SECONDARY_DESTINATION.label}</Text>
+                </View>
+              </Link>
             </Nav>
           ) : null}
-          <Pressable
-            role="button"
-            aria-label="Open navigation menu"
-            aria-expanded={menuOpen}
-            onPress={() => menuStore.setState({ open: true })}
-            className={`h-11 w-11 items-center justify-center border border-ink-600 bg-ink-900 ${Platform.OS === 'web' ? 'md:hidden' : ''}`}
-          >
-            <Menu size={22} className="text-silver-50" />
-          </Pressable>
+          <View className="flex-row items-center gap-2">
+            {Platform.OS === 'web' ? (
+              <Pressable
+                role="button"
+                aria-label="Pa'Casa: hablar con la app"
+                onPress={openLive}
+                className="hidden min-h-11 flex-row items-center gap-2 rounded-soft border border-transparent bg-cta px-4 hover:bg-cta-pressed focus-visible:outline-2 focus-visible:outline-focus md:inline-flex"
+              >
+                <Mic size={18} className="text-on-cta" />
+                <Text className="text-sm font-semibold text-on-cta">Pa&apos;Casa</Text>
+              </Pressable>
+            ) : null}
+            <Pressable
+              role="button"
+              aria-label="Open navigation menu"
+              aria-expanded={menuOpen}
+              onPress={() => menuStore.setState({ open: true })}
+              className={`h-11 w-11 items-center justify-center rounded-soft border border-border bg-surface-raised focus-visible:outline-2 focus-visible:outline-focus ${Platform.OS === 'web' ? 'md:hidden' : ''}`}
+            >
+              <Menu size={22} className="text-text" />
+            </Pressable>
+          </View>
         </Header>
         <View className="min-h-0 flex-1">{children}</View>
       </SafeArea>
       {placement.kind !== 'header-only' ? navigation : null}
       <Modal visible={menuOpen} transparent animationType="fade" onRequestClose={closeMenu}>
-        <SafeArea className="flex-1 bg-ink-950/95" edges={['top', 'bottom', 'left', 'right']}>
+        <SafeArea className="flex-1 bg-surface" edges={['top', 'bottom', 'left', 'right']}>
           <View role="dialog" aria-modal aria-label="Navigation menu" className="mx-auto w-full max-w-4xl flex-1 p-4">
-            <View className="min-h-12 flex-row items-center justify-between border-b border-ink-700 pb-3">
-              <Text className="font-display text-xl text-silver-50">Pa&apos;Casa</Text>
-              <Pressable role="button" aria-label="Close navigation menu" onPress={closeMenu} className="h-11 w-11 items-center justify-center border border-ink-600 bg-ink-900">
-                <X size={22} className="text-silver-50" />
+            <View className="min-h-12 flex-row items-center justify-between border-b border-border pb-3">
+              <BrandLockup />
+              <Pressable role="button" aria-label="Close navigation menu" onPress={closeMenu} className="h-11 w-11 items-center justify-center rounded-soft border border-border bg-surface-raised focus-visible:outline-2 focus-visible:outline-focus">
+                <X size={22} className="text-text" />
               </Pressable>
             </View>
             <ScrollView className="flex-1" contentContainerClassName="gap-2 py-5">
               <Nav aria-label="Mobile navigation" className="gap-2">
-                {DESTINATIONS.map((destination) => (
+                <Pressable
+                  role="button"
+                  aria-label="Pa'Casa: hablar con la app"
+                  onPress={() => {
+                    closeMenu();
+                    openLive();
+                  }}
+                  className="min-h-14 w-full flex-row items-center gap-4 rounded-soft border border-transparent bg-cta px-4 focus-visible:outline-2 focus-visible:outline-focus"
+                >
+                  <Mic size={24} className="text-on-cta" />
+                  <Text className="text-lg font-semibold text-on-cta">Pa&apos;Casa</Text>
+                </Pressable>
+                {[...DESTINATIONS, SECONDARY_DESTINATION].map((destination) => (
                   <Link key={destination.href} href={destination.href} {...(Platform.OS === 'web' ? { onClick: closeMenu } : { onPress: closeMenu })} aria-current={isActive(destination.href) ? 'page' : undefined}>
-                    <View className={`min-h-14 flex-row items-center gap-4 border px-4 ${isActive(destination.href) ? 'border-royal-400 bg-royal-500/20' : 'border-ink-700 bg-ink-900'}`}>
-                      <destination.icon size={24} className="text-royal-300" />
-                      <Text className="text-lg font-semibold text-silver-50">{destination.label}</Text>
+                    <View className={`min-h-14 flex-row items-center gap-4 rounded-soft border px-4 ${isActive(destination.href) ? 'border-border-strong bg-surface-sunken' : 'border-border bg-surface-raised'}`}>
+                      <destination.icon size={24} className={isActive(destination.href) ? 'text-accent' : 'text-text-muted'} />
+                      <Text className="text-lg font-semibold text-text">{destination.label}</Text>
                     </View>
                   </Link>
                 ))}
@@ -207,7 +251,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           </View>
         </SafeArea>
       </Modal>
-      {HAS_CAMERA ? <CameraLab open={open} onClose={() => setOpen(false)} /> : null}
+      <PaCasaLiveOverlay />
     </SafeArea>
   );
 }

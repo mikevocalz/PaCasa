@@ -137,6 +137,21 @@ export function groundQuestion(question, form, pending) {
     };
   }
 
+  // "¿Cómo llego a la clínica?" — BEFORE the topic loop: "la dirección de la
+  // clínica" also matches the /direccion/ topic, which would answer with the
+  // patient's own home address. The clinic is the only destination the
+  // session knows; `directions` gives the screen a place it can map and
+  // route to rather than a paragraph to invent.
+  if (/lleg|donde (queda|esta|es|se encuentra)|ubicad|direccion d(el|e la) (clinica|consultorio|hospital|cita)/.test(asked)) {
+    const clinic = (form.clinic ?? '').trim();
+    if (!clinic) return { text: MISSING };
+    return {
+      text: `Su formulario es para ${clinic}. Toque «Cómo llegar» para abrir la ruta en el mapa.`,
+      readAloud: `Su formulario es para ${clinic}.`,
+      directions: { label: clinic, query: clinic },
+    };
+  }
+
   for (const topic of TOPICS) {
     if (!topic.match.test(asked)) continue;
     const captured = form.answers.find(
@@ -166,6 +181,7 @@ export const SUGGESTED_QUESTIONS = [
   '¿Qué significa esta pregunta?',
   'Repita la pregunta más despacio.',
   '¿Qué sigue?',
+  '¿Cómo llego a la clínica?',
 ];
 
 /* ----------------------------------------------------------- TRADUCCIÓN */

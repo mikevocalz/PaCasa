@@ -179,6 +179,15 @@ export function currentQuestion(form: PatientForm | null): PatientAnswer | null 
   return form ? pendingAnswers(form)[0] ?? null : null;
 }
 
+/**
+ * Safe to finish only when every answer holds a value the patient confirmed.
+ * `completeForm` refuses anything short of this, so no screen can mark a form
+ * `listo` over pending or unconfirmed answers.
+ */
+export function canCompleteForm(form: PatientForm): boolean {
+  return form.answers.length > 0 && form.answers.every(isAnswered);
+}
+
 export const latestDocument = (documents: PatientDocument[]): PatientDocument | null => documents[0] ?? null;
 
 export const findDocument = (documents: PatientDocument[], id: string | null | undefined) =>
@@ -238,14 +247,16 @@ export const usePatientSession = create<PatientSessionState>((set) => ({
     })),
   setActiveForm: (activeFormId) => set({ activeFormId }),
   completeForm: (formId) =>
-    set((state) => ({
-      forms: patchForm(state.forms, formId, (form) => ({
-        ...form,
-        status: 'listo',
-        answers: form.answers.map((item) => ({ ...item, confirmed: item.value.trim().length > 0 })),
-      })),
-      activeFormId: state.activeFormId === formId ? null : state.activeFormId,
-    })),
+    set((state) => {
+      const form = state.forms.find((item) => item.id === formId);
+      // Never confirm answers on the patient's behalf: an incomplete or
+      // unconfirmed form stays en_progreso and the call is a no-op.
+      if (!form || !canCompleteForm(form)) return {};
+      return {
+        forms: patchForm(state.forms, formId, (item) => ({ ...item, status: 'listo' })),
+        activeFormId: state.activeFormId === formId ? null : state.activeFormId,
+      };
+    }),
   addDocument: (document) => set((state) => ({ documents: [document, ...state.documents.filter((existing) => existing.id !== document.id)] })),
   resetSession: () => set((state) => ({ ...baseline(state.demoMode) })),
   setDemoMode: (on) => set({ demoMode: on, ...baseline(on) }),

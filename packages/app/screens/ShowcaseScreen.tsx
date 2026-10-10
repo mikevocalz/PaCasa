@@ -1,71 +1,130 @@
 'use client';
 
 import { Link } from 'solito/link';
+import { usePathname } from 'solito/navigation';
 import { useLayoutSize } from '@acme/ui';
-import { ArrowRight } from '@acme/ui/icons';
-import { ScrollView, Text, View } from '@acme/ui/tw';
-import { RevealTarget, ShowcaseReveal } from './ShowcaseReveal';
+import { ArrowRight, FileText, Mic } from '@acme/ui/icons';
+import { Text, View } from '@acme/ui/tw';
+import { startExampleForm } from '../session/actions';
+import { useLiveOverlay } from '../session/live-overlay';
+import { latestDocument, pendingAnswers, useActiveForm, usePatientSession } from '../session/patient';
+import { PatientBigAction, PatientButton, PatientFrame, PatientPanel, ProgressRow } from './patient-ui';
 import { SHOWCASE_DEMOS, type ShowcaseDemo } from './showcase-demos';
 
+/**
+ * Inicio: the patient's starting point. Spanish-first, one clear primary
+ * path — start or resume the visit by talking — with the session's progress,
+ * the latest document and the rest of the workflows one level down.
+ */
 export function ShowcaseScreen({ demos = SHOWCASE_DEMOS }: { demos?: readonly ShowcaseDemo[] }) {
+  const pathname = usePathname() ?? '/';
   const { size, onLayout } = useLayoutSize();
+  const form = useActiveForm();
+  const documents = usePatientSession((state) => state.documents);
+  const openLive = useLiveOverlay((state) => state.openLive);
+  const document = latestDocument(documents);
+  const pending = form ? pendingAnswers(form) : [];
   const columns = size.width >= 640 ? 2 : 1;
-  return (
-    <ShowcaseReveal>
-      <ScrollView
-        className="flex-1 bg-ink-950"
-        contentContainerClassName="relative mx-auto w-full max-w-4xl gap-14 overflow-hidden px-4 py-12 md:px-6 md:py-20"
-      >
-        <View aria-hidden className="absolute -right-32 -top-24 h-96 w-96 rounded-full bg-royal-500/15" />
-        <View aria-hidden className="absolute right-40 top-36 h-56 w-56 rounded-full bg-carolina-400/10" />
-        <View className="gap-8">
-          <View className="min-w-0 max-w-4xl gap-6">
-            <RevealTarget target="headline">
-              <View className="gap-5">
-                <Text className="text-xs font-semibold uppercase tracking-[0.28em] text-royal-300">Pa&apos;Casa</Text>
-                <Text role="heading" aria-level={1} className="font-display text-5xl leading-[1.02] text-silver-50 md:text-7xl">
-                  Premium interfaces for every dimension.
-                </Text>
-              </View>
-            </RevealTarget>
-            <RevealTarget target="intro">
-              <Text className="max-w-3xl text-lg leading-8 text-silver-300 md:text-xl md:leading-9">
-                One production-minded system for native controls, authored motion, real-time graphics and spatial computing—built with Expo and Next.js.
-              </Text>
-            </RevealTarget>
-          </View>
-          <View className="gap-2 border-l-2 border-royal-500 bg-ink-900/80 px-5 py-4 shadow-card">
-            <Text className="font-display text-3xl text-silver-50">05</Text>
-            <Text className="text-xs font-semibold uppercase tracking-[0.18em] text-silver-400">Connected surfaces</Text>
-          </View>
-        </View>
 
-        <RevealTarget target="demos">
-          <View role="list" onLayout={onLayout} className="flex-row flex-wrap gap-4">
-            {demos.map((demo, index) => (
-              <View role="listitem" key={demo.href} style={{ width: index === 0 || columns === 1 ? '100%' : (size.width - 16) / 2 }}>
-                <Link href={demo.href}>
-                  <View className="group min-h-56 overflow-hidden border border-ink-700 bg-ink-900/90 p-6 shadow-card transition-colors hover:border-royal-500 hover:bg-ink-800 md:p-8">
-                    <View className="flex-1 gap-6">
-                      <View className="flex-row items-start justify-between gap-4">
-                        <Text className="text-xs font-semibold uppercase tracking-[0.2em] text-royal-300">0{index + 1} · {demo.layout}</Text>
-                        <View className="h-10 w-10 items-center justify-center border border-ink-600 bg-ink-950 group-hover:border-royal-400">
-                          <ArrowRight size={20} className="text-silver-200" />
-                        </View>
-                      </View>
-                      <View className="gap-3">
-                        <Text className="font-display text-3xl leading-tight text-silver-50 md:text-4xl">{demo.title}</Text>
-                        <Text className="max-w-2xl text-base leading-7 text-silver-300">{demo.line}</Text>
-                      </View>
-                    </View>
-                    <View aria-hidden className="mt-7 h-1 w-16 bg-royal-500 group-hover:w-28" />
-                  </View>
-                </Link>
+  const startTalking = () => {
+    startExampleForm();
+    openLive(pathname, 'hablar');
+  };
+  const resumeTalking = () => openLive(pathname, 'hablar');
+
+  return (
+    <PatientFrame
+      question="¿Qué necesita hacer ahora?"
+      title={form ? 'Continuemos con su formulario' : '¿Qué necesita llenar hoy?'}
+      lead={
+        form
+          ? `${form.title} · ${form.clinic}`
+          : 'Suba el formulario de la clínica y Pa’Casa se lo pregunta en español, una pregunta a la vez.'
+      }
+    >
+      {form ? (
+        <PatientPanel label="Formulario en curso">
+          <ProgressRow form={form} />
+          <Text className="text-base text-text-muted">
+            {pending.length === 0 ? 'Ya contestó todo. Revise sus respuestas.' : `Siguiente pregunta: ${pending[0]?.questionEs ?? ''}`}
+          </Text>
+          <View className="flex-row flex-wrap gap-3">
+            <PatientButton label="Continuar hablando" onPress={resumeTalking} />
+            <Link href="/game">
+              <View className="min-h-12 items-center justify-center rounded-soft border border-border bg-surface-raised px-6">
+                <Text className="text-base font-semibold text-text">Revisar respuestas</Text>
               </View>
-            ))}
+            </Link>
           </View>
-        </RevealTarget>
-      </ScrollView>
-    </ShowcaseReveal>
+        </PatientPanel>
+      ) : (
+        <View className="gap-4">
+          <PatientBigAction
+            icon={Mic}
+            label="Empezar con un formulario"
+            hint="Pa’Casa le pregunta en español"
+            onPress={startTalking}
+          />
+          <PatientBigAction
+            icon={Mic}
+            label="Hablar con Pa’Casa"
+            hint="Traducir frases o preguntar sobre su formulario"
+            tone="quiet"
+            onPress={() => openLive(pathname, 'hablar')}
+          />
+        </View>
+      )}
+
+      {document ? (
+        <PatientPanel label="Último documento">
+          <View className="gap-1">
+            <Text className="font-display text-lg text-text">{document.title}</Text>
+            <Text className="text-sm text-text-muted">
+              {document.clinic} · {document.kind === 'pdf' ? 'PDF' : 'Imagen'} ·{' '}
+              {document.pages.length > 0 ? `${document.pages.length} páginas` : 'sin leer todavía'}
+            </Text>
+          </View>
+          <Link href="/hybrid">
+            <View className="min-h-12 items-center justify-center self-start rounded-soft border border-border bg-surface-raised px-6">
+              <Text className="text-base font-semibold text-text">Ver documentos</Text>
+            </View>
+          </Link>
+        </PatientPanel>
+      ) : null}
+
+      <View role="list" onLayout={onLayout} className="flex-row flex-wrap gap-4">
+        {demos.map((demo) => (
+          <View role="listitem" key={demo.href} style={{ width: columns === 1 ? '100%' : (size.width - 16) / 2 }}>
+            <Link href={demo.href}>
+              <View className="group min-h-44 gap-4 overflow-hidden rounded-soft border border-border bg-surface-raised p-6 transition-colors hover:border-border-strong hover:bg-surface-sunken">
+                <View className="flex-row items-start justify-between gap-4">
+                  <Text className="text-sm font-semibold text-accent">{demo.layout}</Text>
+                  <View className="h-10 w-10 items-center justify-center rounded-soft border border-border bg-surface">
+                    <ArrowRight size={20} className="text-text-muted" />
+                  </View>
+                </View>
+                <View className="gap-2">
+                  <Text className="font-display text-2xl leading-tight text-text">{demo.title}</Text>
+                  <Text className="text-base leading-7 text-text-muted">{demo.line}</Text>
+                </View>
+              </View>
+            </Link>
+          </View>
+        ))}
+      </View>
+
+      <PatientPanel label="Privacidad de esta sesión">
+        <Text className="text-base leading-7 text-text-muted">
+          Esta sesión es temporal: los formularios y documentos viven en este dispositivo mientras dura la visita.
+          No es un expediente médico y no se guarda como historial permanente.
+        </Text>
+        <Link href="/immersive">
+          <View className="flex-row items-center gap-2 self-start">
+            <FileText size={18} className="text-accent" />
+            <Text className="text-base font-semibold text-accent">Cómo funciona Pa’Casa</Text>
+          </View>
+        </Link>
+      </PatientPanel>
+    </PatientFrame>
   );
 }

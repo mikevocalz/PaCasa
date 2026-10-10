@@ -1,9 +1,15 @@
 /**
  * @acme/theme — the single token source (PROMPT-2).
  * Brand: NYC Mon. Knicks orange, royal blue, carolina blue, leaf green,
- * candy apple red, black and white, all sampled from the logo. Daylit by
- * default (canon Decision #4): the light column is the city by day (concrete
- * neutrals, MTA signage black); the dark column is night and the hatch.
+ * candy apple red, black and white, all sampled from the logo.
+ *
+ * Pa'Casa healthcare remap (ADR 0002): the primitive scales are unchanged and
+ * every token name keeps its public API; only the semantic roles are re-pointed.
+ * The light column is the default patient-facing scheme — a warm daylit paper
+ * page, white raised cards, dark type, a calm carolina CTA and a royal accent.
+ * The dark column stays the night scheme; its neon `glow-*` look remains for
+ * legacy kit surfaces, while `shadow-card`/`raised`/`overlay` are now soft,
+ * neutral elevation that patient screens can rely on.
  *
  * `build-css.mjs` emits theme.css (web/storybook, Tailwind v4 `@theme` with
  * light-dark()) and theme-native.css (mobile, Uniwind `@variant` theme blocks)
@@ -113,45 +119,53 @@ export const palette = {
 
 // ---- semantic colors (light / dark) ----------------------------------------
 // Emitted as `light-dark(...)` so system-following is zero-code on every platform.
-// Light is daylit and the default (Decision #4): concrete neutrals, signage-black
-// type, orange only as a face (`cta`). Dark is night and the hatch, unchanged:
-// night base, orange hero, royal structure, carolina for secondary/info.
+// Light is daylit and the default (Decision #4, ADR 0002): warm paper neutrals
+// (the lightest orange steps), signage-black type, a calm carolina CTA and a
+// royal accent — no orange in body text, no glow in daylight. Dark is night,
+// unchanged: night base, orange hero, royal structure, carolina secondary/info.
 // Every pair is measured in contrast.ts (Law 10).
 
 /** The semantic colour roles; every value is a `{ light, dark }` pair. */
 export const semantic = {
-  /** page base */
-  bg: { light: concrete[50], dark: brand.night },
-  surface: { light: concrete[50], dark: brand.night },
+  /** page base: warm daylit paper */
+  bg: { light: orange[50], dark: brand.night },
+  surface: { light: orange[50], dark: brand.night },
+  /** raised cards stay white so they lift cleanly off the warm page */
   'surface-raised': { light: palette.white, dark: '#0A1230' },
-  'surface-sunken': { light: concrete[100], dark: '#000212' },
+  /** recessed wells: a deeper step of the same warm paper */
+  'surface-sunken': { light: orange[100], dark: '#000212' },
   text: { light: signage.black, dark: brand.white },
   'text-muted': { light: concrete[600], dark: brand.silver },
   /** Secondary text with more weight than muted: quiet status chips (Badge tone="neutral"). */
   'text-secondary': { light: concrete[700], dark: brand.silver },
   'text-inverse': { light: brand.white, dark: brand.night },
   /**
-   * Kept for existing screens, which draw it as text (orange-700 on daylit).
-   * New screens use `cta` for the primary action face, `accent` for links and
-   * `text` for emphasis.
+   * Kept for existing screens, which draw it as text; now a calm clinical blue
+   * by day instead of orange. New screens use `cta` for the primary action
+   * face, `accent` for links and `text` for emphasis.
    */
-  primary: { light: orange[700], dark: brand.orange },
-  'primary-pressed': { light: orange[800], dark: orange[400] },
+  primary: { light: royal[700], dark: brand.orange },
+  'primary-pressed': { light: royal[800], dark: orange[400] },
   'on-primary': { light: palette.white, dark: brand.night },
-  /** Primary call to action: brand orange is a face in both schemes (Decision #7). Never text. */
-  cta: { light: orange[500], dark: brand.orange },
-  'cta-pressed': { light: orange[400], dark: orange[400] },
-  /** Label on `cta`. Never white: white on orange is 2.62:1. */
+  /**
+   * Primary call to action: calm carolina blue in both schemes (ADR 0002).
+   * Never text. `on-cta` stays dark ink so it also holds on the legacy
+   * tone-orange face the kit's variant="cta" still paints (control-look.ts).
+   */
+  cta: { light: carolina[500], dark: carolina[400] },
+  'cta-pressed': { light: carolina[600], dark: carolina[300] },
+  /** Label on `cta`. Dark ink: white fails on orange (2.62) and black holds on carolina. */
   'on-cta': { light: signage.black, dark: brand.night },
-  // Accent = the secondary voice: royal on light, carolina on night.
-  accent: { light: royal[500], dark: brand.carolina },
-  'accent-pressed': { light: royal[600], dark: carolina[400] },
+  // Accent = the secondary voice: calm royal on light, carolina on night.
+  accent: { light: royal[600], dark: brand.carolina },
+  'accent-pressed': { light: royal[700], dark: carolina[400] },
   'on-accent': { light: palette.white, dark: brand.night },
-  // Royal blue is the structure: rules, outlines, the grid's glow.
-  structure: { light: royal[500], dark: royal[500] },
+  // Calm blue-grey structure: rules, outlines, quiet grids.
+  structure: { light: carolina[700], dark: royal[500] },
   border: { light: concrete[200], dark: '#1A2E6E' },
-  'border-strong': { light: royal[500], dark: royal[400] },
-  focus: { light: royal[500], dark: brand.carolina },
+  'border-strong': { light: royal[600], dark: royal[400] },
+  /** carolina-700: calm ring that still holds 3:1 on the night kit controls */
+  focus: { light: carolina[700], dark: brand.carolina },
   success: { light: leaf[700], dark: brand.leaf },
   'on-success': { light: palette.white, dark: brand.night },
   danger: { light: apple[600], dark: apple[400] },
@@ -171,8 +185,10 @@ export const semantic = {
   'tone-apple-text': { light: apple[700], dark: apple[400] },
   /** Brick is Harlem's deep orange, so its light step sits one below orange's. */
   'tone-brick-text': { light: orange[900], dark: orange[300] },
-  // Glow colours (8-digit hex, alpha baked in) for neon shadows. No glow in
-  // daylight: the light value is fully transparent (alpha 00).
+  // Glow colours (8-digit hex, alpha baked in) for the legacy `glow-*` shadow
+  // tokens used by night kit surfaces. New patient screens get their depth
+  // from `shadow-card`/`raised`/`overlay`, which no longer read these vars.
+  // No glow in daylight: the light value is fully transparent (alpha 00).
   glow: { light: '#0058F800', dark: '#0058F8A6' },
   'glow-hot': { light: '#FC7C0000', dark: '#FC7C0080' },
 } as const;
@@ -254,8 +270,10 @@ export const neon = {
 // ---- typography -------------------------------------------------------------
 
 export const fontFamilies = {
-  // Archivo Black for the jersey-weight headlines; Space Grotesk does the work.
-  display: "'Archivo Black', 'Arial Black', sans-serif",
+  // Calm healthcare direction: the readable sans leads both stacks. Archivo
+  // Black stays in `display` as the loaded fallback for legacy kit surfaces;
+  // both files keep loading (apps/web uses next/font, mobile expo-font).
+  display: "'Space Grotesk', 'Archivo Black', 'Arial Black', sans-serif",
   sans: "'Space Grotesk', system-ui, -apple-system, sans-serif",
 } as const;
 
@@ -289,7 +307,9 @@ export const leading = {
 /**
  * Mobile type ramp (docs/DESIGN_SYSTEM.md "Type"). Sizes and line heights are
  * points at the default Dynamic Type size; the OS scales them up to XXL.
- * Sentence case everywhere. `station` is the one display use per screen; the
+ * Sentence case everywhere. Body copy is 18 pt and labels 16 pt, so patient
+ * screens stay readable; nothing goes below the 13 pt caption floor.
+ * `station` is the one display use per screen; the
  * `display-*` steps in {@linkcode typeScale} stay for the website.
  * Emitted to CSS as `--text-type-<name>` (utility `text-type-<name>`).
  */
@@ -298,12 +318,12 @@ export const typeRamp = {
   'type-station': { family: 'display', sizePt: 34, lineHeightPt: 38, weight: 400 },
   /** the screen's question */
   'type-title': { family: 'sans', sizePt: 24, lineHeightPt: 30, weight: 700 },
-  /** default body copy */
-  'type-body': { family: 'sans', sizePt: 17, lineHeightPt: 24, weight: 400 },
+  /** default body copy — 18 pt keeps patient text comfortable */
+  'type-body': { family: 'sans', sizePt: 18, lineHeightPt: 26, weight: 400 },
   /** inline emphasis and values */
-  'type-body-strong': { family: 'sans', sizePt: 17, lineHeightPt: 24, weight: 600 },
+  'type-body-strong': { family: 'sans', sizePt: 18, lineHeightPt: 26, weight: 600 },
   /** buttons, field labels, keys */
-  'type-label': { family: 'sans', sizePt: 15, lineHeightPt: 20, weight: 500 },
+  'type-label': { family: 'sans', sizePt: 16, lineHeightPt: 22, weight: 500 },
   /** legal links and hints; nothing is set smaller */
   'type-caption': { family: 'sans', sizePt: 13, lineHeightPt: 18, weight: 400 },
   /**
@@ -432,12 +452,12 @@ export const minHeights = {
 } as const;
 
 /**
- * Corners. NYC-MON is square: every step of the Tailwind radius scale is 0, so
- * `rounded-md`, `rounded-card` and friends draw square corners, and the neon
- * shapes (corner cuts, cornices) carry the silhouette. Rounding is opt-in:
- * components take a `rounded` prop that applies `rounded-soft`. `full` stays
- * a circle for the few things that are round on purpose (status dots, loader
- * pills, the donut).
+ * Corners. NYC-MON's square steps are intact (xs–4xl stay 0) so the neon
+ * shapes keep their silhouette, but the opt-in radii are now a gentle
+ * healthcare round: components' `rounded` prop applies `rounded-soft`, and
+ * `rounded-card`/`rounded-sheet` give raised surfaces a soft clinical edge.
+ * `full` stays a circle for the few things that are round on purpose (status
+ * dots, loader pills, the donut).
  */
 export const radius = {
   xs: '0px',
@@ -448,19 +468,22 @@ export const radius = {
   '2xl': '0px',
   '3xl': '0px',
   '4xl': '0px',
-  card: '0px',
-  sheet: '0px',
+  /** raised cards and panels */
+  card: '0.75rem',
+  /** bottom sheets and modal surfaces */
+  sheet: '1rem',
   /** The opt-in rounding behind every component's `rounded` prop. */
-  soft: '0.625rem',
+  soft: '0.75rem',
   full: '9999px',
 } as const;
 
-// Neon elevation (NeonBlade): a soft royal-blue glow instead of a grey drop.
-// `glow-*` are the hero glows for focused or featured surfaces.
+// Soft, neutral elevation — not a coloured glow. Patient screens get calm
+// depth from these; `glow-*` remain only for legacy kit surfaces that opt into
+// the night neon look (`glow` tokens stay transparent by day).
 export const shadows = {
-  card: '0 0 22px -8px var(--color-glow)',
-  raised: '0 0 32px -8px var(--color-glow)',
-  overlay: '0 0 48px -6px var(--color-glow)',
+  card: '0 1px 2px #00041C0A, 0 4px 12px #00041C0F',
+  raised: '0 2px 6px #00041C0D, 0 12px 28px #00041C14',
+  overlay: '0 4px 12px #00041C0F, 0 24px 56px #00041C1F',
   'glow-orange': '0 0 28px -4px var(--color-glow-hot)',
   'glow-royal': '0 0 28px -4px var(--color-glow)',
 } as const;

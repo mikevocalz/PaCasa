@@ -13,7 +13,7 @@ export function Document({ children }: Props) {
   // suppressHydrationWarning: THEME_SCRIPT sets data-theme from the cookie
   // before hydration — an intentional server/client attribute difference.
   return (
-    <html lang="en" data-theme="dark" suppressHydrationWarning className={`${display.variable} ${sans.variable}`}>
+    <html lang="es" data-theme="light" suppressHydrationWarning className={`${display.variable} ${sans.variable}`}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
       </head>

@@ -4,6 +4,7 @@ import { KeyboardProvider } from "react-native-keyboard-controller";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { withUniwind } from "uniwind";
 import { AppShell, SafeAreaProvider } from "@acme/app";
+import { semantic } from "@acme/theme";
 import { setThemePreference } from "@acme/theme/switch";
 import "../global.css";
 
@@ -11,17 +12,17 @@ import "../global.css";
 // Module scope, not render scope — withUniwind builds the wrapper eagerly.
 const GestureRoot = withUniwind(GestureHandlerRootView);
 
-// The starter is dark-first: apply it before the first frame instead of inheriting the OS appearance.
-setThemePreference("dark");
+// Pa'Casa is daylit-first: follow the OS appearance instead of forcing a scheme.
+setThemePreference("system");
 
 export default function RootLayout() {
   return (
     <GestureRoot className="flex-1">
-      <StatusBar style="light" />
+      <StatusBar style="auto" />
       <KeyboardProvider>
         <SafeAreaProvider>
           <AppShell>
-            <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: "#000" } }} />
+            <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: semantic.bg.light } }} />
           </AppShell>
         </SafeAreaProvider>
       </KeyboardProvider>

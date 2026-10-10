@@ -9,6 +9,19 @@ import { currentQuestion, type PatientForm } from './patient';
  * document travels with it, so the screen can offer "Ver en el documento".
  */
 
+/**
+ * A place the patient can be routed to. The session only ever knows the
+ * clinic's NAME — never coordinates — so the block carries the lookup string
+ * and the card resolves it through the geocoder. What the map found is
+ * displayed back to the patient rather than trusting a guessed location.
+ */
+export interface DirectionsBlock {
+  /** The destination as the patient knows it — the clinic named on the form. */
+  label: string;
+  /** The lookup string for the map pin and the route link. */
+  query: string;
+}
+
 export interface Grounding {
   text: string;
   /** The label exactly as printed on the source form, when the answer came from one. */
@@ -16,6 +29,8 @@ export interface Grounding {
   questionEs?: string;
   /** Text worth reading aloud, when the answer is a question. */
   readAloud?: string;
+  /** A "how do I get there" answer — the card shows the clinic on a map. */
+  directions?: DirectionsBlock;
 }
 
 const MISSING = 'No tengo esa información en este formulario.';
@@ -62,6 +77,20 @@ export function groundQuestion(question: string, form: PatientForm | null): Grou
     return { text: pending.questionEs, sourceLabel: pending.sourceLabel, questionEs: pending.questionEs, readAloud: pending.questionEs };
   }
 
+  // "¿Cómo llego a la clínica?" — BEFORE the topic loop: "la dirección de la
+  // clínica" also matches the /direccion/ topic, which answers with the
+  // patient's own home address — exactly the wrong answer to a directions
+  // question. The clinic is the only destination the session knows.
+  if (/lleg|donde (queda|esta|es|se encuentra)|ubicad|direccion d(el|e la) (clinica|consultorio|hospital|cita)/.test(asked)) {
+    const clinic = form.clinic.trim();
+    if (!clinic) return { text: MISSING };
+    return {
+      text: `Su formulario es para ${clinic}. Toque «Cómo llegar» para abrir la ruta en el mapa.`,
+      readAloud: `Su formulario es para ${clinic}.`,
+      directions: { label: clinic, query: clinic },
+    };
+  }
+
   // "¿Qué puse como teléfono?" — a captured answer.
   for (const topic of QUESTION_TOPICS) {
     if (!topic.match.test(asked)) continue;
@@ -92,4 +121,5 @@ export const SUGGESTED_QUESTIONS: readonly string[] = [
   '¿Qué significa esta pregunta?',
   'Repita la pregunta más despacio.',
   '¿Qué sigue?',
+  '¿Cómo llego a la clínica?',
 ];

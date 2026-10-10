@@ -35,39 +35,47 @@ const users = [
 ];
 
 for (const fixture of users) {
-  let existing = await pool.query(
-    'select id, email from better_auth."user" where lower(email) = lower($1) limit 1',
+  const existing = await pool.query(
+    'select id from better_auth."user" where lower(email) = lower($1) limit 1',
     [fixture.email],
   );
 
-  if (!existing.rows[0]) {
-    await auth.api.signUpEmail({
-      body: {
-        name: fixture.name,
-        email: fixture.email,
-        password,
-      },
-    });
-    existing = await pool.query(
-      'select id, email from better_auth."user" where lower(email) = lower($1) limit 1',
-      [fixture.email],
-    );
+  const fixtureProfile = await pool.query(
+    'select id, auth_user_id from app.profiles where is_demo = true and lower(demo_email) = lower($1) limit 1',
+    [fixture.email],
+  );
+  if (!fixtureProfile.rows[0]) throw new Error(`Missing seeded profile for ${fixture.email}`);
+
+  if (existing.rows[0]) {
+    // Email alone proves no account ownership. Never attach privileged demo profiles
+    // to an account that somebody created before the trusted seeding operation.
+    if (fixtureProfile.rows[0].auth_user_id !== existing.rows[0].id) {
+      throw new Error(`A prior unbound account exists for ${fixture.email}; stop and investigate`);
+    }
+    console.log(`verified previously bound demo fixture ${fixture.email}`);
+    continue;
   }
 
-  const authUser = existing.rows[0];
-  if (!authUser) throw new Error(`Could not resolve Better Auth user for ${fixture.email}`);
+  const created = await auth.api.signUpEmail({
+    body: { name: fixture.name, email: fixture.email, password },
+  });
+  const newId = created?.user?.id;
+  if (!newId) throw new Error(`Could not create Better Auth user for ${fixture.email}`);
 
-  await pool.query(
+  const bound = await pool.query(
     `update app.profiles
         set auth_user_id = $1,
             updated_at = now()
-      where is_demo = true
-        and lower(demo_email) = lower($2)`,
-    [authUser.id, fixture.email],
+      where id = $2
+        and is_demo = true
+        and auth_user_id like 'demo-%'
+      returning id`,
+    [newId, fixtureProfile.rows[0].id],
   );
-
-  console.log(`seeded ${fixture.email}`);
+  if (bound.rowCount !== 1) {
+    throw new Error(`Fixture for ${fixture.email} was already bound or unexpectedly changed`);
+  }
+  console.log(`seeded demo user ${fixture.email}`);
 }
 
-console.log('Demo password:', password);
 await pool.end();

@@ -1,8 +1,8 @@
 {
-  "name": "universal-spatial-starter",
+  "name": "pacasa",
   "version": "0.1.0",
   "private": true,
-  "description": "Five-screen Expo + Next.js reference app: native UI, Rive and Viro across phone, web and headsets.",
+  "description": "Pa'Casa \u2014 a universal spatial app for mobile, web and headsets.",
   "license": "MIT",
   "packageManager": "pnpm@12.8.1",
   "engines": {
@@ -22,7 +22,10 @@
     "spatial:verify-typegpu": "node tooling/verify-typegpu-toolchain.mjs",
     "verify:routes": "node tooling/verify-five-routes.mjs",
     "rive:build": "node tooling/build-rive.mjs",
-    "verify:rive": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON tooling/verify-rive-assets.mjs"
+    "verify:rive": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON tooling/verify-rive-assets.mjs",
+    "build:base44": "BASE44_EXPORT=1 pnpm --filter web build",
+    "base44:setup": "npm ci --prefix tooling/base44-cli",
+    "base44:deploy": "npm exec --prefix tooling/base44-cli -- base44 deploy -y --no-build"
   },
   "devDependencies": {
     "playwright": "1.64.0",

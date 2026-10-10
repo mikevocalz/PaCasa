@@ -4,13 +4,9 @@ import { Document } from './Document';
 import './rn-globals';
 import './globals.css';
 
-// All five routes are fully static: no request-time server rendering on the
-// initial shell, on prefetch, or on client navigation. Adding a dynamic read
-// to any route fails the build instead of silently degrading.
-export const ensureStatic = 'navigation';
-
+// All five routes are statically rendered; Base44 uses Next static export.
 export const metadata: Metadata = {
-  title: { default: 'Spatial Starter', template: '%s | Spatial Starter' },
+  title: { default: "Pa'Casa", template: "%s | Pa'Casa" },
   description: 'Five screens, two layouts: native UI, Rive and Viro on Expo and Next.js.',
 };
 

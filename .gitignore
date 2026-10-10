@@ -25,8 +25,6 @@ storybook-static
 .gradle
 
 # Written by dev tooling on every run — regenerated locally, not source
-/AGENTS.md
-apps/web/AGENTS.md
 apps/web/CLAUDE.md
 /CLAUDE.md
 scripts/out/
@@ -40,3 +38,6 @@ apps/mobile/modules/**/android/build/
 
 # Machine-specific device and tooling discovery
 .codex/project-environment.json
+
+# Base44 local project link
+base44/.app.jsonc

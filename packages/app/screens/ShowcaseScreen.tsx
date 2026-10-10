@@ -22,7 +22,7 @@ export function ShowcaseScreen({ demos = SHOWCASE_DEMOS }: { demos?: readonly Sh
           <View className="min-w-0 max-w-4xl gap-6">
             <RevealTarget target="headline">
               <View className="gap-5">
-                <Text className="text-xs font-semibold uppercase tracking-[0.28em] text-royal-300">Universal spatial starter</Text>
+                <Text className="text-xs font-semibold uppercase tracking-[0.28em] text-royal-300">Pa&apos;Casa</Text>
                 <Text role="heading" aria-level={1} className="font-display text-5xl leading-[1.02] text-silver-50 md:text-7xl">
                   Premium interfaces for every dimension.
                 </Text>

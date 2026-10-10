@@ -1,6 +1,6 @@
 <div align="center">
 
-# ◈ UNIVERSAL SPATIAL STARTER
+# ◈ Pa'Casa
 
 ### Five thoughtful screens. Two layout families. Any supported surface.
 
@@ -18,6 +18,32 @@
 
 > [!IMPORTANT]
 > This is a **five-screen reference application**, not a showcase full of unfinished features. Native controls and spatial rendering are composable; **Game Layout is a distinct layout family**. Camera Lab is a **native-only modal opened by the raised central scan button**, not a sixth route. VisionCamera supplies the camera on every native target, headsets included. The web build has no camera and no Scan action. No simulated camera, prerecorded video, or substitute phone stream.
+
+## Project identity
+
+- App display name: **Pa'Casa**
+- Repository: [mikevocalz/PaCasa](https://github.com/mikevocalz/PaCasa)
+- Package / Expo slug / URL scheme: `pacasa`
+- iOS bundle ID and Android package: `dev.pacasa.app`
+- Source: [universal-spatial-starter](https://github.com/mikevocalz/universal-spatial-starter), commit `0acf742bdaad6c584187269ecbdebba44754b923`.
+
+The starter's screens, assets, Zustand stores, native plugins and platform behavior are preserved. Quest retains `expo-horizon-core`, `orientation: 'default'`, and the 1280×800dp window. Set up Pa'Casa-specific service credentials from `.env.example` before using external integrations.
+
+## Base44
+
+[Pa'Casa dashboard](https://app.base44.com/apps/6aca5ff33ab16f3383490010/editor/workspace/overview)
+
+The source lives in this repository. Base44 hosts the exported web app; native Android/iOS/headset binaries are built separately with Expo.
+
+```bash
+pnpm base44:setup
+npm exec --prefix tooling/base44-cli -- base44 login
+npm exec --prefix tooling/base44-cli -- base44 link --projectId 6aca5ff33ab16f3383490010
+pnpm build:base44
+pnpm base44:deploy
+```
+
+Run the link command only on a new checkout. The local Base44 link and credentials are not committed. The CLI has its own npm installation because its Deno URL dependency is incompatible with this workspace's pnpm dependency policy. The static export disables Next server caching only for the Base44 build; normal Next development and hosting remain available.
 
 ## The experience at a glance
 

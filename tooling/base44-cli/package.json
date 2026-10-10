@@ -1,0 +1,8 @@
+{
+  "name": "pacasa-base44-cli",
+  "private": true,
+  "version": "0.1.0",
+  "devDependencies": {
+    "base44": "^0.1.32"
+  }
+}

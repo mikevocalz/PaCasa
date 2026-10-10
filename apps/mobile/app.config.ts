@@ -11,15 +11,15 @@ loadProjectEnv(join(appDir, '../..'), { silent: true, force: true });
 // ExpoConfig, but @expo-pico/core's plugin still reads the key (and warns
 // without it), so it stays, typed as an extension.
 const config: ExpoConfig & { newArchEnabled: true } = {
-  name: 'Spatial Starter',
-  slug: 'universal-spatial-starter',
-  scheme: 'spatialstarter',
+  name: "Pa'Casa",
+  slug: 'pacasa',
+  scheme: 'pacasa',
   version: '0.1.0',
   orientation: 'default',
   icon: './assets/images/icon.png',
   userInterfaceStyle: 'automatic',
   ios: {
-    bundleIdentifier: 'dev.spatialstarter.app',
+    bundleIdentifier: 'dev.pacasa.app',
     supportsTablet: true,
     // Camera Lab (@acme/camera). VisionCamera v5 ships no config plugin; its
     // Expo setup is this usage string plus the Android CAMERA permission,
@@ -32,7 +32,7 @@ const config: ExpoConfig & { newArchEnabled: true } = {
     },
   },
   android: {
-    package: 'dev.spatialstarter.app',
+    package: 'dev.pacasa.app',
     adaptiveIcon: {
       foregroundImage: './assets/images/adaptive-icon.png',
       backgroundColor: palette.ink[50],

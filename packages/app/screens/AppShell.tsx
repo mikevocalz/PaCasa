@@ -151,12 +151,12 @@ export function AppShell({ children }: { children: ReactNode }) {
     <SafeArea edges={['top', 'bottom']} style={{ direction: 'ltr' }} className={`min-h-0 flex-1 bg-ink-950 ${placement.rail ? 'flex-row' : ''}`}>
       <SafeArea edges={placement.rail ? ['left'] : ['left', 'right']} style={{ direction: I18nManager.isRTL ? 'rtl' : 'ltr' }} className="min-h-0 min-w-0 flex-1">
         <Header className="h-16 shrink-0 flex-row items-center justify-between gap-3 border-b border-ink-800 bg-ink-950 px-4">
-          <Link href="/" aria-label="Spatial Kit home">
+          <Link href="/" aria-label="Pa&apos;Casa home">
             <View className="flex-row items-center gap-3">
               <View className="h-8 w-8 items-center justify-center border border-royal-400 bg-royal-500">
-                <Text className="font-display text-lg text-silver-50">S</Text>
+                <Text className="font-display text-lg text-silver-50">P</Text>
               </View>
-              <Text className="font-display text-lg text-silver-50">Spatial Kit</Text>
+              <Text className="font-display text-lg text-silver-50">Pa&apos;Casa</Text>
             </View>
           </Link>
           {Platform.OS === 'web' ? (
@@ -187,7 +187,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <SafeArea className="flex-1 bg-ink-950/95" edges={['top', 'bottom', 'left', 'right']}>
           <View role="dialog" aria-modal aria-label="Navigation menu" className="mx-auto w-full max-w-4xl flex-1 p-4">
             <View className="min-h-12 flex-row items-center justify-between border-b border-ink-700 pb-3">
-              <Text className="font-display text-xl text-silver-50">Spatial Kit</Text>
+              <Text className="font-display text-xl text-silver-50">Pa&apos;Casa</Text>
               <Pressable role="button" aria-label="Close navigation menu" onPress={closeMenu} className="h-11 w-11 items-center justify-center border border-ink-600 bg-ink-900">
                 <X size={22} className="text-silver-50" />
               </Pressable>

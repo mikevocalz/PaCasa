@@ -1,0 +1,10 @@
+{
+  "name": "Pa'Casa",
+  "visibility": "public",
+  "site": {
+    "buildCommand": "pnpm build:base44",
+    "serveCommand": "pnpm --filter web dev",
+    "outputDirectory": "./apps/web/out",
+    "installCommand": "pnpm install --frozen-lockfile"
+  }
+}

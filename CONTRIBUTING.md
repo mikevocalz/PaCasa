@@ -1,4 +1,4 @@
-# Contributing to Universal Spatial Starter
+# Contributing to Pa'Casa
 
 This folder is a **documentation/engineering specification**, not a completed fork or compiled application. The five-screen starter should be created as a separate fork/derivative of [NYC-Mon](https://github.com/mikevocalz/nyc-mon), with app-specific lore, credentials, backend/admin and private assets stripped out. Retain proper source/third-party licensing and attribution.
 

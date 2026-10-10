@@ -8,6 +8,7 @@ const nextConfig: NextConfig = {
   // NEXT_DIST_DIR lets a second build (perf lanes, bisects) write beside the
   // served `.next` without clobbering it. Must stay inside apps/web.
   distDir: process.env.NEXT_DIST_DIR || '.next',
+  ...(process.env.BASE44_EXPORT === '1' ? { output: 'export' as const, trailingSlash: true, images: { unoptimized: true } } : {}),
   // React Compiler — auto-memoization, same as the mobile app's
   // experiments.reactCompiler in app.config.ts.
   reactCompiler: true,
@@ -46,8 +47,9 @@ const nextConfig: NextConfig = {
   logging: {
     browserToTerminal: true,
   },
-  cacheComponents: true,
-  partialPrefetching: true,
+  // Base44 serves static files; server caching and partial prefetching need Next hosting.
+  cacheComponents: process.env.BASE44_EXPORT !== '1',
+  partialPrefetching: process.env.BASE44_EXPORT !== '1',
   // DO NOT add `experimental.scrollRestoration` here. It still exists in the
   // 16.3 config schema (config-shared.d.ts) so it looks available, but its only
   // consumer is shared/lib/router/router.js — the PAGES router. This app is App

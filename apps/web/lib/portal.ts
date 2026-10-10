@@ -32,18 +32,9 @@ export async function resolveProfile(authUser: { id: string; email: string; name
   );
   if (direct.rows[0]) return toProfile(direct.rows[0]);
 
-  // Demo fixtures are seeded before Better Auth exists. On the first real
-  // login, bind the fixture to the real Better Auth user id by email.
-  const demo = await db.query<ProfileRow>(
-    `update app.profiles
-        set auth_user_id = $1,
-            updated_at = now()
-      where is_demo = true
-        and lower(demo_email) = lower($2)
-      returning id, auth_user_id, account_type, status, display_name, preferred_language, demo_email`,
-    [authUser.id, authUser.email],
-  );
-  return demo.rows[0] ? toProfile(demo.rows[0]) : null;
+  // Never claim a seeded patient/provider profile by self-asserted email.
+  // Demo users are explicitly linked to their Better Auth IDs by the audited seed script.
+  return null;
 }
 
 export async function organizationsForProfile(profile: { id: string; accountType: PortalAccountType }) {
@@ -54,6 +45,7 @@ export async function organizationsForProfile(profile: { id: string; accountType
          from app.provider_memberships pm
          join app.organizations o on o.id = pm.organization_id
         where pm.provider_profile_id = $1
+          and pm.status = 'active'
         order by o.name`,
       [profile.id],
     );
@@ -66,6 +58,7 @@ export async function organizationsForProfile(profile: { id: string; accountType
        from app.patient_organization_links pol
        join app.organizations o on o.id = pol.organization_id
       where pol.patient_profile_id = $1
+        and pol.status = 'active'
       order by o.name`,
     [profile.id],
   );

@@ -2,7 +2,6 @@ import { toNextJsHandler } from 'better-auth/next-js';
 import { auth, authRuntimeConfigured } from '../../../../lib/auth';
 import { corsPreflight, withCors } from '../../../../lib/cors';
 
-export const runtime = 'nodejs';
 
 const handlers = toNextJsHandler(auth);
 

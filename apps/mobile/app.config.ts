@@ -25,14 +25,17 @@ const config: ExpoConfig & { newArchEnabled: true } = {
     // Expo setup is this usage string plus the Android CAMERA permission,
     // which the @reactvision/react-viro plugin below already writes for AR
     // mode (declaring it again here duplicates the manifest element). No
-    // microphone: Camera Lab never records.
+    // Assistant VoiceRecorder records locally after the user's explicit tap.
     infoPlist: {
       NSCameraUsageDescription:
         'Camera Lab uses the camera to find a keyboard in view. Frames are analyzed on this device and never saved.',
+      NSMicrophoneUsageDescription:
+        'Pa’Casa records a voice note only when you choose Record. Review happens on your device; it is never sent automatically.',
     },
   },
   android: {
     package: 'dev.pacasa.app',
+    permissions: ['RECORD_AUDIO'],
     adaptiveIcon: {
       foregroundImage: './assets/images/adaptive-icon.png',
       backgroundColor: palette.ink[50],

@@ -7,3 +7,6 @@ export { GameScreen } from './screens/GameScreen';
 export { ImmersiveScreen, type ImmersiveScreenProps } from './screens/ImmersiveScreen';
 export { AppShell } from './screens/AppShell';
 export { SafeAreaProvider } from './providers/safe-area';
+
+export { PaCasaHomeScreen } from './screens/PaCasaHomeScreen';
+export { MiPlanScreen, CitasScreen, ApoyoScreen } from './screens/PaCasaTabScreens';

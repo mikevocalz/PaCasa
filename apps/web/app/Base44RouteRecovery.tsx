@@ -9,7 +9,7 @@ export function Base44RouteRecovery() {
   useEffect(() => {
     const { pathname, search, hash } = window.location;
     const route = pathname.replace(/\/$/, '');
-    if (['/native', '/hybrid', '/game', '/immersive'].includes(route)) {
+    if (['/mi-plan', '/citas', '/apoyo', '/lab', '/native', '/hybrid', '/game', '/immersive'].includes(route)) {
       router.replace(`${route}/${search}${hash}`, { scroll: false });
     }
   }, [router]);

@@ -23,6 +23,7 @@
     "@acme/theme": "workspace:*",
     "@acme/ui": "workspace:*",
     "kinetrell": "catalog:",
+    "react-native-nitro-fetch": "catalog:",
     "react-native-safe-area-context": "catalog:",
     "solito": "catalog:",
     "zustand": "catalog:",

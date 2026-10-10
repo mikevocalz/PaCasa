@@ -4,10 +4,10 @@ import { Document } from './Document';
 import './rn-globals';
 import './globals.css';
 
-// All five routes are statically rendered; Base44 uses Next static export.
+// Product tabs and preserved lab routes are statically rendered for Base44.
 export const metadata: Metadata = {
   title: { default: "Pa'Casa", template: "%s | Pa'Casa" },
-  description: 'Five screens, two layouts: native UI, Rive and Viro on Expo and Next.js.',
+  description: 'Pa’Casa: Spanish-first questions, translation and form guidance at your pace.',
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

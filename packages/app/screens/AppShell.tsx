@@ -7,16 +7,17 @@ import { usePathname } from 'solito/navigation';
 import { CameraLab } from '@acme/camera';
 import { navChrome } from '@acme/theme';
 import { Modal, SafeArea, useAdaptiveNavigationPlacement, useSafeInsets, useInstanceStore, useStore } from '@acme/ui';
-import { Box, Gamepad2, Layers, Menu, Navigation, ScanLine, Star, X } from '@acme/ui/icons';
+import { Calendar, CheckSquare, Heart, Home, Menu, MessageCircle, X } from '@acme/ui/icons';
 import { Header, Nav, Pressable, ScrollView, Text, View } from '@acme/ui/tw';
 import { useCameraLabStore } from '../state';
+import { useAssistantStore } from '../assistant/store';
+import { AssistantOverlay } from './AssistantOverlay';
 
 const DESTINATIONS = [
-  { href: '/', label: 'Showcase', short: 'Home', icon: Star },
-  { href: '/native', label: 'Native', short: 'Native', icon: Box },
-  { href: '/hybrid', label: 'Hybrid', short: 'Hybrid', icon: Layers },
-  { href: '/game', label: 'Game', short: 'Game', icon: Gamepad2 },
-  { href: '/immersive', label: 'Immersive', short: '3D', icon: Navigation },
+  { href: '/', label: 'Inicio', short: 'Inicio', icon: Home },
+  { href: '/mi-plan', label: 'Mi Plan', short: 'Plan', icon: CheckSquare },
+  { href: '/citas', label: 'Citas', short: 'Citas', icon: Calendar },
+  { href: '/apoyo', label: 'Apoyo', short: 'Apoyo', icon: Heart },
 ] as const;
 
 const navSize = (value: string) => Number.parseFloat(value);
@@ -71,18 +72,21 @@ function Destination({
   );
 }
 
-function ScanButton({ rail }: { rail: boolean }) {
-  const setOpen = useCameraLabStore((state) => state.setOpen);
+function AssistantButton({ rail }: { rail: boolean }) {
+  const openAssistant = useAssistantStore((state) => state.openAssistant);
   return (
     <Pressable
       role="button"
-      aria-label="Scan with Camera Lab"
-      onPress={() => setOpen(true)}
+      aria-label="Abrir Pa’Casa: chat y traducción"
+      accessibilityHint="Abre el asistente sin cambiar de sección"
+      onPress={() => openAssistant('chat')}
       style={rail ? undefined : { width: ACTION_SIZE, height: ACTION_SIZE, marginTop: -ACTION_RAISE }}
-      className={`items-center justify-center border border-royal-300 bg-royal-500 shadow-glow-royal active:bg-royal-600 focus-visible:outline-2 focus-visible:outline-silver-50 ${rail ? 'min-h-14 w-full gap-1' : 'shrink-0 border-4 border-ink-950'}`}
+      className={rail
+        ? 'min-h-16 w-full items-center justify-center gap-1 border border-royal-300 bg-royal-500 shadow-glow-royal'
+        : 'shrink-0 items-center justify-center border-4 border-ink-950 bg-royal-500 shadow-glow-royal'}
     >
-      <ScanLine size={24} strokeWidth={2.25} className="text-silver-50" />
-      <Text className="text-xs font-semibold text-silver-50">Scan</Text>
+      <MessageCircle size={26} strokeWidth={2.25} className="text-silver-50" />
+      <Text className="text-xs font-semibold text-silver-50">Pa’Casa</Text>
     </Pressable>
   );
 }
@@ -99,11 +103,12 @@ export function AppShell({ children }: { children: ReactNode }) {
   const insets = useSafeInsets();
   const open = useCameraLabStore((state) => state.open);
   const setOpen = useCameraLabStore((state) => state.setOpen);
+  const openAssistant = useAssistantStore((state) => state.openAssistant);
   const isActive = (href: string) => (href === '/' ? pathname === '/' : pathname.startsWith(href));
   const railWidth = placement.hardwareWidth || (placement.expanded ? EXPANDED_RAIL_WIDTH : RAIL_WIDTH) + insets.right;
   const navigation = (
     <Nav
-      aria-label="Demos"
+      aria-label="Secciones de Pa’Casa"
       style={placement.rail ? { width: railWidth, paddingRight: placement.hardwareWidth ? 0 : insets.right, flexShrink: 0 } : { height: 72, flexShrink: 0 }}
       className={placement.rail ? 'h-full border-l border-ink-700 bg-ink-950/95 shadow-overlay' : 'flex-row items-center border-t border-ink-700 bg-ink-950/95 px-1 pb-2 shadow-overlay'}
     >
@@ -114,7 +119,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         showsHorizontalScrollIndicator={false}
         contentContainerClassName={placement.rail ? 'grow items-stretch justify-center gap-2 px-2 py-4' : 'flex-1 flex-row items-center'}
       >
-      {(HAS_CAMERA && !placement.rail ? DESTINATIONS.slice(0, 3) : DESTINATIONS).map((destination) => (
+      {(placement.rail ? DESTINATIONS : DESTINATIONS.slice(0, 2)).map((destination) => (
         <Destination
           key={destination.href}
           {...destination}
@@ -123,17 +128,13 @@ export function AppShell({ children }: { children: ReactNode }) {
           expanded={placement.expanded}
         />
       ))}
-      {HAS_CAMERA ? (
-        placement.rail ? (
-          <View className="mt-3 w-full">
-            <ScanButton rail />
-          </View>
-        ) : (
-          <ScanButton rail={false} />
-        )
-      ) : null}
-      {HAS_CAMERA && !placement.rail
-        ? DESTINATIONS.slice(3).map((destination) => (
+      {placement.rail ? (
+        <View className="mt-3 w-full"><AssistantButton rail /></View>
+      ) : (
+        <AssistantButton rail={false} />
+      )}
+      {!placement.rail
+        ? DESTINATIONS.slice(2).map((destination) => (
             <Destination
               key={destination.href}
               {...destination}
@@ -168,11 +169,19 @@ export function AppShell({ children }: { children: ReactNode }) {
                   </View>
                 </Link>
               ))}
+              <Pressable
+                role="button" accessibilityLabel="Abrir chat y traducción"
+                onPress={() => openAssistant('chat')}
+                className="ml-2 min-h-11 flex-row items-center justify-center gap-2 border border-royal-400 bg-royal-500 px-4"
+              >
+                <MessageCircle size={20} className="text-silver-50" />
+                <Text className="text-sm font-semibold text-silver-50">Hablar / Traducir</Text>
+              </Pressable>
             </Nav>
           ) : null}
           <Pressable
             role="button"
-            aria-label="Open navigation menu"
+            aria-label="Abrir menú de navegación"
             aria-expanded={menuOpen}
             onPress={() => menuStore.setState({ open: true })}
             className={`h-11 w-11 items-center justify-center border border-ink-600 bg-ink-900 ${Platform.OS === 'web' ? 'md:hidden' : ''}`}
@@ -202,11 +211,21 @@ export function AppShell({ children }: { children: ReactNode }) {
                     </View>
                   </Link>
                 ))}
+                <Pressable
+                  role="button"
+                  aria-label="Abrir Pa’Casa: chat y traducción"
+                  onPress={() => { closeMenu(); openAssistant('chat'); }}
+                  className="min-h-14 flex-row items-center gap-4 border border-royal-300 bg-royal-500 px-4"
+                >
+                  <MessageCircle size={24} className="text-silver-50" />
+                  <Text className="text-lg font-semibold text-silver-50">Chat y traducción</Text>
+                </Pressable>
               </Nav>
             </ScrollView>
           </View>
         </SafeArea>
       </Modal>
+      <AssistantOverlay onScan={() => setOpen(true)} />
       {HAS_CAMERA ? <CameraLab open={open} onClose={() => setOpen(false)} /> : null}
     </SafeArea>
   );

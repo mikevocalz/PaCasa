@@ -10,6 +10,8 @@ export interface AssistantMessage {
   readonly mode: AssistantMode;
   readonly role: AssistantRole;
   readonly text: string;
+  /** Optional OpenUI Lang for approved assistant-only card components. */
+  readonly ui?: string;
 }
 export interface AssistantRequest {
   readonly mode: AssistantMode;
@@ -51,4 +53,14 @@ export function assistantReplyFromResponse(value: unknown): string | null {
   return typeof reply === 'string' && reply.trim().length > 0 && reply.length <= 10000
     ? reply.trim()
     : null;
+}
+
+/**
+ * OpenUI Lang is optional. The registry performs full component parsing;
+ * this contract only bounds the payload and removes empty/non-string values.
+ */
+export function assistantUIFromResponse(value: unknown): string | null {
+  if (!value || typeof value !== 'object') return null;
+  const ui = (value as { ui?: unknown }).ui;
+  return typeof ui === 'string' && ui.trim() && ui.length <= 12_000 ? ui.trim() : null;
 }

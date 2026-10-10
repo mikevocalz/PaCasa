@@ -59,6 +59,7 @@ const nextConfig: NextConfig = {
   transpilePackages: [
     '@acme/ui',
     '@acme/app',
+    '@acme/chat-ui',
     '@acme/camera',
     '@acme/assets',
     '@expo/html-elements',

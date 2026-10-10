@@ -21,7 +21,7 @@ export const useAssistantStore = create<{
   setBusy: (busy: boolean) => void;
   setError: (error: string | null) => void;
   setVoiceNotice: (notice: string | null) => void;
-  appendMessage: (mode: AssistantMode, role: AssistantRole, text: string) => void;
+  appendMessage: (mode: AssistantMode, role: AssistantRole, text: string, ui?: string) => void;
 }>((set) => ({
   open: false,
   mode: 'chat',
@@ -44,7 +44,7 @@ export const useAssistantStore = create<{
   setBusy: (busy) => set({ busy }),
   setError: (error) => set({ error }),
   setVoiceNotice: (voiceNotice) => set({ voiceNotice }),
-  appendMessage: (mode, role, text) => set((s) => ({
-    messages: [...s.messages, { id: (s.messages.at(-1)?.id ?? 0) + 1, mode, role, text }],
+  appendMessage: (mode, role, text, ui) => set((s) => ({
+    messages: [...s.messages, { id: (s.messages.at(-1)?.id ?? 0) + 1, mode, role, text, ui }],
   })),
 }));

@@ -5,7 +5,8 @@ import { Platform } from 'react-native';
 import { Modal, SafeArea, VoiceRecorder } from '@acme/ui';
 import { ArrowRight, MessageCircle, Mic, ScanLine, X } from '@acme/ui/icons';
 import { Pressable, ScrollView, Text, TextInput, View } from '@acme/ui/tw';
-import { MAX_MESSAGE_CHARS, assistantReplyFromResponse, makeAssistantRequest, type AssistantMode } from '../assistant/contract';
+import { MAX_MESSAGE_CHARS, assistantReplyFromResponse, assistantUIFromResponse, makeAssistantRequest, type AssistantMode } from '../assistant/contract';
+import { OpenUIMessage } from '@acme/chat-ui';
 import { useAssistantStore } from '../assistant/store';
 
 /**
@@ -84,7 +85,7 @@ export function AssistantOverlay({ onScan }: { onScan: () => void }) {
       const payload: unknown = await response.json();
       const reply = assistantReplyFromResponse(payload);
       if (!reply) throw new Error('El servicio no devolvió una respuesta válida.');
-      if (!controller.signal.aborted) store.appendMessage(mode, 'assistant', reply);
+      if (!controller.signal.aborted) store.appendMessage(mode, 'assistant', reply, assistantUIFromResponse(payload) ?? undefined);
     } catch (cause) {
       if (!controller.signal.aborted) {
         store.setError(cause instanceof Error ? cause.message : 'No fue posible conectar con Pa’Casa.');
@@ -172,6 +173,9 @@ export function AssistantOverlay({ onScan }: { onScan: () => void }) {
                   {message.role === 'user' ? 'Tú' : 'Pa’Casa'}
                 </Text>
                 <Text className="text-base leading-7 text-silver-50">{message.text}</Text>
+                {message.role === 'assistant' && message.ui ? (
+                  <OpenUIMessage ui={message.ui} onSuggestion={(value) => store.setDraft(value)} />
+                ) : null}
               </View>
             ))}
 

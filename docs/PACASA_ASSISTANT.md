@@ -72,3 +72,28 @@ form schema → Spanish question → answer → user confirmation → English fo
 field, with review/PDF as explicit actions. No third-party submission in MVP.
 OpenUI component generation is a separate PR; it must not own the authorized
 actions, microphone, navigation or document data.
+
+## OpenUI rich response mode (stacked PR)
+
+A text response may additionally carry `ui`: the OpenUI Lang program for
+our **restricted** `@acme/chat-ui` registry. It is parsed and rendered only
+inside an assistant message. The backend must generate from
+`packages/chat-ui/src/modelLibrary.ts`; the client renders with the same
+Zod prop schemas.
+
+Example (not a real translation):
+```text
+root = PaCasaResponse([p, tr])
+p = PaCasaText("La siguiente pregunta dice:")
+tr = TranslationPair("First name", "Nombre", "en", "es")
+```
+
+The browser and native renderer are given **no toolProvider** and all built-in
+action/URL expressions are rejected before rendering. Review cards only
+**pre-fill** a new chat message: nothing is auto-confirmed, saved, or sent.
+The product can continue displaying ordinary `reply` text when `ui` is
+absent or invalid.
+
+This is a progressive enhancement over the text contract, not a claim that
+live OpenUI generation is configured. A real hosted assistant service must be
+deployed and configured before live bilingual answers can be generated.

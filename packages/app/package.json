@@ -25,7 +25,8 @@
     "kinetrell": "catalog:",
     "react-native-safe-area-context": "catalog:",
     "solito": "catalog:",
-    "zustand": "catalog:"
+    "zustand": "catalog:",
+    "@acme/chat-ui": "workspace:*"
   },
   "devDependencies": {
     "@acme/config": "workspace:*",

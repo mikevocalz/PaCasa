@@ -7,7 +7,8 @@ import { RiveStage } from '@acme/spatial/rive';
 import { riveFiles } from '@acme/assets/rive';
 import { DocumentCamera } from '@acme/camera/document-scanner';
 import { useAssistantStore } from '../assistant/store';
-import { Pressable, Text, TextInput, View } from '@acme/ui/tw';
+import { Textarea } from '@acme/ui';
+import { Pressable, Text, View } from '@acme/ui/tw';
 
 interface ScanState {
   phase: 'ready' | 'recognizing' | 'review';
@@ -88,9 +89,9 @@ export function ScanWorkspace({ active }: { active: boolean }) {
           <Text className="text-sm text-silver-300">
             Fuente: {scan.source === 'on-device' ? 'Modelo local ExecuTorch' : 'Google Gemini Vision, prueba'}
           </Text>
-          <TextInput multiline value={scan.text} onChangeText={scan.setText}
-            maxLength={9000} aria-label="Editar texto reconocido"
-            className="min-h-36 rounded-xl border border-ink-500 bg-ink-950 p-3 text-base text-silver-50" />
+          <Textarea label="Editar texto reconocido" rounded value={scan.text}
+            onChangeText={scan.setText} maxLength={9000} numberOfLines={7}
+            className="min-h-36 text-base" />
           <Pressable role="button" accessibilityLabel="Llevar texto revisado al chat para confirmar su envío"
             onPress={moveToChat}
             className="min-h-14 items-center justify-center rounded-xl bg-royal-500 px-4">

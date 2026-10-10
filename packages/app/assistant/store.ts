@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { AssistantLanguage, AssistantMessage, AssistantRole, AssistantMode } from './contract.ts';
+import type { AssistantLanguage, AssistantMessage, AssistantMode, AssistantRole } from './contract.ts';
 import type { AssistantSurfaceMode } from './modes.ts';
 
 /** Ephemeral assistant session. Never persisted, shared with no analytics SDK. */

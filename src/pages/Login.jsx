@@ -8,7 +8,7 @@ import TextField from '@/components/ui/TextField';
 import { useAuth } from '@/lib/AuthContext';
 
 export default function Login() {
-  const { isAuthenticated, profile, login, loginDemo, remoteAuthConfigured } = useAuth();
+  const { isAuthenticated, profile, login, loginDemo } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [email, setEmail] = useState('');
@@ -49,9 +49,10 @@ export default function Login() {
         <TextField id="login-password" label="Contraseña" type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} />
         <Button type="submit" className="w-full" disabled={pending || !email || !password}>{pending ? 'Entrando…' : 'Entrar'}</Button>
         <p className="text-center text-sm text-fg-muted">¿No tiene cuenta? <a className="font-semibold text-accent-soft underline underline-offset-4" href="/signup">Crear una cuenta</a></p>
+        <p className="text-center text-sm text-fg-muted"><a className="font-semibold text-accent-soft underline underline-offset-4" href="/forgot-password">¿Olvidó su contraseña?</a></p>
       </form>
       <section className="mt-7 space-y-3 border-t border-line pt-6" aria-labelledby="demo-login-title">
-        <header className="space-y-1"><h3 id="demo-login-title" className="font-display text-lg text-fg">Entradas rápidas para la demo</h3><p className="text-sm leading-6 text-fg-subtle">{remoteAuthConfigured ? 'El acceso con correo usa las cuentas sembradas en Supabase. Estas entradas abren una sesión de demostración local, sin datos clínicos reales.' : 'El backend aún no está conectado; estos botones abren una sesión demo temporal.'}</p></header>
+        <header className="space-y-1"><h3 id="demo-login-title" className="font-display text-lg text-fg">Entradas rápidas para la demo</h3><p className="text-sm leading-6 text-fg-subtle">El acceso con correo usa su cuenta Pa’Casa. Estas entradas abren una sesión de demostración local, con datos ficticios.</p></header>
         <div className="grid gap-3 sm:grid-cols-2">
           <Card as="article" className="space-y-3 p-4"><UserRound className="text-emerald-300" aria-hidden /><div><h4 className="font-semibold text-fg">Paciente</h4><p className="text-sm text-fg-subtle">Rosa Velázquez</p></div><Button tone="secondary" className="w-full" onClick={() => demoSubmit('patient')}>Entrar como paciente</Button></Card>
           <Card as="article" className="space-y-3 p-4"><Stethoscope className="text-sky-300" aria-hidden /><div><h4 className="font-semibold text-fg">Proveedor</h4><p className="text-sm text-fg-subtle">Dra. Elena Ruiz</p></div><Button tone="secondary" className="w-full" onClick={() => demoSubmit('provider')}>Entrar como proveedor</Button></Card>

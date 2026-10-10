@@ -22,7 +22,8 @@ async function request(path, options = {}) {
 // Embeddings can deny Web Storage access, which used to make the demo entry
 // buttons fail silently; the session then lives in memory for the tab.
 let memorySession = null;
-function readDemoSession() {
+/** The portal reads this on boot, so a demo session survives a page reload. */
+export function readDemoSession() {
   if (typeof window === 'undefined') return memorySession;
   try { return JSON.parse(window.sessionStorage.getItem(DEMO_KEY) || 'null') ?? memorySession; } catch { return memorySession; }
 }
@@ -34,6 +35,8 @@ function writeDemoSession(value) {
     else window.sessionStorage.setItem(DEMO_KEY, JSON.stringify(value));
   } catch { /* storage denied: the in-memory session still signs the visitor in */ }
 }
+export function clearDemoSession() { writeDemoSession(null); }
+
 export function hasRemoteAuth() { return Boolean(configuredEndpoint); }
 
 export async function getPortalSession() {

@@ -1,4 +1,6 @@
 {
+  "name": "User",
+  "type": "object",
   "properties": {
     "role": {
       "type": "string",
@@ -7,11 +9,39 @@
         "admin",
         "user"
       ]
+    },
+    "displayName": {
+      "type": "string",
+      "description": "Name the person uses in Pa'Casa"
+    },
+    "accountType": {
+      "type": "string",
+      "description": "Which portal the account opens",
+      "enum": [
+        "patient",
+        "provider"
+      ],
+      "default": "patient"
+    },
+    "accountStatus": {
+      "type": "string",
+      "description": "Provider accounts stay pending until the clinic approves the membership",
+      "enum": [
+        "active",
+        "pending"
+      ],
+      "default": "active"
+    },
+    "organization": {
+      "type": "string",
+      "description": "Clinic slug for provider accounts"
+    },
+    "preferredLanguage": {
+      "type": "string",
+      "description": "Language preference for the portal"
     }
   },
   "required": [
     "role"
-  ],
-  "name": "User",
-  "type": "object"
+  ]
 }

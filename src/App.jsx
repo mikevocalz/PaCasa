@@ -9,6 +9,7 @@ import RoleRoute from '@/components/RoleRoute';
 import PatientShell from '@/components/PatientShell';
 import ProviderShell from '@/components/ProviderShell';
 import Documentos from '@/pages/Documentos';
+import ForgotPassword from '@/pages/ForgotPassword';
 import Formularios from '@/pages/Formularios';
 import Inicio from '@/pages/Inicio';
 import Login from '@/pages/Login';
@@ -20,6 +21,7 @@ import ProviderPaCasa from '@/pages/ProviderPaCasa';
 import ProviderPatients from '@/pages/ProviderPatients';
 import ProviderPending from '@/pages/ProviderPending';
 import Register from '@/pages/Register';
+import ResetPassword from '@/pages/ResetPassword';
 import Revisar from '@/pages/Revisar';
 
 function PortalRoutes() {
@@ -45,6 +47,9 @@ function PortalRoutes() {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Register />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
 
       <Route element={<RoleRoute role="patient" />}>
         <Route path="/pacasa" element={<PaCasaLive />} />

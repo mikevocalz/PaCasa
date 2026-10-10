@@ -12,7 +12,7 @@ export function RiveStage({
   className,
   height = 280,
 }: RiveStageProps) {
-  const { riveFile } = useRiveFile({ uri: source });
+  const { riveFile } = useRiveFile((typeof source === 'number' ? source : { uri: source }) as Parameters<typeof useRiveFile>[0]);
 
   return (
     <View

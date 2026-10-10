@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useLocale } from '@/i18n/store';
+import { refreshDeviceLanguage, useLocale } from '@/i18n/store';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter as Router, Navigate, Route, Routes } from 'react-router-dom';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
@@ -28,6 +28,18 @@ function AuthenticatedApp() {
   useEffect(() => {
     document.documentElement.lang = language;
   }, [language]);
+
+  useEffect(() => {
+    const refreshWhenVisible = () => {
+      if (document.visibilityState === 'visible') refreshDeviceLanguage();
+    };
+    window.addEventListener('focus', refreshDeviceLanguage);
+    document.addEventListener('visibilitychange', refreshWhenVisible);
+    return () => {
+      window.removeEventListener('focus', refreshDeviceLanguage);
+      document.removeEventListener('visibilitychange', refreshWhenVisible);
+    };
+  }, []);
 
   if (isLoadingAuth) {
     return (

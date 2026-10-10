@@ -216,7 +216,7 @@ function Traducir() {
     setResult(null);
     setBusy(false);
     stopSpeaking();
-  }, [language, speaker]);
+  }, [language]);
 
   useEffect(() => () => { requestId.current += 1; stopSpeaking(); }, []);
 
@@ -294,12 +294,12 @@ function Traducir() {
           <ActionButton
             label={t('translate.provider')}
             tone={speaker === 'provider' ? 'solid' : 'quiet'}
-            onPress={() => { setSpeaker('provider'); setInput(''); }}
+            onPress={() => { requestId.current += 1; setBusy(false); setResult(null); setSpeaker('provider'); setInput(''); }}
           />
           <ActionButton
             label={`${t('translate.patient')} · ${label(language)}`}
             tone={speaker === 'patient' ? 'solid' : 'quiet'}
-            onPress={() => { setSpeaker('patient'); setInput(''); }}
+            onPress={() => { requestId.current += 1; setBusy(false); setResult(null); setSpeaker('patient'); setInput(''); }}
           />
         </div>
       </div>
@@ -312,7 +312,7 @@ function Traducir() {
           id="live-translation-input"
           lang={sourceLanguage}
           value={input}
-          onChange={(event) => { setInput(event.target.value); setResult(null); }}
+          onChange={(event) => { requestId.current += 1; setBusy(false); setInput(event.target.value); setResult(null); }}
           maxLength={2000}
           rows={3}
           className="w-full border border-line bg-panel p-4 text-base text-fg outline-none"

@@ -8,6 +8,8 @@ import {
   Home,
   Info,
   ListChecks,
+  LogIn,
+  LogOut,
   Menu,
   Mic,
   MicOff,
@@ -15,6 +17,7 @@ import {
   Volume2,
   X,
 } from 'lucide-react';
+import { useAuth } from '@/lib/AuthContext';
 import { resetSession, setDemoMode, setReturnTo, useSession } from '@/session/store';
 import { canListen, canSpeak, microphoneAvailable } from '@/session/voice';
 
@@ -131,6 +134,7 @@ function DrawerText({ title, children }) {
 export default function PatientShell() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [panel, setPanel] = useState(null);
 
@@ -285,6 +289,31 @@ export default function PatientShell() {
                   <RotateCcw size={22} className="text-accent-soft" aria-hidden />
                   Reiniciar sesión
                 </button>
+
+                {/* Signing in is optional: the tabs work without it. */}
+                {user ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      logout();
+                      closeDrawer();
+                    }}
+                    className="flex min-h-14 w-full items-center gap-4 border border-line bg-panel px-4 text-left text-base text-fg hover:border-accent-soft hover:bg-panel-2"
+                  >
+                    <LogOut size={22} className="text-accent-soft" aria-hidden />
+                    Cerrar sesión
+                  </button>
+                ) : (
+                  <Link
+                    to="/login"
+                    onClick={closeDrawer}
+                    className="flex min-h-14 w-full items-center gap-4 border border-line bg-panel px-4 text-left text-base text-fg hover:border-accent-soft hover:bg-panel-2"
+                  >
+                    <LogIn size={22} className="text-accent-soft" aria-hidden />
+                    Iniciar sesión
+                  </Link>
+                )}
+
                 <p className="px-1 text-sm text-fg-subtle">
                   {canListen() ? (
                     <span className="flex items-center gap-2">

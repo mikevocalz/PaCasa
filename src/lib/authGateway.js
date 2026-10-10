@@ -16,14 +16,20 @@ async function request(path, options = {}) {
   return body;
 }
 
+// Embeddings can deny Web Storage access, which used to make the demo entry
+// buttons fail silently; the session then lives in memory for the tab.
+let memorySession = null;
 function readDemoSession() {
-  if (typeof window === 'undefined') return null;
-  try { return JSON.parse(window.sessionStorage.getItem(DEMO_KEY) || 'null'); } catch { return null; }
+  if (typeof window === 'undefined') return memorySession;
+  try { return JSON.parse(window.sessionStorage.getItem(DEMO_KEY) || 'null') ?? memorySession; } catch { return memorySession; }
 }
 function writeDemoSession(value) {
+  memorySession = value;
   if (typeof window === 'undefined') return;
-  if (!value) window.sessionStorage.removeItem(DEMO_KEY);
-  else window.sessionStorage.setItem(DEMO_KEY, JSON.stringify(value));
+  try {
+    if (!value) window.sessionStorage.removeItem(DEMO_KEY);
+    else window.sessionStorage.setItem(DEMO_KEY, JSON.stringify(value));
+  } catch { /* storage denied: the in-memory session still signs the visitor in */ }
 }
 export function hasRemoteAuth() { return Boolean(configuredEndpoint); }
 

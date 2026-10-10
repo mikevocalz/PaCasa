@@ -9,8 +9,10 @@
     "node": ">=24.15.0 <26"
   },
   "scripts": {
-    "dev": "turbo dev",
-    "build": "turbo build",
+    "dev": "vite",
+    "build": "vite build",
+    "dev:workspace": "turbo dev",
+    "build:workspace": "turbo build",
     "lint": "turbo lint",
     "typecheck": "turbo typecheck",
     "test": "turbo test",
@@ -26,6 +28,11 @@
     "build:base44": "BASE44_EXPORT=1 pnpm --filter web build",
     "base44:setup": "npm ci --prefix tooling/base44-cli",
     "base44:deploy": "npm exec --prefix tooling/base44-cli -- base44 deploy -y --no-build"
+  },
+  "dependencies": {
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "vite": "8.2.0"
   },
   "devDependencies": {
     "playwright": "1.64.0",

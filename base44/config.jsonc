@@ -2,9 +2,11 @@
   "name": "Pa'Casa",
   "visibility": "public",
   "site": {
-    "buildCommand": "pnpm build:base44",
-    "serveCommand": "pnpm --filter web dev",
-    "outputDirectory": "./apps/web/out",
-    "installCommand": "pnpm install --frozen-lockfile"
+    // The Base44 surface is the root Vite app (index.html + src/), not the
+    // Expo/Next workspace, which keeps its own turbo build (pnpm build:workspace).
+    "buildCommand": "vite build",
+    "serveCommand": "vite",
+    "outputDirectory": "./dist",
+    "installCommand": "pnpm install --no-frozen-lockfile"
   }
 }

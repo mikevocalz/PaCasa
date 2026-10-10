@@ -20,6 +20,7 @@
   },
   "devDependencies": {
     "@acme/config": "workspace:*",
+    "@types/node": "catalog:",
     "@types/react": "catalog:",
     "react": "catalog:",
     "react-native": "catalog:",

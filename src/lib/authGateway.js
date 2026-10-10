@@ -1,6 +1,9 @@
 import { base44AuthEndpoint } from './authEndpoint.mjs';
 
-const configuredEndpoint = (import.meta.env.VITE_PACASA_AUTH_URL ?? '').trim();
+// The portal's sign-in service is this app's own pacasaAuth function, reached
+// same-origin; deploy the app behind another host and set
+// VITE_PACASA_AUTH_URL to override it.
+const configuredEndpoint = (import.meta.env.VITE_PACASA_AUTH_URL ?? '/functions/pacasaAuth').trim();
 const DEMO_KEY = 'pacasa.demo.portal.session';
 
 async function request(path, options = {}) {
@@ -68,10 +71,10 @@ export async function translatePortalPhrase({ text, sourceLanguage, targetLangua
 }
 
 export async function signInDemo(role) {
-  if (hasRemoteAuth()) {
-    // A public bundle must never contain a provider password. Seeded accounts use normal sign-in.
-    throw new Error('Introduce el correo y la contraseña de prueba facilitados por tu equipo. Las credenciales no se incluyen en la aplicación.');
-  }
+  // An explicit preview entry, still available once the real service is
+  // configured but cannot answer (for example before the workspace can run
+  // backend functions). It fabricates a local session and never carries a
+  // service credential; seeded accounts sign in through the form above.
   const provider = role === 'provider';
   const session = {
     user: { id: provider ? 'demo-provider-elena' : 'demo-patient-rosa', name: provider ? 'Dra. Elena Ruiz' : 'Rosa Velázquez', email: provider ? 'elena.ruiz@demo.pacasa.test' : 'rosa.patient@demo.pacasa.test' },

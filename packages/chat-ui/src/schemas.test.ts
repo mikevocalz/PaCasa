@@ -21,11 +21,21 @@ test('rejects tool, mutation, URL, and state execution from model output', () =>
 });
 
 test('all assistant domains have model descriptions and strict schemas', () => {
-  assert.deepEqual(Object.keys(descriptions), ['PaCasaText', 'TranslationPair', 'FormFieldReview', 'FollowUpSuggestion', 'PaCasaResponse']);
+  assert.deepEqual(Object.keys(descriptions), ['PaCasaText', 'TranslationPair', 'FormFieldReview', 'FollowUpSuggestion', 'DirectionsMap', 'PaCasaResponse']);
   assert.equal(paCasaSchemas.translation.safeParse({
     original: 'Hello', translated: 'Hola', source: 'en', target: 'es',
   }).success, true);
   assert.equal(paCasaSchemas.translation.safeParse({
     original: 'Hello', translated: '', source: 'en', target: 'xx',
+  }).success, false);
+});
+
+
+test('directions cards require trusted finite coordinates', () => {
+  assert.equal(paCasaSchemas.directions.safeParse({
+    name: 'Hospital', address: 'NY', latitude: 40.75, longitude: -73.98,
+  }).success, true);
+  assert.equal(paCasaSchemas.directions.safeParse({
+    name: 'Hospital', address: 'NY', latitude: 999, longitude: -73.98,
   }).success, false);
 });

@@ -1,6 +1,8 @@
 import { createServer } from 'node:http';
 import { parseAssistantRequest, buildGeminiRequest, parseGeminiResponse, MAX_BODY_BYTES } from './core.mjs';
 import { streamGeminiAnswer } from './stream.mjs';
+import { resolveDirectionPlace } from './directions.mjs';
+import { serveStaticMap } from './map.mjs';
 
 const PORT = Number.parseInt(process.env.PORT ?? '8787', 10);
 const HOST = process.env.HOST ?? '127.0.0.1';
@@ -61,6 +63,12 @@ export async function handleAssistantRequest(req, res, fetchModel = fetch) {
   }
   if (req.url === '/healthz' && req.method === 'GET') {
     respond(res, 200, { status: 'ok', configured: Boolean(GEMINI_API_KEY) }, origin);
+    return;
+  }
+  if (req.url?.startsWith('/assistant/map?')) {
+    if (req.method !== 'GET') { respond(res, 405, { error: 'Método no permitido.' }, origin); return; }
+    if (!mayProceed(req.socket.remoteAddress ?? 'unknown')) { respond(res, 429, { error: 'Inténtalo más tarde.' }, origin); return; }
+    await serveStaticMap(req, res, process.env.GOOGLE_MAPS_API_KEY);
     return;
   }
   if (req.url !== '/assistant' && req.url !== '/assistant/stream') {
@@ -127,7 +135,10 @@ export async function handleAssistantRequest(req, res, fetchModel = fetch) {
     );
     if (!response.ok) throw new Error('model-unavailable');
     if (streaming) {
-      await streamGeminiAnswer(response, res, parsed, origin, ALLOWED_ORIGINS);
+      let place = null;
+      try { place = await resolveDirectionPlace(parsed.text, process.env.GOOGLE_MAPS_API_KEY); }
+      catch { /* Optional location lookup must not break chat. */ }
+      await streamGeminiAnswer(response, res, parsed, origin, ALLOWED_ORIGINS, place);
       return;
     }
     const payload = await response.json();

@@ -1,4 +1,5 @@
 import { makeOpenUICards } from './core.mjs';
+import { makeDirectionsOpenUI } from './directions.mjs';
 
 export function decodeGeminiPacket(raw) {
   try {
@@ -9,7 +10,7 @@ export function decodeGeminiPacket(raw) {
 export const sse = (event, payload) => 'event: ' + event + '\ndata: ' + JSON.stringify(payload) + '\n\n';
 
 /** Server controls the only allowed events/UI. Upstream fragments are never rendered as executable UI. */
-export async function streamGeminiAnswer(response, res, request, origin, allowedOrigins) {
+export async function streamGeminiAnswer(response, res, request, origin, allowedOrigins, place = null) {
   res.writeHead(200, {
     'Content-Type': 'text/event-stream; charset=utf-8',
     'Cache-Control': 'no-store, no-cache, private',
@@ -47,7 +48,7 @@ export async function streamGeminiAnswer(response, res, request, origin, allowed
     buffer += decoder.decode();
     if (buffer.trim()) consume(buffer);
     if (!text.trim()) throw new Error('empty-response');
-    res.write(sse('done', { reply: text.trim(), ui: makeOpenUICards(request, text.trim()) }));
+    res.write(sse('done', { reply: text.trim(), ui: makeDirectionsOpenUI(text.trim(), place) ?? makeOpenUICards(request, text.trim()) }));
   } catch {
     if (!res.destroyed) res.write(sse('error', { message: 'La respuesta fue interrumpida. Inténtalo de nuevo.' }));
   } finally { if (!res.destroyed) res.end(); }

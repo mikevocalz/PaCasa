@@ -1,0 +1,34 @@
+name: Talk closeout diagnostic (temporary)
+on:
+  push:
+    branches: [feat/pacasa-realtime-bilingual-talk-orb]
+    paths: [.github/workflows/talk-closeout-diagnostic.yml]
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Inspect merge without committing
+        shell: bash
+        run: |
+          git config user.name 'PaCasa closeout diagnostic'
+          git config user.email 'closeout@example.invalid'
+          git merge --no-commit --no-ff origin/main || true
+          echo '=== Unmerged paths ==='
+          git diff --name-only --diff-filter=U
+          echo '=== Source conflict hunks (no environment or lockfile contents) ==='
+          for file in $(git diff --name-only --diff-filter=U); do
+            case "$file" in
+              *.ts|*.tsx|*.jsx|*/package.json|package.json|pnpm-workspace.yaml)
+                echo "=== $file ==="
+                git diff --cc -- "$file" | head -220
+                ;;
+            esac
+          done
+          git merge --abort || true

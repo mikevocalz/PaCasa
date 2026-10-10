@@ -487,6 +487,8 @@ importers:
         specifier: 'catalog:'
         version: 2.11.7
 
+  apps/assistant-api: {}
+
   apps/mobile:
     dependencies:
       '@acme/app':

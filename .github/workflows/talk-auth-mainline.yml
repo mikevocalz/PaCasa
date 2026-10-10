@@ -1,0 +1,50 @@
+name: Reconcile Talk with auth mainline (temporary)
+on:
+  push:
+    branches: [feat/pacasa-realtime-bilingual-talk-orb]
+    paths: [.github/workflows/talk-auth-mainline.yml]
+permissions:
+  contents: write
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 12.8.1
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Merge main and stop on unreviewed source conflicts
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git merge --no-commit --no-ff origin/main || true
+          python3 - <<'PY'
+          import subprocess
+          paths = set(subprocess.check_output(['git','diff','--name-only','--diff-filter=U'],text=True).splitlines())
+          if not paths <= {'pnpm-lock.yaml'}:
+              print('Unreviewed conflicting source paths:', sorted(paths - {'pnpm-lock.yaml'}))
+              raise SystemExit(1)
+          if 'pnpm-lock.yaml' in paths:
+              subprocess.check_call(['git','checkout','--theirs','--','pnpm-lock.yaml'])
+              subprocess.check_call(['git','add','--','pnpm-lock.yaml'])
+          PY
+      - name: Regenerate combined auth and speech lockfile
+        run: |
+          pnpm install --lockfile-only --no-frozen-lockfile --ignore-scripts
+          pnpm install --lockfile-only --frozen-lockfile --ignore-scripts
+          node --test packages/app/talk/model.test.ts packages/app/talk/turn-lease.test.ts
+      - name: Commit on feature branch only and remove temporary workflow
+        run: |
+          test -z "$(git diff --name-only --diff-filter=U)"
+          git add pnpm-lock.yaml
+          git rm .github/workflows/talk-auth-mainline.yml
+          git diff --cached --check
+          git commit -m 'fix(talk): preserve voice and auth dependencies on current main'
+          git push origin HEAD:feat/pacasa-realtime-bilingual-talk-orb

@@ -1,16 +1,19 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Check, Languages, Mic, MicOff, Volume2, X } from 'lucide-react';
 import { startExampleForm } from '@/session/actions';
-import { groundQuestion, translatePhrase, SUGGESTED_QUESTIONS } from '@/session/domain';
+import { groundQuestion, PHRASES, SUGGESTED_QUESTIONS } from '@/session/domain';
 import { currentQuestion, formProgress, pendingAnswers, setAnswer, setConfirmed, useSession } from '@/session/store';
 import { canListen, canSpeak, listen, speak, stopSpeaking } from '@/session/voice';
 import { ActionButton, BigAction } from '@/components/patient-ui';
+import { useLocale } from '@/i18n/store';
+import { speechLanguage } from '@/i18n/locale.mjs';
+import { translateForRecipient } from '@/i18n/translate.mjs';
 
 const MODES = [
-  { id: 'hablar', label: 'Hablar', icon: Mic },
-  { id: 'traducir', label: 'Traducir', icon: Languages },
-  { id: 'preguntar', label: 'Preguntar', icon: Volume2 },
+  { id: 'hablar', key: 'live.mode.speak', icon: Mic },
+  { id: 'traducir', key: 'live.mode.translate', icon: Languages },
+  { id: 'preguntar', key: 'live.mode.ask', icon: Volume2 },
 ];
 
 /**
@@ -20,6 +23,7 @@ const MODES = [
 export default function PaCasaLive() {
   const { forms, activeFormId, returnTo } = useSession();
   const navigate = useNavigate();
+  const { t } = useLocale();
   const [mode, setMode] = useState('hablar');
 
   const form = forms.find((item) => item.id === activeFormId) ?? forms.find((item) => item.status === 'en_progreso') ?? null;
@@ -36,7 +40,7 @@ export default function PaCasaLive() {
   return (
     <div className="flex min-h-screen flex-col bg-page">
       <header className="flex items-center justify-between gap-3 border-b border-line px-4 py-3">
-        <button type="button" onClick={close} aria-label="Cerrar Pa’Casa Live" className="flex h-11 w-11 items-center justify-center border border-line bg-panel text-fg">
+        <button type="button" onClick={close} aria-label={t('live.close')} className="flex h-11 w-11 items-center justify-center border border-line bg-panel text-fg">
           <X size={22} aria-hidden />
         </button>
         <h1 className="font-display text-xl text-fg">Pa’Casa</h1>
@@ -65,7 +69,7 @@ export default function PaCasaLive() {
               mode === item.id ? 'border-royal-400 bg-accent text-silver-50' : 'border-line bg-panel text-fg-muted'
             }`}
           >
-            <item.icon size={18} aria-hidden /> {item.label}
+            <item.icon size={18} aria-hidden /> {t(item.key)}
           </button>
         ))}
       </nav>
@@ -190,70 +194,197 @@ function Hablar({ form, next, done, total, onReview, onClose }) {
   );
 }
 
-/** Traducir: two-way English ⇄ Spanish for the front desk. */
+/** A local conversation preview, not a clinical messaging transport.
+ * Provider input is English; patient preference comes from the device or
+ * an accessible override. No manually chosen language direction.
+ */
 function Traducir() {
-  const [direction, setDirection] = useState('en-es');
+  const { language, preference, setPreference, deviceLanguage, t } = useLocale();
+  const [speaker, setSpeaker] = useState('provider');
   const [input, setInput] = useState('');
   const [result, setResult] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const [hearing, setHearing] = useState(false);
+  const requestId = useRef(0);
+
+  const sourceLanguage = speaker === 'provider' ? 'en' : language;
+  const targetLanguage = speaker === 'provider' ? language : 'en';
+  const label = (code) => t(code === 'en' ? 'locale.en' : 'locale.es');
+
+  useEffect(() => {
+    requestId.current += 1;
+    setResult(null);
+    setBusy(false);
+    stopSpeaking();
+  }, [language, speaker]);
+
+  useEffect(() => () => { requestId.current += 1; stopSpeaking(); }, []);
+
+  const submit = async (text = input, participant = speaker) => {
+    if (!text.trim()) return;
+    const id = ++requestId.current;
+    const from = participant === 'provider' ? 'en' : language;
+    const to = participant === 'provider' ? language : 'en';
+    setBusy(true);
+    setResult(null);
+    try {
+      const translated = await translateForRecipient({
+        text,
+        sourceLanguage: from,
+        targetLanguage: to,
+        endpoint: import.meta.env.VITE_PACASA_TRANSLATION_URL,
+      });
+      if (id === requestId.current) setResult({ ...translated, original: text.trim(), from, to });
+    } catch {
+      if (id === requestId.current) setResult({ status: 'error', text: '', original: text.trim(), from, to });
+    } finally {
+      if (id === requestId.current) setBusy(false);
+    }
+  };
+
+  const record = () => {
+    if (hearing || !canListen()) return;
+    setHearing(true);
+    const cancel = listen(
+      (transcript) => {
+        setInput(transcript);
+        void submit(transcript);
+      },
+      () => setHearing(false),
+      speechLanguage(sourceLanguage),
+    );
+    if (!cancel) setHearing(false);
+  };
 
   return (
-    <section className="mx-auto max-w-2xl space-y-6">
-      <div className="flex flex-wrap gap-3">
-        <ActionButton
-          tone={direction === 'en-es' ? 'solid' : 'quiet'}
-          label="English → Español"
-          onPress={() => {
-            setDirection('en-es');
-            setResult(null);
-          }}
-        />
-        <ActionButton
-          tone={direction === 'es-en' ? 'solid' : 'quiet'}
-          label="Español → English"
-          onPress={() => {
-            setDirection('es-en');
-            setResult(null);
-          }}
-        />
+    <section aria-labelledby="translation-title" className="mx-auto max-w-2xl space-y-6">
+      <div className="space-y-2">
+        <h2 id="translation-title" className="font-display text-2xl text-fg">{t('translate.heading')}</h2>
+        <p className="text-base leading-7 text-fg-muted">{t('translate.lead')}</p>
+      </div>
+
+      <div className="grid gap-3 sm:grid-cols-2">
+        <div className="border border-line bg-panel p-4">
+          <p className="text-xs uppercase tracking-[0.14em] text-fg-subtle">{t('translate.provider')}</p>
+          <p className="mt-2 text-lg text-fg">English</p>
+        </div>
+        <div className="space-y-3 border border-royal-400 bg-panel p-4">
+          <p className="text-xs uppercase tracking-[0.14em] text-fg-subtle">{t('translate.patient')}</p>
+          <p className="text-lg text-fg">{label(language)}</p>
+          <p className="text-sm text-fg-subtle">{t('translate.detected')} {label(deviceLanguage)}</p>
+          <label className="block space-y-2" htmlFor="live-patient-language">
+            <span className="block text-sm text-fg-muted">{t('locale.heading')}</span>
+            <select
+              id="live-patient-language"
+              value={preference}
+              onChange={(event) => setPreference(event.target.value)}
+              className="min-h-12 w-full border border-line bg-page px-3 text-base text-fg"
+            >
+              <option value="auto">{t('locale.auto')}</option>
+              <option value="en">{t('locale.en')}</option>
+              <option value="es">{t('locale.es')}</option>
+            </select>
+          </label>
+        </div>
       </div>
 
       <div className="space-y-3">
-        <label className="block text-sm text-fg-muted" htmlFor="traducir">
-          {direction === 'en-es' ? 'Escriba en inglés' : 'Escriba en español'}
-        </label>
-        <textarea
-          id="traducir"
-          value={input}
-          onChange={(event) => setInput(event.target.value)}
-          rows={3}
-          className="w-full border border-line bg-panel p-4 text-base text-fg outline-none"
-        />
-        <div className="flex flex-wrap gap-3">
-          <ActionButton label="Traducir" onPress={() => setResult(translatePhrase(input, direction))} disabled={!input.trim()} />
+        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-fg-muted">{t('translate.speaker')}</p>
+        <div className="flex flex-wrap gap-2">
           <ActionButton
-            tone="quiet"
-            label="Escuchar"
-            onPress={() => speak(input)}
-            disabled={!canSpeak()}
+            label={t('translate.provider')}
+            tone={speaker === 'provider' ? 'solid' : 'quiet'}
+            onPress={() => { setSpeaker('provider'); setInput(''); }}
+          />
+          <ActionButton
+            label={`${t('translate.patient')} · ${label(language)}`}
+            tone={speaker === 'patient' ? 'solid' : 'quiet'}
+            onPress={() => { setSpeaker('patient'); setInput(''); }}
           />
         </div>
       </div>
 
+      <div className="space-y-3">
+        <label htmlFor="live-translation-input" className="block text-sm text-fg-muted">
+          {t(speaker === 'provider' ? 'translate.inputProvider' : 'translate.inputPatient')}
+        </label>
+        <textarea
+          id="live-translation-input"
+          lang={sourceLanguage}
+          value={input}
+          onChange={(event) => { setInput(event.target.value); setResult(null); }}
+          maxLength={2000}
+          rows={3}
+          className="w-full border border-line bg-panel p-4 text-base text-fg outline-none"
+        />
+        <div className="flex flex-wrap gap-3">
+          <ActionButton
+            label={t(speaker === 'provider' ? 'translate.sendProvider' : 'translate.sendPatient')}
+            disabled={!input.trim() || busy}
+            onPress={() => { void submit(); }}
+          />
+          <ActionButton
+            tone="quiet"
+            label={hearing ? t('translate.listening') : t('translate.record')}
+            disabled={!canListen() || hearing || busy}
+            onPress={record}
+          />
+          <ActionButton
+            tone="quiet"
+            label={t('translate.listenOriginal')}
+            disabled={!canSpeak() || !input.trim()}
+            onPress={() => speak(input, speechLanguage(sourceLanguage))}
+          />
+        </div>
+      </div>
+
+      {busy ? <p role="status" className="text-sm text-fg-muted">{t('translate.waiting')}</p> : null}
       {result ? (
-        <div className="space-y-3 border border-line bg-panel p-5" aria-live="polite">
-          {result.matched ? (
-            <>
-              <p className="text-xs uppercase tracking-[0.14em] text-fg-subtle">Traducción</p>
-              <p className="text-xl text-fg">{result.text}</p>
-              <ActionButton tone="quiet" label="Escuchar" onPress={() => speak(result.text)} />
-            </>
+        <div className="space-y-4 border border-line bg-panel p-5" aria-live="polite">
+          <div>
+            <p className="text-xs uppercase tracking-[0.14em] text-fg-subtle">{t('translate.original')} · {label(result.from)}</p>
+            <p className="mt-2 whitespace-pre-wrap text-base text-fg">{result.original}</p>
+          </div>
+          {result.status === 'translated' || result.status === 'identity' ? (
+            <div className="space-y-3 border-t border-line pt-4" lang={result.to}>
+              <p className="text-xs uppercase tracking-[0.14em] text-fg-subtle">{t('translate.result')} · {label(result.to)}</p>
+              <p className="whitespace-pre-wrap text-xl text-fg">{result.text}</p>
+              {result.status === 'identity' ? <p className="text-sm text-fg-muted">{t('translate.same')}</p> : null}
+              <ActionButton
+                tone="quiet"
+                label={t('translate.listenResult')}
+                disabled={!canSpeak()}
+                onPress={() => speak(result.text, speechLanguage(result.to))}
+              />
+            </div>
           ) : (
-            <p className="text-base text-fg-muted">
-              No tengo una traducción para esa frase. Puede usar una de las frases frecuentes.
+            <p role="alert" className="border-t border-line pt-4 text-sm text-fg-muted">
+              {t(result.status === 'unavailable' ? 'translate.unavailable' : 'translate.error')}
             </p>
           )}
         </div>
       ) : null}
+
+      <div className="space-y-2">
+        <p className="text-sm font-semibold text-fg-muted">{t('translate.phrases')}</p>
+        <div className="flex flex-wrap gap-2">
+          {PHRASES.slice(0, 4).map((phrase) => (
+            <button
+              key={phrase.en}
+              type="button"
+              className="min-h-11 border border-line bg-panel px-3 py-2 text-left text-sm text-fg-muted hover:border-accent-soft"
+              onClick={() => {
+                setSpeaker('provider');
+                setInput(phrase.en);
+                void submit(phrase.en, 'provider');
+              }}
+            >
+              {phrase.en}
+            </button>
+          ))}
+        </div>
+      </div>
+      <p className="text-sm leading-6 text-fg-subtle">{t('translate.notice')}</p>
     </section>
   );
 }

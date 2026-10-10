@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+import { useLocale } from '@/i18n/store';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter as Router, Navigate, Route, Routes } from 'react-router-dom';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
@@ -21,6 +23,11 @@ import Revisar from '@/pages/Revisar';
  */
 function AuthenticatedApp() {
   const { isLoadingAuth, authError, navigateToLogin } = useAuth();
+  const { language } = useLocale();
+
+  useEffect(() => {
+    document.documentElement.lang = language;
+  }, [language]);
 
   if (isLoadingAuth) {
     return (

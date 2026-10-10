@@ -225,7 +225,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           </View>
         </SafeArea>
       </Modal>
-      <AssistantOverlay onScan={() => setOpen(true)} />
+      <AssistantOverlay />
       {HAS_CAMERA ? <CameraLab open={open} onClose={() => setOpen(false)} /> : null}
     </SafeArea>
   );

@@ -23,6 +23,7 @@
     "@reactvision/viro-web-renderer": "catalog:",
     "@rive-app/react-webgl2": "catalog:",
     "canvaskit-wasm": "catalog:",
+    "expo-camera": "catalog:",
     "gsap": "catalog:",
     "kinetrell": "catalog:",
     "lenis": "catalog:",

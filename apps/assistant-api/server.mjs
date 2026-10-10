@@ -3,6 +3,7 @@ import { parseAssistantRequest, buildGeminiRequest, parseGeminiResponse, MAX_BOD
 import { streamGeminiAnswer } from './stream.mjs';
 import { resolveDirectionPlace } from './directions.mjs';
 import { serveStaticMap } from './map.mjs';
+import { readDocumentJson, parseDocumentRequest, documentTextFromGemini } from './document.mjs';
 
 const PORT = Number.parseInt(process.env.PORT ?? '8787', 10);
 const HOST = process.env.HOST ?? '127.0.0.1';
@@ -71,7 +72,7 @@ export async function handleAssistantRequest(req, res, fetchModel = fetch) {
     await serveStaticMap(req, res, process.env.GOOGLE_MAPS_API_KEY);
     return;
   }
-  if (req.url !== '/assistant' && req.url !== '/assistant/stream') {
+  if (req.url !== '/assistant' && req.url !== '/assistant/stream' && req.url !== '/assistant/document') {
     respond(res, 404, { error: 'No encontrado.' }, origin);
     return;
   }
@@ -103,6 +104,17 @@ export async function handleAssistantRequest(req, res, fetchModel = fetch) {
     return;
   }
   try {
+    if (req.url === '/assistant/document') {
+      if (process.env.PACASA_ENABLE_DEMO_DOC_OCR !== '1') {
+        respond(res, 503, { error: 'El lector de documentos de demostración está deshabilitado.' }, origin);
+        return;
+      }
+      const document = parseDocumentRequest(await readDocumentJson(req));
+      if (!document) { respond(res, 400, { error: 'Documento inválido o sin consentimiento.' }, origin); return; }
+      const extracted = await documentTextFromGemini(document, GEMINI_API_KEY, MODEL, fetchModel);
+      respond(res, 200, extracted, origin);
+      return;
+    }
     const parsed = parseAssistantRequest(await readJson(req));
     if (!parsed) {
       respond(res, 400, { error: 'La solicitud no es válida.' }, origin);

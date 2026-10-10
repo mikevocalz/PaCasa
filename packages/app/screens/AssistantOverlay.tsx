@@ -6,6 +6,7 @@ import { Modal, SafeArea, VoiceRecorder } from '@acme/ui';
 import { ArrowRight, MessageCircle, Mic, ScanLine, X } from '@acme/ui/icons';
 import { Pressable, ScrollView, Text, TextInput, View } from '@acme/ui/tw';
 import { OpenUIMessage } from '@acme/chat-ui';
+import { ScanWorkspace } from '../scanner/ScanWorkspace';
 import { ChatOrb } from '../assistant/ChatOrb';
 import { streamFetch } from '../assistant/stream-fetch';
 import { readAssistantStream } from '../assistant/stream';
@@ -24,7 +25,7 @@ const endpointAvailable = Boolean(ENDPOINT &&
  * Bottom navigation is hidden; closing always restores the previous route.
  * The three modes own separate work surfaces, never silently share transcripts.
  */
-export function AssistantOverlay({ onScan }: { onScan: () => void }) {
+export function AssistantOverlay() {
   const store = useAssistantStore();
   const { open, mode, sourceLanguage, draft, busy, streamingText, messages, consent, error, voiceNotice } = store;
   const abortRef = useRef<AbortController | null>(null);
@@ -150,31 +151,7 @@ export function AssistantOverlay({ onScan }: { onScan: () => void }) {
           <ScrollView className="min-h-0 flex-1 px-4" keyboardShouldPersistTaps="handled"
             contentContainerClassName="gap-4 pb-6 pt-5">
             {scan ? (
-              <View className="gap-5 rounded-2xl border border-ink-700 bg-ink-900 p-5">
-                <View className="items-center gap-3 py-9">
-                  <View className="h-28 w-28 items-center justify-center rounded-3xl border border-royal-400 bg-royal-500/15">
-                    <ScanLine size={56} className="text-royal-300" />
-                  </View>
-                  <Text role="heading" aria-level={2} className="font-display text-2xl text-silver-50">Escanea a tu ritmo</Text>
-                  <Text className="text-center text-base leading-7 text-silver-300">
-                    Encuadra el documento. Podrás revisar el texto antes de traducirlo o usarlo.
-                  </Text>
-                </View>
-                {Platform.OS !== 'web' ? (
-                  <Pressable role="button" accessibilityLabel="Abrir vista de cámara de prueba"
-                    onPress={onScan} className="min-h-14 flex-row items-center justify-center gap-3 rounded-xl bg-royal-500 px-5">
-                    <ScanLine size={23} className="text-silver-50" />
-                    <Text className="font-semibold text-silver-50">Abrir cámara de prueba</Text>
-                  </Pressable>
-                ) : (
-                  <Text role="status" className="text-base leading-7 text-silver-300">
-                    El escáner web aún no está conectado. No se ha capturado ni enviado ningún documento.
-                  </Text>
-                )}
-                <Text className="text-sm leading-6 text-silver-400">
-                  Esta vista preliminar no extrae texto ni envía formularios. El procesamiento de documentos requiere el módulo de escaneo.
-                </Text>
-              </View>
+              <ScanWorkspace active={open && scan} />
             ) : (
               <>
                 {!talk ? <ChatOrb busy={busy} /> : null}

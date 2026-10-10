@@ -67,6 +67,7 @@ const nextConfig: NextConfig = {
     'expo-drag-drop-content-view',
     '@legendapp/motion',
     '@expo/ui',
+    'expo-camera',
     'expo-image',
     'expo-modules-core',
     'expo',

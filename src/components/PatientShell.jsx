@@ -191,13 +191,13 @@ export default function PatientShell() {
         </button>
       </header>
 
-      <main className="min-h-0 flex-1 pb-24">
+      <main className="min-h-0 flex-1 pb-24 md:pb-0">
         <Outlet />
       </main>
 
       <nav
         aria-label="Navegación principal"
-        className="fixed inset-x-0 bottom-0 z-30 flex items-stretch border-t border-line bg-page/95 px-1 pb-2 pt-1.5 backdrop-blur"
+        className="fixed inset-x-0 bottom-0 z-30 flex items-stretch border-t border-line bg-page/95 px-1 pb-2 pt-1.5 backdrop-blur md:hidden"
       >
         {TABS.slice(0, 2).map((tab) => (
           <TabItem key={tab.to} tab={tab} active={isActive(tab.to)} />

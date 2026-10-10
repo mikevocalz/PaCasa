@@ -20,9 +20,11 @@ export const AuthProvider = ({ children }) => {
         const current = await base44.auth.me();
         if (!cancelled && current) setUser(current);
       } catch (error) {
-        // No session is the normal case for a public app; a 401/403 is not.
+        // No session is the normal case for a public app: an unsigned-in
+        // visitor is simply anonymous, never an error. Only a signed-in email
+        // the app does not know about is surfaced.
         const status = error?.status ?? error?.response?.status;
-        if (!cancelled && (status === 401 || status === 403)) {
+        if (!cancelled && status === 403) {
           setAuthError({ type: 'user_not_registered', message: error.message });
         }
       } finally {

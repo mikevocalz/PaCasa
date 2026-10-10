@@ -1,0 +1,12 @@
+{
+  "extends": "@acme/config/typescript/react-library.json",
+  "compilerOptions": {
+    "strict": true,
+    "noEmit": true,
+    "allowImportingTsExtensions": true
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx"
+  ]
+}

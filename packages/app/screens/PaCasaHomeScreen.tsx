@@ -48,10 +48,10 @@ export function PaCasaHomeScreen() {
           onPress={() => openAssistant('chat')}
         />
         <BigAction
-          title="Traducir"
-          description="Pasa una frase de inglés a español o de español a inglés."
+          title="Hablar y traducir"
+          description="Abre el modo Hablar para traducir frases entre médico y paciente."
           icon={Mic}
-          onPress={() => openAssistant('translate')}
+          onPress={() => openAssistant('talk')}
         />
       </View>
       <View className="gap-3 border-l-4 border-royal-400 bg-ink-900/80 p-5">
@@ -65,7 +65,7 @@ export function PaCasaHomeScreen() {
         </Text>
         <View className="flex-row items-center gap-2">
           <ScanLine size={17} className="text-silver-400" />
-          <Text className="text-sm text-silver-400">Para escanear un documento, abre el asistente en la app móvil.</Text>
+          <Text className="text-sm text-silver-400">En el botón central puedes elegir Chat, Escanear o Hablar.</Text>
         </View>
       </View>
     </ScrollView>

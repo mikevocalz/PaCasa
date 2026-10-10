@@ -524,6 +524,8 @@ importers:
         specifier: ^2.11.7
         version: 2.11.7
 
+  apps/assistant-api: {}
+
   apps/mobile:
     dependencies:
       '@acme/app':

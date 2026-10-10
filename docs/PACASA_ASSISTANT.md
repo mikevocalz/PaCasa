@@ -97,3 +97,23 @@ absent or invalid.
 This is a progressive enhancement over the text contract, not a claim that
 live OpenUI generation is configured. A real hosted assistant service must be
 deployed and configured before live bilingual answers can be generated.
+
+## Gemini assistant API (third stacked PR)
+
+`apps/assistant-api` supplies a separate, stateless text endpoint. It calls
+Google Gemini through server-side `GEMINI_API_KEY` and builds allowed OpenUI
+Lang components **deterministically** from validated `{reply}` model output.
+Unlike arbitrary model-generated OpenUI code, this service controls both
+component selection and parameters. The model can translate and explain,
+but cannot run tools or submit documents.
+
+Run `pnpm --filter assistant-api test` and
+`pnpm --filter assistant-api dev`. On Base44 static web, deploy the
+service separately over HTTPS and configure its URL; it is not live just
+because the PR contains a server implementation. See
+[service README](../apps/assistant-api/README.md).
+
+This service is for the no-real-patient-data prototype. Add real authentication,
+an appropriate healthcare privacy/security assessment, provider agreements,
+abuse protection, and a release review before any PHI processing. Neither
+CORS nor in-memory rate limiting is an acceptable replacement for auth.

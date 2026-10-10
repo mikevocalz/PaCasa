@@ -1,13 +1,14 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { LogIn, Mail, Lock, Loader2 } from "lucide-react";
+import { LogIn, Mail, Lock, Loader2, ArrowRight } from "lucide-react";
 import AuthLayout from "@/components/AuthLayout";
 import GoogleIcon from "@/components/GoogleIcon";
 import { safeReturnTo } from "@/lib/authReturnTo";
+import { setDemoMode } from "@/session/store";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -17,6 +18,17 @@ export default function Login() {
   // Post-login destination (e.g. the MCP OAuth consent page sends users here
   // with returnTo so the grant flow can resume). Same-origin paths only.
   const returnTo = safeReturnTo();
+  const navigate = useNavigate();
+
+  /**
+   * The one-tap demo: no account, straight into the sample visit. That visit
+   * is held in memory for a single visit, so this enters the app without a page
+   * reload — a reload would start the session over.
+   */
+  const openDemo = () => {
+    setDemoMode(true);
+    navigate("/");
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -127,6 +139,20 @@ export default function Login() {
           )}
         </Button>
       </form>
+
+      <div className="mt-6 border-t border-border pt-6">
+        <p className="text-sm text-muted-foreground">
+          Just looking around? The sample visit opens without an account.
+        </p>
+        <Button
+          variant="outline"
+          className="mt-3 w-full h-12 text-sm font-medium"
+          onClick={openDemo}
+        >
+          <ArrowRight className="w-4 h-4 mr-2" />
+          Enter the demo visit
+        </Button>
+      </div>
     </AuthLayout>
   );
 }

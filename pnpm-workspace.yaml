@@ -38,6 +38,8 @@ allowBuilds:
   # kinetrell ships source for git consumers; its `prepare` runs tsdown to
   # emit dist/ (the exports map only resolves against built files).
   "kinetrell@https://codeload.github.com/mikevocalz/Kinetrell/tar.gz/344de51531ce050c4311d3feb70e4d596bdc8041": true
+  # Reviewed at the exact catalog commit: prepare invokes expo-module prepare.
+  "@native-springs/shaders@https://codeload.github.com/MatthewSRC/native-springs-shaders/tar.gz/a0e45176f87d93f6ce1b84b256233002a062850e": true
   "@openuidev/lang-core": false
   "react-native-executorch@0.10.0": true
   unrs-resolver: true

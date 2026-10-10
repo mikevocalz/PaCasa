@@ -24,6 +24,8 @@
     "@rive-app/react-webgl2": "catalog:",
     "canvaskit-wasm": "catalog:",
     "expo-camera": "catalog:",
+    "expo-speech": "catalog:",
+    "expo-speech-recognition": "catalog:",
     "gsap": "catalog:",
     "kinetrell": "catalog:",
     "lenis": "catalog:",

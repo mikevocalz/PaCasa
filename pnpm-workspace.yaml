@@ -82,6 +82,8 @@ catalog:
   "@expo/metro-runtime": 58.0.14
   expo-asset: 58.0.13
   expo-camera: ~58.0.9
+  expo-speech: 58.0.3
+  expo-speech-recognition: 57.1.1
   expo-constants: 58.0.10
   "@expo/dom-webview": 58.0.2
   expo-font: 58.0.7
@@ -98,6 +100,7 @@ catalog:
   # apps/mobile/babel.config.js names this preset, so the app must declare it;
   # the Gradle JS bundle step resolves it from the app, not through expo.
   babel-preset-expo: 58.0.12
+  "@native-springs/shaders": github:MatthewSRC/native-springs-shaders#a0e45176f87d93f6ce1b84b256233002a062850e
   react-native-executorch: 0.10.0
   react-native-nitro-fetch: 1.8.0
   react-native-audio-api: audio-api-nightly

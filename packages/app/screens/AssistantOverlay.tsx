@@ -2,11 +2,12 @@
 
 import { useEffect, useRef } from 'react';
 import { Platform } from 'react-native';
-import { Modal, SafeArea, VoiceRecorder } from '@acme/ui';
+import { Modal, SafeArea } from '@acme/ui';
 import { ArrowRight, MessageCircle, Mic, ScanLine, X } from '@acme/ui/icons';
 import { Pressable, ScrollView, Text, TextInput, View } from '@acme/ui/tw';
 import { OpenUIMessage } from '@acme/chat-ui';
 import { ScanWorkspace } from '../scanner/ScanWorkspace';
+import { TalkWorkspace } from '../talk/TalkWorkspace';
 import { ChatOrb } from '../assistant/ChatOrb';
 import { streamFetch } from '../assistant/stream-fetch';
 import { readAssistantStream } from '../assistant/stream';
@@ -27,7 +28,7 @@ const endpointAvailable = Boolean(ENDPOINT &&
  */
 export function AssistantOverlay() {
   const store = useAssistantStore();
-  const { open, mode, sourceLanguage, draft, busy, streamingText, messages, consent, error, voiceNotice } = store;
+  const { open, mode, sourceLanguage, draft, busy, streamingText, messages, consent, error } = store;
   const abortRef = useRef<AbortController | null>(null);
   useEffect(() => () => abortRef.current?.abort(), []);
 
@@ -152,6 +153,8 @@ export function AssistantOverlay() {
             contentContainerClassName="gap-4 pb-6 pt-5">
             {scan ? (
               <ScanWorkspace active={open && scan} />
+            ) : talk ? (
+              <TalkWorkspace active={open && talk} />
             ) : (
               <>
                 {!talk ? <ChatOrb busy={busy} /> : null}
@@ -193,23 +196,13 @@ export function AssistantOverlay() {
                     <Text className="text-base leading-7 text-silver-50">{streamingText}</Text>
                   </View>
                 ) : null}
-                {talk && Platform.OS !== 'web' ? (
-                  <View className="gap-3 rounded-xl border border-ink-700 bg-ink-900 p-4">
-                    <Text className="font-semibold text-silver-50">Nota de voz local</Text>
-                    <VoiceRecorder maxSeconds={60} onCancel={() => store.setVoiceNotice(null)}
-                      onComplete={(take) => store.setVoiceNotice(
-                        'Grabación local revisada (' + Math.ceil(take.duration) + ' s). Aún no se ha transcrito ni enviado.'
-                      )} />
-                    {voiceNotice ? <Text role="status" className="text-sm text-silver-300">{voiceNotice}</Text> : null}
-                  </View>
-                ) : null}
               </>
             )}
             <Text className="text-sm leading-6 text-silver-400">
               Revisa siempre las traducciones y las respuestas. Pa’Casa no envía formularios ni decide por ti.
             </Text>
           </ScrollView>
-          {!scan ? (
+          {!scan && !talk ? (
             <View className="gap-3 border-t border-ink-700 bg-ink-950 px-4 py-4">
               {error ? <Text role="alert" className="text-sm leading-6 text-danger">{error}</Text> : null}
               {!endpointAvailable ? (

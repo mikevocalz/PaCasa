@@ -7,7 +7,7 @@ interface NativePixels {
   pixelFormat: string;
 }
 
-const CHANNELS: Readonly<Record<string, readonly number[]>> = {
+const CHANNELS: Readonly<Record<string, readonly [number, number, number]>> = {
   RGBA: [0, 1, 2], BGRA: [2, 1, 0],
   ARGB: [1, 2, 3], ABGR: [3, 2, 1],
   RGBX: [0, 1, 2], BGRX: [2, 1, 0],
@@ -26,10 +26,11 @@ export function toOcrImageBuffer(raw: NativePixels): ImageBuffer {
   const src = new Uint8Array(raw.buffer);
   if (src.length !== raw.width * raw.height * stride) throw new Error('Longitud de píxeles incorrecta.');
   const dst = new Uint8Array(raw.width * raw.height * 3);
+  const [r, g, b] = channels;
   for (let p = 0, o = 0; p < src.length; p += stride, o += 3) {
-    dst[o] = src[p + channels[0]];
-    dst[o + 1] = src[p + channels[1]];
-    dst[o + 2] = src[p + channels[2]];
+    dst[o] = src[p + r]!;
+    dst[o + 1] = src[p + g]!;
+    dst[o + 2] = src[p + b]!;
   }
   return { data: dst, width: raw.width, height: raw.height, layout: 'hwc', format: 'rgb' };
 }

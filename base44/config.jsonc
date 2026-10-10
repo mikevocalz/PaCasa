@@ -7,6 +7,6 @@
     "buildCommand": "vite build",
     "serveCommand": "vite",
     "outputDirectory": "./dist",
-    "installCommand": "pnpm install --no-frozen-lockfile"
+    "installCommand": "pnpm install --no-frozen-lockfile || npm install --no-audit --no-fund"
   }
 }

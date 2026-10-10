@@ -3,12 +3,18 @@
 import { Link } from 'solito/link';
 import { useInstanceStore, useStore } from '@acme/ui';
 import { Text, TextInput, View } from '@acme/ui/tw';
-import { PatientButton, PatientFrame, PatientPanel, ProgressRow } from './patient-ui';
-import { canCompleteForm, formProgress, usePatientSession, type PatientAnswer, type PatientForm } from '../session/patient';
 import { startExampleForm } from '../session/actions';
+import { useLiveOverlay } from '../session/live-overlay';
+import {
+  canCompleteForm,
+  formProgress,
+  usePatientSession,
+  type PatientAnswer,
+  type PatientForm,
+} from '../session/patient';
 import { canPrint, printDocument } from '../session/print';
 import { canSpeak, speak } from '../speech/speech';
-import { useLiveOverlay } from '../session/live-overlay';
+import { PatientButton, PatientFrame, PatientPanel, ProgressRow } from './patient-ui';
 
 /** Pa'Casa Live is a modal overlay, not a route: record this screen to return to. */
 function openLiveOverlay(returnTo: string) {
@@ -42,10 +48,10 @@ function ReviewRow({
   const confirmAnswer = usePatientSession((s) => s.confirmAnswer);
   const filled = answer.value.trim().length > 0;
   return (
-    <View className="gap-3 border border-ink-700 bg-ink-900/90 p-5 shadow-card">
+    <View className="gap-3 rounded-soft border border-border bg-surface-raised p-5">
       <View className="gap-1">
-        <Text className="text-xs uppercase tracking-[0.14em] text-silver-500">{answer.sourceLabel}</Text>
-        <Text role="heading" aria-level={2} className="font-display text-xl leading-tight text-silver-50">
+        <Text className="text-sm font-semibold text-text-muted">{answer.sourceLabel}</Text>
+        <Text role="heading" aria-level={2} className="font-display text-xl leading-tight text-text">
           {answer.questionEs}
         </Text>
       </View>
@@ -54,12 +60,12 @@ function ReviewRow({
           value={draft}
           onChangeText={onEdit}
           aria-label={`Respuesta para ${answer.questionEs}`}
-          className="min-h-12 border border-ink-600 bg-ink-950 px-4 text-base text-silver-50 placeholder:text-silver-500 focus:border-royal-400"
+          className="min-h-12 rounded-soft border border-border bg-surface px-4 text-base text-text placeholder:text-text-muted focus:border-border-strong"
         />
       ) : (
-        <Text className="text-lg text-silver-100">{filled ? answer.value : 'Pendiente'}</Text>
+        <Text className="text-lg leading-8 text-text">{filled ? answer.value : 'Pendiente'}</Text>
       )}
-      <Text className={`text-sm ${answer.confirmed && filled ? 'text-carolina-300' : 'text-silver-400'}`}>
+      <Text className={`text-sm ${answer.confirmed && filled ? 'text-success' : 'text-text-muted'}`}>
         {answer.confirmed && filled ? 'Confirmada' : 'Pendiente de confirmar'}
       </Text>
       <View className="flex-row flex-wrap gap-3">
@@ -89,9 +95,9 @@ function ReadySummary({ form }: { form: PatientForm }) {
       <PatientPanel label="Respuestas confirmadas">
         <View role="list" className="gap-4">
           {form.answers.map((answer) => (
-            <View role="listitem" key={answer.id} className="gap-1 border-b border-ink-800 pb-3">
-              <Text className="text-xs uppercase tracking-[0.14em] text-silver-500">{answer.sourceLabel}</Text>
-              <Text className="text-base text-silver-50">{answer.value || 'Sin respuesta'}</Text>
+            <View role="listitem" key={answer.id} className="gap-1 border-b border-border pb-3">
+              <Text className="text-sm font-semibold text-text-muted">{answer.sourceLabel}</Text>
+              <Text className="text-base leading-7 text-text">{answer.value || 'Sin respuesta'}</Text>
             </View>
           ))}
         </View>
@@ -99,13 +105,13 @@ function ReadySummary({ form }: { form: PatientForm }) {
           {canPrint() ? (
             <PatientButton label="Imprimir o guardar" onPress={printDocument} />
           ) : (
-            <Text className="text-base leading-7 text-silver-300">
+            <Text className="text-base leading-7 text-text-muted">
               Imprimir no está disponible en esta versión. Puede mostrar este resumen en recepción.
             </Text>
           )}
           <Link href="/native" aria-label="Ir a Formularios">
-            <View className="min-h-12 items-center justify-center border border-ink-600 bg-ink-900 px-6 shadow-card hover:border-royal-500 hover:bg-ink-800">
-              <Text className="text-sm font-semibold uppercase tracking-[0.12em] text-silver-200">Ir a Formularios</Text>
+            <View className="min-h-12 items-center justify-center rounded-soft border border-border bg-surface-raised px-6 hover:bg-surface-sunken">
+              <Text className="text-base font-semibold text-text">Ir a Formularios</Text>
             </View>
           </Link>
         </View>
@@ -165,7 +171,7 @@ export function GameScreen() {
     <PatientFrame question="Revisar" title="Revise sus respuestas" lead={`${form.title} · ${form.clinic}`}>
       <PatientPanel label="Progreso">
         <ProgressRow form={form} />
-        <Text className="text-base text-silver-100">
+        <Text className="text-base leading-7 text-text">
           {done} de {total} respuestas confirmadas
         </Text>
         {done < total ? (
@@ -199,7 +205,7 @@ export function GameScreen() {
       </View>
 
       <PatientPanel label="Todo está correcto">
-        <Text className="text-base leading-7 text-silver-300">
+        <Text className="text-base leading-7 text-text-muted">
           {completable
             ? 'Todas las respuestas están confirmadas. Marque el formulario como listo.'
             : `Faltan ${remaining} respuestas por contestar y confirmar antes de terminar.`}

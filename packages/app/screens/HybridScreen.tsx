@@ -4,9 +4,11 @@ import { ChevronLeft, ChevronRight, FileText } from '@acme/ui/icons';
 import { useInstanceStore, useLayoutSize, useStore } from '@acme/ui';
 import { Pressable, Text, TextInput, View } from '@acme/ui/tw';
 import { useRouter } from 'solito/navigation';
-import { addUploadedDocument, startFormFromDocument } from '../session/actions';
+import { useAssistantStore } from '../assistant/store';
+import { addReadDocument, addUploadedDocument, startFormFromDocument } from '../session/actions';
 import { analysisCopy, analyseDocument, type DocumentAnalysis } from '../session/document-analysis';
-import { canPickDocument, pickDocument } from '../session/document-picker';
+import { canPickDocument, pickDocument, type PickedDocument } from '../session/document-picker';
+import { canReadDocument, readPickedDocument } from '../session/document-reader';
 import { useLiveOverlay } from '../session/live-overlay';
 import { findDocument, usePatientSession, type PatientDocument } from '../session/patient';
 import { canSpeak, speak } from '../speech/speech';
@@ -24,6 +26,9 @@ import { PatientButton, PatientFrame, PatientPanel } from './patient-ui';
 /** Preguntar opens Pa'Casa Live (mounted by AppShell) on this screen's questions. */
 const askPaCasa = () => useLiveOverlay.getState().openLive('/hybrid', 'preguntar');
 
+/** Escanear opens the assistant overlay's camera workspace (mounted by AppShell). */
+const scanWithPaCasa = () => useAssistantStore.getState().openAssistant('scan');
+
 /** Screen-local UI state: which document is open, its page and search, the last analysis run. */
 interface DocumentosState {
   selectedId: string | null;
@@ -31,6 +36,11 @@ interface DocumentosState {
   query: string;
   /** Tied to the document it read. Synchronous — no staged progress states. */
   analysis: { documentId: string; result: DocumentAnalysis } | null;
+  /** A picked file waiting on the patient's read/save-unread decision. */
+  pending: PickedDocument | null;
+  consent: boolean;
+  reading: boolean;
+  readError: string | null;
 }
 
 const pageCountLabel = (document: PatientDocument) =>
@@ -41,8 +51,8 @@ export function HybridScreen() {
   const split = size.width >= 720;
   const documents = usePatientSession((state) => state.documents);
   const router = useRouter();
-  const local = useInstanceStore<DocumentosState>(() => ({ selectedId: null, page: 1, query: '', analysis: null }));
-  const { selectedId, page, query, analysis } = useStore(local);
+  const local = useInstanceStore<DocumentosState>(() => ({ selectedId: null, page: 1, query: '', analysis: null, pending: null, consent: false, reading: false, readError: null }));
+  const { selectedId, page, query, analysis, pending, consent, reading, readError } = useStore(local);
   const selected = findDocument(documents, selectedId);
   const selectedAnalysis = selected && analysis?.documentId === selected.id ? analysis.result : null;
 
@@ -50,7 +60,31 @@ export function HybridScreen() {
 
   const upload = async () => {
     const picked = await pickDocument();
-    if (picked) addUploadedDocument(picked.name, picked.kind);
+    if (!picked) return;
+    if (canReadDocument(picked)) {
+      local.setState({ pending: picked, consent: false, readError: null });
+      return;
+    }
+    const added = addUploadedDocument(picked.name, picked.kind);
+    local.setState({ selectedId: added.id, page: 1 });
+  };
+
+  const readPending = async () => {
+    if (!pending || !consent || reading) return;
+    local.setState({ reading: true, readError: null });
+    try {
+      const text = await readPickedDocument(pending);
+      const added = addReadDocument(pending.name, pending.kind, text);
+      local.setState({ pending: null, consent: false, reading: false, selectedId: added.id, page: 1 });
+    } catch (error) {
+      local.setState({ reading: false, readError: error instanceof Error ? error.message : 'No se pudo leer.' });
+    }
+  };
+
+  const keepUnread = () => {
+    if (!pending) return;
+    const added = addUploadedDocument(pending.name, pending.kind);
+    local.setState({ pending: null, consent: false, readError: null, selectedId: added.id, page: 1 });
   };
 
   const runAnalysis = (document: PatientDocument) =>
@@ -62,7 +96,7 @@ export function HybridScreen() {
   };
 
   /** "Usar para formulario" creates the form; nothing is answered or confirmed yet. */
-  const useForForm = (document: PatientDocument) => {
+  const createForm = (document: PatientDocument) => {
     const form = startFormFromDocument(document.id);
     if (form) router.push('/native');
   };
@@ -76,17 +110,51 @@ export function HybridScreen() {
       <View onLayout={onLayout} className="gap-4" style={{ flexDirection: split ? 'row' : 'column', alignItems: split ? 'flex-start' : 'stretch' }}>
         <View className="gap-4" style={{ width: split ? (size.width - 16) * 0.4 : '100%' }}>
           <PatientPanel label="Subir un documento">
-            {canPickDocument() ? (
-              <View className="gap-3">
-                <PatientButton label="Subir PDF o foto" onPress={upload} />
+            <View className="gap-3">
+              {canPickDocument() ? <PatientButton label="Subir PDF o foto" onPress={upload} /> : null}
+              <PatientButton tone={canPickDocument() ? 'quiet' : 'solid'} label="Escanear con la cámara" onPress={scanWithPaCasa} />
+              {canPickDocument() ? (
                 <Text className="text-sm leading-6 text-text-muted">
-                  En esta versión Pa’Casa anota el nombre del archivo; el contenido aparece como «no se pudo leer».
+                  Si el lector de demostración está conectado, Pa’Casa lee el texto del archivo solo con su permiso.
                 </Text>
-              </View>
-            ) : (
-              <Text className="text-base leading-7 text-text-muted">Esta versión no puede subir documentos en este dispositivo.</Text>
-            )}
+              ) : (
+                <Text className="text-sm leading-6 text-text-muted">
+                  Esta versión no puede subir archivos en este dispositivo; la cámara abre el escáner de Pa’Casa.
+                </Text>
+              )}
+            </View>
           </PatientPanel>
+
+          {pending ? (
+            <PatientPanel label="Leer el archivo">
+              <View className="gap-3">
+                <Text className="text-base font-semibold text-text">{pending.name}</Text>
+                <Text className="text-sm leading-6 text-text-muted">
+                  El archivo se envía al lector de Google de demostración. No use datos reales de pacientes.
+                </Text>
+                <Pressable
+                  role="checkbox"
+                  aria-checked={consent}
+                  onPress={() => local.setState({ consent: !consent })}
+                  className="min-h-12 flex-row items-center gap-3 focus-visible:outline-2 focus-visible:outline-focus"
+                >
+                  <View className={`h-6 w-6 border-2 ${consent ? 'border-accent bg-accent' : 'border-border bg-surface-raised'}`} />
+                  <Text className="min-w-0 flex-1 text-sm leading-6 text-text">
+                    Autorizo leer esta imagen con el servicio de demostración.
+                  </Text>
+                </Pressable>
+                {readError ? <Text role="alert" className="text-sm leading-6 text-danger">{readError}</Text> : null}
+                <View className="flex-row flex-wrap gap-3">
+                  <PatientButton
+                    label={reading ? 'Leyendo…' : 'Leer el documento'}
+                    disabled={!consent || reading}
+                    onPress={() => void readPending()}
+                  />
+                  <PatientButton tone="quiet" label="Guardar sin leer" onPress={keepUnread} />
+                </View>
+              </View>
+            </PatientPanel>
+          ) : null}
 
           <PatientPanel label="En esta sesión">
             {documents.length === 0 ? (
@@ -139,7 +207,7 @@ export function HybridScreen() {
               <Text className="text-base leading-7 text-text-muted">Elija un documento de la lista para ver su texto.</Text>
             </PatientPanel>
           )}
-          {selectedAnalysis ? <AnalysisPanel analysis={selectedAnalysis} onUseForForm={() => selected && useForForm(selected)} /> : null}
+          {selectedAnalysis ? <AnalysisPanel analysis={selectedAnalysis} onUseForForm={() => selected && createForm(selected)} /> : null}
         </View>
       </View>
     </PatientFrame>
@@ -277,7 +345,7 @@ function AnalysisPanel({ analysis, onUseForForm }: { analysis: DocumentAnalysis;
         <View className="gap-3">
           {analysis.fields.map((field) => (
             <View key={`${field.page}-${field.sourceLabel}`} className="gap-1 border-b border-border pb-3">
-              <Text className="text-xs uppercase tracking-[0.14em] text-text-muted">En el formulario dice · página {field.page}</Text>
+              <Text className="text-sm font-semibold text-text-muted">En el formulario dice · página {field.page}</Text>
               <Text className="text-base text-text">{field.sourceLabel}</Text>
               <Text className="text-sm text-text-muted">En español: {field.questionEs}</Text>
             </View>

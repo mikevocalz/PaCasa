@@ -35,7 +35,7 @@ export const descriptions = {
   TranslationPair: 'Display a verified bilingual source and translated phrase. Both texts must be supplied by the assistant backend.',
   FormFieldReview: 'Preview one proposed English form field and Spanish explanation for explicit human review. Never save or submit the answer.',
   FollowUpSuggestion: 'A safe suggested question that fills, but never sends, the message composer.',
-  DirectionsMap: 'A confirmed geocoded destination, static map preview, and app-owned route button. Coordinates must come from a trusted places API, never from free-form model text.',
+  DirectionsMap: 'A confirmed geocoded destination, static map preview, and app-owned route button. Coordinates must come from a trusted geocoding API, never from free-form model text.',
   PaCasaResponse: 'The only root container. Holds an ordered list of approved components, rendering vertically inside chat.',
 } as const;
 

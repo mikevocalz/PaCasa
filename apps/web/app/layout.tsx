@@ -4,7 +4,7 @@ import { Document } from './Document';
 import './rn-globals';
 import './globals.css';
 
-// All five routes are statically rendered; Base44 uses Next static export.
+// All product and preserved workflow routes are statically rendered; Base44 uses Next static export.
 export const metadata: Metadata = {
   title: { default: "Pa'Casa", template: "%s | Pa'Casa" },
   description:

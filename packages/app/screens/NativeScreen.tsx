@@ -1,10 +1,11 @@
 'use client';
 
 import { Link } from 'solito/link';
+import { Mic } from '@acme/ui/icons';
 import { useInstanceStore, useLayoutSize, useStore } from '@acme/ui';
 import { Pressable, Text, TextInput, View } from '@acme/ui/tw';
-import { resolveWorkspaceLayout } from './workspace-layout';
-import { PatientBigAction, PatientButton, PatientFrame, PatientPanel, ProgressRow } from './patient-ui';
+import { startExampleForm } from '../session/actions';
+import { useLiveOverlay } from '../session/live-overlay';
 import {
   FORM_SOURCE_LABEL,
   formProgress,
@@ -13,9 +14,8 @@ import {
   type PatientAnswer,
   type PatientForm,
 } from '../session/patient';
-import { startExampleForm } from '../session/actions';
-import { useLiveOverlay } from '../session/live-overlay';
-import { Mic } from '@acme/ui/icons';
+import { PatientBigAction, PatientButton, PatientFrame, PatientPanel, ProgressRow } from './patient-ui';
+import { resolveWorkspaceLayout } from './workspace-layout';
 
 /** Pa'Casa Live is a modal overlay, not a route: record this screen to return to. */
 function openLiveOverlay(returnTo: string) {
@@ -56,17 +56,17 @@ function AnswerRow({
   const confirmAnswer = usePatientSession((s) => s.confirmAnswer);
   const filled = answer.value.trim().length > 0;
   return (
-    <View className="gap-3 border-b border-ink-800 pb-4">
-      <Text className="text-xs uppercase tracking-[0.14em] text-silver-500">{answer.sourceLabel}</Text>
-      <Text className="text-base text-silver-100">{answer.questionEs}</Text>
+    <View className="gap-3 border-b border-border pb-4">
+      <Text className="text-sm font-semibold text-text-muted">{answer.sourceLabel}</Text>
+      <Text className="text-base leading-7 text-text">{answer.questionEs}</Text>
       <TextInput
         value={editing ? draft : answer.value}
         onChangeText={onEdit}
         aria-label={`Respuesta para ${answer.questionEs}`}
         placeholder="Pendiente"
-        className="min-h-12 border border-ink-600 bg-ink-950 px-4 text-base text-silver-50 placeholder:text-silver-500 focus:border-royal-400"
+        className="min-h-12 rounded-soft border border-border bg-surface px-4 text-base text-text placeholder:text-text-muted focus:border-border-strong"
       />
-      <Text className={`text-sm ${answer.confirmed && filled ? 'text-carolina-300' : 'text-silver-400'}`}>
+      <Text className={`text-sm ${answer.confirmed && filled ? 'text-success' : 'text-text-muted'}`}>
         {answer.confirmed && filled ? 'Confirmada' : 'Pendiente de confirmar'}
       </Text>
       <View className="flex-row flex-wrap gap-3">
@@ -92,13 +92,15 @@ function FormRow({ form, selected, onPress }: { form: PatientForm; selected: boo
       role="button"
       aria-pressed={selected}
       onPress={onPress}
-      className={`min-h-14 gap-2 border-l-2 px-4 py-3 ${selected ? 'border-royal-400 bg-royal-500/20' : 'border-transparent active:bg-ink-800 hover:bg-ink-800'}`}
+      className={`min-h-14 gap-2 rounded-soft border-l-2 px-4 py-3 focus-visible:outline-2 focus-visible:outline-focus ${
+        selected ? 'border-accent bg-surface-sunken' : 'border-transparent hover:bg-surface-sunken active:bg-surface-sunken'
+      }`}
     >
-      <Text className={`text-base ${selected ? 'font-semibold text-silver-50' : 'text-silver-200'}`}>{form.title}</Text>
-      <Text className="text-sm text-silver-400">
+      <Text className={`text-base ${selected ? 'font-semibold text-text' : 'text-text'}`}>{form.title}</Text>
+      <Text className="text-sm text-text-muted">
         {form.clinic} · {FORM_SOURCE_LABEL[form.source]} · {FORM_STATUS_LABEL[form.status]}
       </Text>
-      <Text className="text-sm text-silver-400">
+      <Text className="text-sm text-text-muted">
         {done} de {total} respuestas confirmadas
       </Text>
       <ProgressRow form={form} />
@@ -136,23 +138,23 @@ export function NativeScreen() {
     <View className="gap-4">
       <PatientPanel label="Formularios" className="flex-1">
         {inProgress.length > 0 ? (
-          <View role="list" className="gap-1">
-            <Text className="text-xs font-semibold uppercase tracking-[0.18em] text-silver-400">En progreso</Text>
+          <View role="list" className="gap-2">
+            <Text className="text-sm font-semibold text-text-muted">En progreso</Text>
             {inProgress.map((form) => (
               <FormRow key={form.id} form={form} selected={form.id === selectedId} onPress={() => select(form.id)} />
             ))}
           </View>
         ) : null}
         {ready.length > 0 ? (
-          <View role="list" className="gap-1">
-            <Text className="text-xs font-semibold uppercase tracking-[0.18em] text-silver-400">Listos</Text>
+          <View role="list" className="gap-2">
+            <Text className="text-sm font-semibold text-text-muted">Listos</Text>
             {ready.map((form) => (
               <FormRow key={form.id} form={form} selected={form.id === selectedId} onPress={() => select(form.id)} />
             ))}
           </View>
         ) : null}
         {forms.length === 0 ? (
-          <Text className="text-base text-silver-300">No hay formularios en esta visita. Empiece uno abajo.</Text>
+          <Text className="text-base leading-7 text-text-muted">No hay formularios en esta visita. Empiece uno abajo.</Text>
         ) : null}
       </PatientPanel>
 
@@ -167,7 +169,7 @@ export function NativeScreen() {
             if (form) select(form.id);
           }}
         />
-        <PatientButton tone="quiet" label="Hablar con Pa'Casa" onPress={() => openLiveOverlay('/native')} />
+        <PatientButton tone="quiet" label="Hablar con Pa’Casa" onPress={() => openLiveOverlay('/native')} />
       </PatientPanel>
     </View>
   );
@@ -175,24 +177,24 @@ export function NativeScreen() {
   const detail = selected ? (
     <PatientPanel label={selected.title} className="flex-1">
       {wide ? null : <PatientButton tone="quiet" label="Volver a formularios" onPress={() => select(null)} />}
-      <View className="gap-3 border-b border-ink-800 pb-5">
-        <Text className="text-xs font-semibold uppercase tracking-[0.18em] text-royal-300">Formulario</Text>
-        <Text role="heading" aria-level={2} className="font-display text-2xl text-silver-50 md:text-3xl">
+      <View className="gap-3 border-b border-border pb-5">
+        <Text className="text-sm font-semibold text-accent">Formulario</Text>
+        <Text role="heading" aria-level={2} className="font-display text-2xl leading-tight text-text md:text-3xl">
           {selected.title}
         </Text>
-        <Text className="text-base leading-7 text-silver-300">
+        <Text className="text-base leading-7 text-text-muted">
           {selected.clinic} · {FORM_SOURCE_LABEL[selected.source]} · {FORM_STATUS_LABEL[selected.status]}
         </Text>
         <ProgressRow form={selected} />
-        <Text className="text-sm text-silver-400">
+        <Text className="text-sm text-text-muted">
           {pendingAnswers(selected).length === 0 ? 'Todo contestado.' : `${pendingAnswers(selected).length} preguntas por contestar.`}
         </Text>
       </View>
       <View className="flex-row flex-wrap gap-3">
         <PatientButton label="Continuar hablando" onPress={() => continueTalking(selected)} />
         <Link href="/game" aria-label="Revisar respuestas">
-          <View className="min-h-12 items-center justify-center border border-ink-600 bg-ink-900 px-6 shadow-card hover:border-royal-500 hover:bg-ink-800">
-            <Text className="text-sm font-semibold uppercase tracking-[0.12em] text-silver-200">Revisar respuestas</Text>
+          <View className="min-h-12 items-center justify-center rounded-soft border border-border bg-surface px-6 hover:bg-surface-sunken">
+            <Text className="text-base font-semibold text-text">Revisar respuestas</Text>
           </View>
         </Link>
         {wide ? (
@@ -224,7 +226,7 @@ export function NativeScreen() {
     </PatientPanel>
   ) : (
     <PatientPanel label="Detalle" className="flex-1">
-      <Text className="text-base text-silver-300">Elija un formulario para ver sus preguntas y corregir respuestas.</Text>
+      <Text className="text-base leading-7 text-text-muted">Elija un formulario para ver sus preguntas y corregir respuestas.</Text>
     </PatientPanel>
   );
 
@@ -233,16 +235,16 @@ export function NativeScreen() {
   const inspector =
     wide && selected && inspectorOpen ? (
       <View style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: layout.inspectorWidth, zIndex: 10 }}>
-        <PatientPanel label="Procedencia" className="flex-1 border-royal-400 bg-ink-950">
+        <PatientPanel label="Procedencia" className="flex-1 border-border-strong bg-surface">
           <PatientButton tone="quiet" label="Cerrar" onPress={() => store.setState({ inspectorOpen: false })} />
-          <Text className="text-sm text-royal-300">Origen</Text>
-          <Text className="text-base text-silver-50">{FORM_SOURCE_LABEL[selected.source]}</Text>
-          <Text className="text-sm text-royal-300">Documento de origen</Text>
-          <Text className="text-base text-silver-50">{selected.documentId ?? 'Sin documento'}</Text>
-          <Text className="text-sm text-royal-300">Estado</Text>
-          <Text className="text-base text-silver-50">{FORM_STATUS_LABEL[selected.status]}</Text>
-          <Text className="text-sm text-royal-300">Respuestas confirmadas</Text>
-          <Text className="text-base text-silver-50">
+          <Text className="text-sm font-semibold text-accent">Origen</Text>
+          <Text className="text-base text-text">{FORM_SOURCE_LABEL[selected.source]}</Text>
+          <Text className="text-sm font-semibold text-accent">Documento de origen</Text>
+          <Text className="text-base text-text">{selected.documentId ?? 'Sin documento'}</Text>
+          <Text className="text-sm font-semibold text-accent">Estado</Text>
+          <Text className="text-base text-text">{FORM_STATUS_LABEL[selected.status]}</Text>
+          <Text className="text-sm font-semibold text-accent">Respuestas confirmadas</Text>
+          <Text className="text-base text-text">
             {formProgress(selected).done} de {formProgress(selected).total}
           </Text>
         </PatientPanel>

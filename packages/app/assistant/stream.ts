@@ -25,6 +25,18 @@ export function parseStreamFrame(raw: string): AssistantStreamFrame | null {
   return null;
 }
 
+/** Older gateway builds sometimes streamed a JSON {"reply": …} body verbatim. */
+const unwrapReply = (value: string): string => {
+  const trimmed = value.trim();
+  if (!trimmed.startsWith('{')) return value;
+  try {
+    const parsed = JSON.parse(trimmed) as { reply?: unknown };
+    return typeof parsed?.reply === 'string' && parsed.reply.trim() ? parsed.reply : value;
+  } catch {
+    return value;
+  }
+};
+
 export async function readAssistantStream(
   response: Response,
   onDelta: (text: string) => void,
@@ -55,7 +67,7 @@ export async function readAssistantStream(
           if (text.length > 4000) throw new Error('La respuesta fue demasiado larga.');
           onDelta(text);
         } else if (frame?.kind === 'done') {
-          completed = { reply: frame.reply, ui: frame.ui };
+          completed = { reply: unwrapReply(frame.reply), ui: frame.ui };
         } else if (frame?.kind === 'error') {
           throw new Error(frame.message);
         }

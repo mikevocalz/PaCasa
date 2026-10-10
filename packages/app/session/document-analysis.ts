@@ -50,8 +50,13 @@ export const QUESTION_ES: Record<string, string> = {
 const FILL_IN_LINE = /^(.+?):\s*_*\s*$/;
 
 function labelOf(line: string): string | null {
-  const match = FILL_IN_LINE.exec(line.trim());
-  return match?.[1]?.trim() ?? null;
+  const trimmed = line.trim();
+  const label = FILL_IN_LINE.exec(trimmed)?.[1]?.trim() ?? null;
+  if (label && label.length <= 80) return label;
+  // Transcribed text often drops the colon and blanks; a bare line that is a
+  // known form label still names a field.
+  const bare = trimmed.replace(/:+$/, '').trim();
+  return bare.length <= 80 && QUESTION_ES[bare.toLowerCase()] ? bare : null;
 }
 
 export function analyseDocument(document: PatientDocument): DocumentAnalysis {

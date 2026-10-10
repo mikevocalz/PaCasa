@@ -36,27 +36,27 @@ export function BrowserDocumentCamera({ active, consent, onExtracted, onError, o
     finally { busy.current = false; }
   };
   if (!permission?.granted) return (
-    <View className="gap-3 rounded-xl border border-ink-600 p-4">
-      <Text className="text-silver-300">Autoriza la cámara para usar el escáner web.</Text>
+    <View className="gap-3 rounded-soft border border-border bg-surface-raised p-4">
+      <Text className="text-text-muted">Autoriza la cámara para usar el escáner web.</Text>
       <Pressable role="button" onPress={() => { void requestPermission(); }}
-        className="min-h-12 items-center justify-center rounded-xl bg-royal-500">
-        <Text className="font-semibold text-silver-50">Activar cámara web</Text>
+        className="min-h-12 items-center justify-center rounded-soft bg-cta">
+        <Text className="font-semibold text-on-cta">Activar cámara web</Text>
       </Pressable>
     </View>
   );
   return (
     <View className="gap-3">
-      <View className="overflow-hidden rounded-2xl border-2 border-royal-400">
+      <View className="overflow-hidden rounded-soft border-2 border-accent">
         <CameraView ref={camera} active={active} facing="back" style={{ width: '100%', height: 280 }} />
       </View>
-      {!DEMO_URL ? <Text role="status" className="text-sm text-silver-300">
+      {!DEMO_URL ? <Text role="status" className="text-sm text-text-muted">
         Configura el endpoint seguro de documentos en la web.
       </Text> : null}
       <Pressable role="button" disabled={!active || !consent || !DEMO_URL || busy.current}
         accessibilityLabel="Capturar para reconocimiento de texto web con autorización"
         onPress={() => { void capture(); }}
-        className="min-h-14 items-center justify-center rounded-xl bg-royal-500 px-4 disabled:opacity-40">
-        <Text className="font-semibold text-silver-50">Capturar · Leer con Google</Text>
+        className="min-h-14 items-center justify-center rounded-soft bg-cta px-4 disabled:opacity-40">
+        <Text className="font-semibold text-on-cta">Capturar · Leer con Google</Text>
       </Pressable>
     </View>
   );

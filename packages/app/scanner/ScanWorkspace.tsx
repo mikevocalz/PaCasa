@@ -47,20 +47,20 @@ export function ScanWorkspace({ active }: { active: boolean }) {
   };
   return (
     <View className="gap-4">
-      <View className="overflow-hidden rounded-2xl border border-ink-700 bg-ink-900 p-4">
-        <Text role="heading" aria-level={2} className="font-display text-xl text-silver-50">
+      <View className="overflow-hidden rounded-soft border border-border bg-surface-raised p-4">
+        <Text role="heading" aria-level={2} className="font-display text-xl text-text">
           Escanear documento
         </Text>
-        <Text className="mt-2 text-sm leading-6 text-silver-300">
+        <Text className="mt-2 text-sm leading-6 text-text-muted">
           {Platform.OS === 'web'
             ? 'En web, Google leerá la imagen solo tras tu autorización. No uses información real de pacientes durante esta demostración.'
             : 'La cámara y el modelo ExecuTorch leerán las palabras en tu dispositivo. Revisa el resultado antes de compartirlo.'}
         </Text>
       </View>
-      <View className="relative overflow-hidden rounded-2xl border border-ink-700 bg-ink-950">
+      <View className="relative overflow-hidden rounded-soft border border-border bg-surface-sunken">
         <RiveStage source={riveFiles.signalStudio} artboard="SignalStudio"
           className="h-24 border-0" height={96} autoplay={scan.phase === 'recognizing'} />
-        <Text className="py-2 text-center text-sm font-semibold text-royal-300">
+        <Text className="py-2 text-center text-sm font-semibold text-accent">
           {scan.phase === 'recognizing' ? 'Leyendo y detectando texto…' :
             scan.phase === 'review' ? 'Revisar palabras detectadas' : 'Coloca el documento en el marco'}
         </Text>
@@ -68,10 +68,10 @@ export function ScanWorkspace({ active }: { active: boolean }) {
       {Platform.OS === 'web' ? (
         <Pressable role="checkbox" aria-checked={scan.consent}
           onPress={() => scan.setConsent(!scan.consent)}
-          className="min-h-12 flex-row items-center gap-3 rounded-xl border border-ink-700 bg-ink-900 p-3">
-          <View className={scan.consent ? 'h-6 w-6 border-2 border-royal-300 bg-royal-500' :
-            'h-6 w-6 border-2 border-silver-400'} />
-          <Text className="min-w-0 flex-1 text-sm text-silver-200">
+          className="min-h-12 flex-row items-center gap-3 rounded-soft border border-border bg-surface-raised p-3">
+          <View className={scan.consent ? 'h-6 w-6 border-2 border-accent bg-accent' :
+            'h-6 w-6 border-2 border-border bg-surface-sunken'} />
+          <Text className="min-w-0 flex-1 text-sm text-text-muted">
             Autorizo enviar esta imagen al lector Google de prueba. No usaré datos reales de pacientes.
           </Text>
         </Pressable>
@@ -80,13 +80,13 @@ export function ScanWorkspace({ active }: { active: boolean }) {
         onExtracted={scan.onExtracted}
         onError={scan.onError}
         onProgress={scan.setPhase} />
-      {scan.error ? <Text role="alert" className="rounded-xl border border-danger p-3 text-sm text-danger">{scan.error}</Text> : null}
+      {scan.error ? <Text role="alert" className="rounded-soft border border-danger p-3 text-sm text-danger">{scan.error}</Text> : null}
       {scan.phase === 'review' ? (
-        <View className="gap-3 rounded-2xl border border-royal-400/40 bg-ink-900 p-4">
-          <Text role="heading" aria-level={3} className="font-display text-lg text-silver-50">
+        <View className="gap-3 rounded-soft border border-border bg-surface-raised p-4">
+          <Text role="heading" aria-level={3} className="font-display text-lg text-text">
             Revisa el texto antes de usarlo
           </Text>
-          <Text className="text-sm text-silver-300">
+          <Text className="text-sm text-text-muted">
             Fuente: {scan.source === 'on-device' ? 'Modelo local ExecuTorch' : 'Google Gemini Vision, prueba'}
           </Text>
           <Textarea label="Editar texto reconocido" rounded value={scan.text}
@@ -94,15 +94,15 @@ export function ScanWorkspace({ active }: { active: boolean }) {
             className="min-h-36 text-base" />
           <Pressable role="button" accessibilityLabel="Llevar texto revisado al chat para confirmar su envío"
             onPress={moveToChat}
-            className="min-h-14 items-center justify-center rounded-xl bg-royal-500 px-4">
-            <Text className="font-semibold text-silver-50">Llevar texto al Chat</Text>
+            className="min-h-14 items-center justify-center rounded-soft bg-cta px-4">
+            <Text className="font-semibold text-on-cta">Llevar texto al Chat</Text>
           </Pressable>
-          <Pressable role="button" onPress={scan.reset} className="min-h-12 items-center justify-center border border-ink-500">
-            <Text className="font-semibold text-silver-300">Volver a escanear</Text>
+          <Pressable role="button" onPress={scan.reset} className="min-h-12 items-center justify-center rounded-soft border border-border bg-surface-raised">
+            <Text className="font-semibold text-text">Volver a escanear</Text>
           </Pressable>
         </View>
       ) : null}
-      <Text className="text-sm leading-6 text-silver-400">
+      <Text className="text-sm leading-6 text-text-muted">
         Pa’Casa nunca rellena ni envía el formulario automáticamente. Si compartes texto con la IA, tendrás que confirmar en Chat.
       </Text>
     </View>

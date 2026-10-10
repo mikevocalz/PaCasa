@@ -2,8 +2,10 @@
 
 **Workflow:** the patient's starting point — "¿Qué necesita hacer ahora?"
 **Slug:** `/` (locked, `tooling/verify-five-routes.mjs`)
-**Reference implementation:** `src/pages/Inicio.jsx`; shared-app slug currently
-renders `ShowcaseScreen` (`apps/web/app/page.tsx`, `apps/mobile/app/index.tsx`)
+**Reference implementation:** `src/pages/Inicio.jsx`; the shared product home is
+`PaCasaHomeScreen` (`apps/web/app/page.tsx`, `apps/mobile/app/index.tsx`), while
+the form-first visit overview remains on the preserved `/lab` slug via
+`ShowcaseScreen`
 
 ## References (full digest in `00-references.md`)
 

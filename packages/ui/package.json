@@ -23,6 +23,10 @@
       "react-native": "./icons.native.tsx",
       "default": "./icons.web.ts"
     },
+    "./voice": {
+      "react-native": "./audio/voice.native.ts",
+      "default": "./audio/voice.web.ts"
+    },
     "./native": "./native.ts",
     "./admin": "./admin/index.ts",
     "./adaptive-panes": "./adaptive-panes/index.tsx",

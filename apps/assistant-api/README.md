@@ -18,6 +18,8 @@ have been approved. CORS alone is not authentication.
 ## Local development
 
 ```sh
+# `dev` loads the repo-root .env.local; GOOGLE_GEMINI is accepted as an
+# alias for GEMINI_API_KEY (the moyo env name).
 export GEMINI_API_KEY=... # server environment only; never in git or Expo
 export GEMINI_MODEL=gemini-3.8-flash
 export PACASA_ALLOWED_ORIGINS=http://localhost:3000
@@ -47,9 +49,25 @@ run when `BASE44_EXPORT=1`.
 Returns `{ "reply": "...", "ui": "..." }`. Chat history contains at
 most six validated text-only turns. Translation drops all history.
 
+`POST /assistant/stream` — same body for `mode: "chat"`, replies as SSE
+(`delta` events then one `done` with optional OpenUI/directions payloads).
+
+`POST /assistant/document` — `{ "mimeType", "data" (base64), "consent": true }`,
+PDF/JPEG/PNG; returns `{ "text", "engine" }`. Demo OCR only, gated by
+`PACASA_ENABLE_DEMO_DOC_OCR=1`; never for production PHI.
+
+`POST /assistant/speak` — `{ "text" (≤1200 chars), "consent": true }`, streams
+back `audio/mpeg` synthesized by ElevenLabs (`eleven_multilingual_v2`, ES/EN)
+when `ELEVENLABS_API_KEY` and `ELEVENLABS_VOICE_ID` are set; otherwise 503 and
+clients fall back to device text-to-speech.
+
+`GET /assistant/map?lat&lng&label` — proxied static pin map (Google key first,
+then the public Mapbox token); used by the directions card so image URLs
+never carry coordinates through third-party page loads.
+
 Limits: 16 KiB body, 2000 characters per turn, in-memory 20 requests /
 5 minutes per socket IP, 15 second upstream timeout. No file/voice/photo
-upload. No logs of user messages or model replies, no persistent storage.
+retention. No logs of user messages or model replies, no persistent storage.
 Check `GET /healthz` for liveness/configuration without disclosing secrets.
 
 ## Model

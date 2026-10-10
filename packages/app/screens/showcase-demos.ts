@@ -1,7 +1,7 @@
 /**
  * Inicio workflow metadata. Serializable and platform-neutral: on web the page
  * hands it to the client screen across the RSC boundary; on native the screen
- * uses it as its default. The slugs are the locked five routes from
+ * uses it as its default. The slugs are the preserved workflow routes from
  * docs/adr/0002; the labels are the Spanish workflow names patients see.
  */
 export interface ShowcaseDemo {

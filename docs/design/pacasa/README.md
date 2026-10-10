@@ -2,8 +2,8 @@
 
 This folder is the design-lane (D) handoff for the Pa'Casa cross-platform
 healthcare redesign. It documents the research, decisions, copy and
-accessibility risks for repurposing the five shared-app route slugs into the
-patient workflows locked by [ADR 0002](../../adr/0002-pacasa-healthcare-route-map.md).
+accessibility risks for the merged nine-route workspace locked by
+[ADR 0002](../../adr/0002-pacasa-healthcare-route-map.md).
 
 **Scope:** design and evidence only. No source code is changed here; the
 `src/` Base44/Vite patient app is treated as the reference implementation the
@@ -11,17 +11,21 @@ shared app (`apps/web`, `apps/mobile`, `packages/app`) converges on.
 
 ## Route map (binding)
 
-The five slugs are protected by `tooling/verify-five-routes.mjs`. Slugs stay;
+The nine slugs are protected by `tooling/verify-five-routes.mjs`. Slugs stay;
 user-facing labels are Spanish workflow names.
 
 | Slug | Workflow | Nav role | Reference impl |
 |---|---|---|---|
-| `/` | **Inicio** — start or resume the visit | Primary destination | `src/pages/Inicio.jsx` |
-| `/native` | **Formularios** — forms and field progress | Primary destination | `src/pages/Formularios.jsx` |
-| `/hybrid` | **Documentos** — source documents and analysis | Primary destination | `src/pages/Documentos.jsx` |
-| `/game` | **Revisar** — confirm and correct answers | Primary destination | `src/pages/Revisar.jsx` |
+| `/` | **Inicio** — start help, translation, or the visit | Primary destination | `src/pages/Inicio.jsx` |
+| `/mi-plan` | **Mi plan** — current visit guidance | Primary destination | Product tab added after the original five-route lane |
+| `/citas` | **Citas** — appointment preparation | Primary destination | Product tab added after the original five-route lane |
+| `/apoyo` | **Apoyo** — explanation and translation support | Primary destination | Product tab added after the original five-route lane |
+| `/lab` | **Visita** — form-first entry and session overview | Secondary route | `src/pages/Inicio.jsx` form workflow |
+| `/native` | **Formularios** — forms and field progress | Secondary route | `src/pages/Formularios.jsx` |
+| `/hybrid` | **Documentos** — source documents and analysis | Secondary route | `src/pages/Documentos.jsx` |
+| `/game` | **Revisar** — confirm and correct answers | Secondary route | `src/pages/Revisar.jsx` |
 | `/immersive` | **Ayuda** — accessibility, privacy, how Pa'Casa works | Secondary route: header menu / drawer / links, **not a bottom tab** | `src/components/PatientShell.jsx` drawer panels (`DrawerPanel`, lines 30–129) |
-| — (overlay) | **Pa'Casa Live** — Hablar / Traducir / Preguntar | Raised center action; root-level overlay, not a sixth route | `src/pages/PaCasaLive.jsx` (route `/pacasa` outside `PatientShell`, `src/App.jsx:45`) |
+| — (overlay) | **Pa'Casa Live** — Hablar / Traducir / Preguntar | Raised center action; root-level overlay, not a tenth route | `src/pages/PaCasaLive.jsx` (route `/pacasa` outside `PatientShell`, `src/App.jsx:45`) |
 
 The center action opens the Pa'Casa Live overlay. On `src/` it is the
 `/pacasa` route rendered outside `PatientShell`; on the shared app it maps to

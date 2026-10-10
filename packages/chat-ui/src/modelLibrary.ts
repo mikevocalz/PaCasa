@@ -39,7 +39,7 @@ export const library = createLibrary({
   components: [Response, Paragraph, Translation, FieldReview, Suggestion, Directions],
   componentGroups: [
     { name: 'Bilingual assistance', components: ['PaCasaText', 'TranslationPair'], notes: ['Explain English forms in plain Spanish.'] },
-    { name: 'Real places and directions', components: ['DirectionsMap'], notes: ['Only verified Google Places coordinates.'] },
+    { name: 'Real places and directions', components: ['DirectionsMap'], notes: ['Only verified geocoded coordinates.'] },
     { name: 'User-controlled form review', components: ['FormFieldReview', 'FollowUpSuggestion'], notes: ['No action can submit, save or commit an answer.'] },
   ],
 });

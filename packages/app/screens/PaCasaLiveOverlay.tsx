@@ -21,6 +21,8 @@ import { Nav, Pressable, ScrollView, Text, TextInput, View } from '@acme/ui/tw';
 import { startExampleForm } from '../session/actions';
 import { groundQuestion, SUGGESTED_QUESTIONS } from '../session/grounding';
 import { useLiveOverlay, type LiveMode } from '../session/live-overlay';
+import { useLanguage } from '../session/locale';
+import { t, type StringKey } from '../session/strings';
 import {
   currentQuestion,
   formProgress,
@@ -36,16 +38,17 @@ import { PatientBigAction, PatientButton } from './patient-ui';
 
 type IconComponent = ComponentType<{ size?: number; strokeWidth?: number; className?: string }>;
 
-const MODES: readonly { id: LiveMode; label: string; icon: IconComponent }[] = [
-  { id: 'hablar', label: 'Hablar', icon: Mic },
-  { id: 'traducir', label: 'Traducir', icon: Languages },
-  { id: 'preguntar', label: 'Preguntar', icon: HelpCircle },
-];
+const MODES: readonly { id: LiveMode; labelKey: StringKey; icon: IconComponent }[] = [
+  { id: 'hablar', labelKey: 'live.hablar', icon: Mic },
+  { id: 'traducir', labelKey: 'live.traducir', icon: Languages },
+  { id: 'preguntar', labelKey: 'live.preguntar', icon: HelpCircle },
+] as const;
 
 /** Platform-neutral navigation prop for solito Links that also close the overlay. */
 const linkClose = (close: () => void) => (Platform.OS === 'web' ? { onClick: close } : { onPress: close });
 
 export function PaCasaLiveOverlay() {
+  const language = useLanguage();
   const open = useLiveOverlay((state) => state.open);
   const mode = useLiveOverlay((state) => state.mode);
   const setMode = useLiveOverlay((state) => state.setMode);
@@ -82,7 +85,7 @@ export function PaCasaLiveOverlay() {
           <View className="min-h-14 flex-row items-center justify-between gap-3 border-b border-border px-4 py-2">
             <Pressable
               role="button"
-              aria-label="Cerrar Pa'Casa"
+              aria-label={t('assistant.close', language)}
               onPress={close}
               className="h-11 w-11 items-center justify-center rounded-soft border border-border bg-surface-raised focus-visible:outline-2 focus-visible:outline-focus"
             >
@@ -115,7 +118,7 @@ export function PaCasaLiveOverlay() {
                   }`}
                 >
                   <item.icon size={18} className={selected ? 'text-on-accent' : 'text-text-muted'} />
-                  <Text className={`text-sm font-semibold ${selected ? 'text-on-accent' : 'text-text-muted'}`}>{item.label}</Text>
+                  <Text className={`text-sm font-semibold ${selected ? 'text-on-accent' : 'text-text-muted'}`}>{t(item.labelKey, language)}</Text>
                 </Pressable>
               );
             })}

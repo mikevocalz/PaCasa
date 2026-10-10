@@ -25,8 +25,8 @@ export function DocumentCamera(props: DocumentCameraProps) {
 
   if (!BrowserCamera) {
     return (
-      <View role="status" className="rounded-xl border border-ink-600 p-4">
-        <Text className="text-sm text-silver-300">
+      <View role="status" className="rounded-soft border border-border p-4">
+        <Text className="text-sm text-text-muted">
           Preparando la cámara del navegador. No se ha capturado ni enviado ninguna imagen.
         </Text>
       </View>

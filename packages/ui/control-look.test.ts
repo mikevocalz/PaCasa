@@ -45,7 +45,7 @@ test('outerLayout lets a caller align the button', () => {
   assert.equal(outerLayout('self-end'), 'self-end');
 });
 
-test('cta is the orange solid face whatever the tone or district', () => {
-  assert.deepEqual(controlLook('cta'), { look: 'solid', tone: 'orange' });
-  assert.deepEqual(controlLook('cta', 'royal', 'downtown'), { look: 'solid', tone: 'orange' });
+test('cta is the carolina solid face whatever the tone or district', () => {
+  assert.deepEqual(controlLook('cta'), { look: 'solid', tone: 'carolina' });
+  assert.deepEqual(controlLook('cta', 'royal', 'downtown'), { look: 'solid', tone: 'carolina' });
 });

@@ -1,4 +1,4 @@
-// @acme/app: the five shared screens. Route files in apps/mobile and apps/web only render these.
+// @acme/app: shared screens for the product tabs and preserved workflow routes.
 export { ShowcaseScreen } from './screens/ShowcaseScreen';
 export { SHOWCASE_DEMOS, type ShowcaseDemo } from './screens/showcase-demos';
 export { NativeScreen } from './screens/NativeScreen';

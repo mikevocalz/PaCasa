@@ -1,5 +1,12 @@
 # Pa'Casa assistant: product entry and backend contract
 
+> Current patient-shell note: `PaCasaLiveOverlay` is the only assistant
+> mounted by `AppShell` after the healthcare redesign. It provides Hablar,
+> Traducir, and Preguntar without a bundled model endpoint. The backend chat,
+> scanner, and Camera Lab code described below remains in the workspace for a
+> future privacy-reviewed integration, but is not a visible product surface in
+> this build.
+
 ## Navigation
 
 The raised center action on phones and the right hardware rail on foldables/tablets

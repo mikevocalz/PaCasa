@@ -19,7 +19,7 @@ No source-code edits.
   contract, safety requirements
 - `docs/spec/prompts/MASTER_PROMPT_V5.md`, `docs/spec/prompts/ROSTER.md`,
   `docs/spec/prompts/SKILLS.md` — pack context
-- `tooling/verify-five-routes.mjs` — the five-slug contract
+- `tooling/verify-five-routes.mjs` — the merged nine-slug contract
 - `docs/SOURCE_PROVENANCE.md`, `docs/DESIGN_SYSTEM.md` (palette provenance)
 - `AGENTS.md` — shell/workspace/navigation contracts
 

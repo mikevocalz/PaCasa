@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react';
 import { Platform } from 'react-native';
 import { ExpoSpeechRecognitionModule, useSpeechRecognitionEvent } from 'expo-speech-recognition';
 import * as Speech from 'expo-speech';
+import { playUtterance, type UtterancePlayback } from '@acme/ui/voice';
 import { assistantReplyFromResponse, makeAssistantRequest } from '../assistant/contract';
 import { boundedUtterance, spokenLanguageForSpeaker, spokenTranslationLocale, speechLocaleForSpeaker, type TalkSpeaker } from './model';
 import { createTurnLease } from './turn-lease';
@@ -11,6 +12,8 @@ import { useTalkStore } from './store';
 
 const ENDPOINT = Platform.OS === 'web' ? process.env.NEXT_PUBLIC_PACASA_ASSISTANT_URL : process.env.EXPO_PUBLIC_PACASA_ASSISTANT_URL;
 export const talkEndpointAvailable = Boolean(ENDPOINT && (/^https:\/\//.test(ENDPOINT) || /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?\//.test(ENDPOINT)));
+/** ElevenLabs speech rides the same service; unset on hosts without a voice key. */
+const SPEAK_ENDPOINT = ENDPOINT?.replace(/\/assistant\/?$/, '/assistant/speak') ?? null;
 
 /** Zustand owns visible state; refs exclusively own permissions, recognition and request resources. */
 export function useTalkSession(active: boolean) {
@@ -20,6 +23,8 @@ export function useTalkSession(active: boolean) {
   const requestRef = useRef<AbortController | null>(null);
   const recognition = useRef<{ live: boolean; token: number | null; end: (() => void) | null }>({ live: false, token: null, end: null });
   const closing = useRef<Promise<void> | null>(null);
+  const voice = useRef<UtterancePlayback | null>(null);
+  const stopVoice = () => { voice.current?.stop(); voice.current = null; };
   const valid = (token: number) => activeRef.current && lease.current(token) && useTalkStore.getState().consent;
 
   const haltRecognition = (): Promise<void> => {
@@ -46,6 +51,7 @@ export function useTalkSession(active: boolean) {
     recognition.current.token = null;
     useTalkStore.getState().reset();
     void haltRecognition().catch(() => {});
+    stopVoice();
     void Speech.stop().catch(() => {});
   };
   useEffect(() => {
@@ -61,10 +67,30 @@ export function useTalkSession(active: boolean) {
     const store = useTalkStore.getState();
     if (store.muted) { store.setPhase('idle'); return; }
     store.setPhase('speaking');
-    Speech.speak(text, { language: spokenTranslationLocale(speaker), rate: 0.88,
-      onDone: () => { if (valid(token)) useTalkStore.getState().setPhase('idle'); },
-      onStopped: () => { if (valid(token)) useTalkStore.getState().setPhase('idle'); },
-      onError: () => { if (valid(token)) useTalkStore.getState().setError('No se pudo reproducir. Puedes leer el texto.'); } });
+    const finish = () => { if (valid(token)) useTalkStore.getState().setPhase('idle'); };
+    const fail = () => { if (valid(token)) useTalkStore.getState().setError('No se pudo reproducir. Puedes leer el texto.'); };
+    // ElevenLabs through the assistant service is the spoken voice; the
+    // device's own TTS is the fallback when voice is not configured, the
+    // request fails, or playback is blocked. No silent dead air either way.
+    const deviceSpeak = () => {
+      if (!valid(token)) return;
+      Speech.speak(text, { language: spokenTranslationLocale(speaker), rate: 0.88,
+        onDone: finish, onStopped: finish, onError: fail });
+    };
+    if (!SPEAK_ENDPOINT) { deviceSpeak(); return; }
+    void (async () => {
+      try {
+        const response = await fetch(SPEAK_ENDPOINT, { method: 'POST', credentials: 'include',
+          headers: { 'Content-Type': 'application/json', Accept: 'audio/mpeg', 'X-PaCasa-Request': '1' },
+          body: JSON.stringify({ text, consent: true }), signal: AbortSignal.timeout(20_000) });
+        if (!response.ok || !valid(token)) { deviceSpeak(); return; }
+        const playback = playUtterance(await response.arrayBuffer());
+        voice.current = playback;
+        const played = await playback.done;
+        voice.current = null;
+        if (!played) deviceSpeak(); else finish();
+      } catch { deviceSpeak(); }
+    })();
   };
   const translate = async (raw: string) => {
     const store = useTalkStore.getState();
@@ -83,6 +109,7 @@ export function useTalkSession(active: boolean) {
     store.setPhase('translating');
     try {
       await haltRecognition();
+      stopVoice();
       await Speech.stop();
       if (!valid(token)) return;
       const response = await fetch(ENDPOINT, { method: 'POST', credentials: 'include',
@@ -138,6 +165,7 @@ export function useTalkSession(active: boolean) {
     if (token === null) return;
     try {
       await haltRecognition();
+      stopVoice();
       await Speech.stop();
       if (!valid(token)) return;
       const permission = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
@@ -165,7 +193,7 @@ export function useTalkSession(active: boolean) {
     if (!last || !activeRef.current || !store.consent || store.phase === 'listening') return;
     const token = lease.begin();
     if (token === null) return;
-    try { await haltRecognition(); await Speech.stop(); if (valid(token)) speak(last.translation, last.speaker, token); }
+    try { await haltRecognition(); stopVoice(); await Speech.stop(); if (valid(token)) speak(last.translation, last.speaker, token); }
     catch { if (valid(token)) store.setError('No se pudo reproducir.'); }
     finally { lease.release(token); }
   };
@@ -177,7 +205,7 @@ export function useTalkSession(active: boolean) {
     const store = useTalkStore.getState();
     const muted = !store.muted;
     store.setMuted(muted);
-    if (muted) { void Speech.stop().catch(() => {}); if (store.phase === 'speaking') store.setPhase('idle'); }
+    if (muted) { stopVoice(); void Speech.stop().catch(() => {}); if (store.phase === 'speaking') store.setPhase('idle'); }
   };
   return { state, translate, listenTo, stopListening, repeat, toggleConsent, toggleMuted, cancel };
 }

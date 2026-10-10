@@ -1,44 +1,57 @@
 # ADR 0002: Pa'Casa healthcare route map
 
 Date: 2026-02-06
-Status: Accepted for this redesign branch
+Status: Accepted; reconciled with the merged nine-route workspace
 
 ## Context
 
 The repository contains two Pa'Casa surfaces:
 
 - `src/`: the deployed Base44/Vite patient app, with the locked healthcare workflow `Inicio`, `Formularios`, `Documentos`, `Revisar`, and the root-level Pa'Casa Live command surface.
-- `apps/web`, `apps/mobile`, and `packages/app`: the shared cross-platform app, still using the spatial-starter routes and visual language.
+- `apps/web`, `apps/mobile`, and `packages/app`: the shared cross-platform app. After the mainline merge, it has four product routes plus five preserved starter/demo routes.
 
 The shared app is protected by `tooling/verify-five-routes.mjs`, which requires exactly:
 
 - `/`
+- `/apoyo`
+- `/citas`
 - `/game`
 - `/hybrid`
 - `/immersive`
+- `/lab`
+- `/mi-plan`
 - `/native`
 
-The patient session, document analysis, grounded questions, phrasebook, speech, and print modules already exist under `packages/app/session/` and `packages/app/speech/`, but were not connected to visible screens.
+The patient session, document analysis, grounded questions, phrasebook, speech, and print modules exist under `packages/app/session/` and `packages/app/speech/`. The patient workflow screens preserve the technical starter slugs while presenting Spanish workflow names.
 
 ## Decision
 
-Keep the five existing route slugs unchanged and repurpose their shared screens as Pa'Casa workflows:
+Keep all nine existing route slugs unchanged. The product tabs are:
 
 | Route | Patient workflow | Navigation role |
 | --- | --- | --- |
-| `/` | Inicio — start or resume the visit | Primary destination |
-| `/native` | Formularios — forms and field progress | Primary destination |
-| `/hybrid` | Documentos — source documents and analysis | Primary destination |
-| `/game` | Revisar — confirm and correct answers | Primary destination |
-| `/immersive` | Ayuda — accessibility, privacy, and how Pa'Casa works | Secondary route, linked from home/menu rather than a tab |
+| `/` | Inicio — start help, translation, or the visit | Primary destination |
+| `/mi-plan` | Mi plan — current visit guidance and missing work | Primary destination |
+| `/citas` | Citas — appointment preparation | Primary destination |
+| `/apoyo` | Apoyo — explanation and translation support | Primary destination |
 
-Replace the raised Camera Lab action with a Pa'Casa Live overlay. The overlay is not a sixth route; it owns Hablar, Traducir, and Preguntar and returns to the underlying pathname through the existing session contract.
+The preserved starter slugs carry the form-completion workflow:
 
-Keep `packages/camera` and the native Camera Lab implementation intact, but do not present it as patient document capture. Document upload remains honest: web may use the platform file input; native reports that this build has no document picker instead of pretending a capture pipeline exists.
+| Route | Patient workflow | Navigation role |
+| --- | --- | --- |
+| `/lab` | Visita — form-first entry point and session overview | Secondary route |
+| `/native` | Formularios — forms and field progress | Secondary route |
+| `/hybrid` | Documentos — source documents and analysis | Secondary route |
+| `/game` | Revisar — confirm and correct answers | Secondary route |
+| `/immersive` | Ayuda — accessibility, privacy, and how Pa'Casa works | Secondary route |
+
+Replace the raised Camera Lab action with a Pa'Casa Live overlay. The overlay is not a tenth route; it owns Hablar, Traducir, and Preguntar and returns to the underlying pathname through the existing session contract.
+
+Keep `packages/camera`, the assistant internals, and the native Camera Lab implementation intact, but do not present them as patient document capture in the primary shell. Document upload remains honest: web may use the platform file input; native reports that this build has no document picker instead of pretending a capture pipeline exists.
 
 ## Consequences
 
-- Deep links and the five-route verifier remain stable.
+- Deep links and the nine-route verifier remain stable.
 - The patient workflows can share the existing Zustand session store.
 - The old starter route names remain technical slugs; user-facing labels must be Spanish workflow names.
 - The spatial/game demos are no longer patient-facing destinations. Their contracts and package tests remain protected, but the visible screens should not advertise them as healthcare capabilities.

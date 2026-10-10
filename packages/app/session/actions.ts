@@ -1,5 +1,5 @@
 import { analyseDocument, formFromDocument } from './document-analysis';
-import { demoDocuments, demoForms, usePatientSession, type PatientDocument, type PatientForm } from './patient';
+import { demoDocuments, usePatientSession, type PatientDocument, type PatientForm } from './patient';
 
 /**
  * The writes the patient screens share, so a screen never reaches into the
@@ -37,9 +37,8 @@ export function startFormFromDocument(documentId: string): PatientForm | null {
 }
 
 /**
- * A file the patient just chose or photographed. This build has no document
- * text pipeline on this surface, so the document joins the session unread
- * and the screens say so instead of inventing fields.
+ * A file the patient chose but this build could not read. It joins the
+ * session unread and the screens say so instead of inventing fields.
  */
 export function addUploadedDocument(name: string, kind: PatientDocument['kind']): PatientDocument {
   const document: PatientDocument = {
@@ -49,6 +48,25 @@ export function addUploadedDocument(name: string, kind: PatientDocument['kind'])
     kind,
     pages: [],
     unreadable: true,
+  };
+  usePatientSession.getState().addDocument(document);
+  return document;
+}
+
+/**
+ * A file the consent-gated reader actually transcribed. The text lands as a
+ * single readable page so the analyzer can find labeled questions in it;
+ * provenance stays with the uploaded file name and page 1.
+ */
+export function addReadDocument(name: string, kind: PatientDocument['kind'], text: string): PatientDocument {
+  const trimmed = text.trim();
+  const document: PatientDocument = {
+    id: `doc-${slugify(name) || 'archivo'}`,
+    title: name,
+    clinic: 'Sesión actual',
+    kind,
+    pages: trimmed ? [{ number: 1, text: trimmed }] : [],
+    unreadable: !trimmed,
   };
   usePatientSession.getState().addDocument(document);
   return document;

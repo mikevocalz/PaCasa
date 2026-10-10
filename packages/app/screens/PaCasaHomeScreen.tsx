@@ -1,73 +1,75 @@
 'use client';
 
+import { Link } from 'solito/link';
+import { ClipboardList, FileText, Languages, ListChecks, MessageCircle, ShieldCheck } from '@acme/ui/icons';
+import { Text, View } from '@acme/ui/tw';
 import { useAssistantStore } from '../assistant/store';
-import { MessageCircle, Mic, ScanLine, Heart } from '@acme/ui/icons';
-import { Pressable, ScrollView, Text, View } from '@acme/ui/tw';
+import { useLanguage } from '../session/locale';
+import { t, type StringKey } from '../session/strings';
+import { PatientBigAction, PatientFrame, PatientPanel, type PatientIcon } from './patient-ui';
 
-function BigAction({ title, description, onPress, icon: Icon }: {
-  title: string;
-  description: string;
-  onPress: () => void;
-  icon: typeof MessageCircle;
-}) {
-  return (
-    <Pressable
-      role="button"
-      accessibilityLabel={title}
-      onPress={onPress}
-      className="min-h-40 min-w-0 flex-1 gap-3 border border-royal-400/70 bg-ink-900 p-5 shadow-card active:bg-ink-800 focus-visible:outline-2 focus-visible:outline-royal-300"
-    >
-      <Icon size={28} className="text-royal-300" />
-      <Text className="font-display text-2xl text-silver-50">{title}</Text>
-      <Text className="text-base leading-6 text-silver-300">{description}</Text>
-    </Pressable>
-  );
-}
+const VISIT_LINKS = [
+  { href: '/native', labelKey: 'home.forms', hintKey: 'home.formsHint', icon: ClipboardList },
+  { href: '/hybrid', labelKey: 'home.docs', hintKey: 'home.docsHint', icon: FileText },
+  { href: '/game', labelKey: 'home.review', hintKey: 'home.reviewHint', icon: ListChecks },
+] as const satisfies readonly { href: string; labelKey: StringKey; hintKey: StringKey; icon: PatientIcon }[];
 
 export function PaCasaHomeScreen() {
+  const language = useLanguage();
   const openAssistant = useAssistantStore((s) => s.openAssistant);
   return (
-    <ScrollView
-      className="flex-1 bg-ink-950"
-      contentContainerClassName="mx-auto w-full max-w-4xl gap-8 px-4 py-8 md:px-8 md:py-12"
+    <PatientFrame
+      question={t('home.eyebrow', language)}
+      title={t('home.title', language)}
+      lead={t('home.lead', language)}
     >
-      <View className="gap-4">
-        <Text className="text-sm font-semibold uppercase tracking-widest text-royal-300">Pa&apos;Casa · Inicio</Text>
-        <Text role="heading" aria-level={1} className="font-display text-4xl leading-tight text-silver-50 md:text-5xl">
-          Tu voz. Tus respuestas. A tu ritmo.
-        </Text>
-        <Text className="max-w-2xl text-lg leading-8 text-silver-300">
-          Habla en español, entiende lo que te preguntan y revisa tus respuestas antes de usarlas.
-        </Text>
-      </View>
-      <View className="flex-row flex-wrap gap-3">
-        <BigAction
-          title="Pregúntale a Pa’Casa"
-          description="Abre una conversación para entender una pregunta o un formulario."
-          icon={MessageCircle}
-          onPress={() => openAssistant('chat')}
-        />
-        <BigAction
-          title="Hablar y traducir"
-          description="Abre el modo Hablar para traducir frases entre médico y paciente."
-          icon={Mic}
-          onPress={() => openAssistant('talk')}
-        />
-      </View>
-      <View className="gap-3 border-l-4 border-royal-400 bg-ink-900/80 p-5">
-        <View className="flex-row items-center gap-3">
-          <Heart size={22} className="text-royal-300" />
-          <Text className="font-display text-xl text-silver-50">Tú tienes la última palabra</Text>
+      <View className="gap-4 md:flex-row">
+        <View className="flex-1">
+          <PatientBigAction
+            icon={MessageCircle}
+            label={t('home.ask', language)}
+            hint={t('home.askHint', language)}
+            onPress={() => openAssistant('chat')}
+          />
         </View>
-        <Text className="text-base leading-7 text-silver-300">
-          Nunca completaremos ni enviaremos un formulario por ti sin mostrarte qué dice y pedir tu confirmación.
-          No se guardan conversaciones ni respuestas en esta versión.
-        </Text>
-        <View className="flex-row items-center gap-2">
-          <ScanLine size={17} className="text-silver-400" />
-          <Text className="text-sm text-silver-400">En el botón central puedes elegir Chat, Escanear o Hablar.</Text>
+        <View className="flex-1">
+          <PatientBigAction
+            icon={Languages}
+            label={t('home.talk', language)}
+            hint={t('home.talkHint', language)}
+            tone="quiet"
+            onPress={() => openAssistant('talk')}
+          />
         </View>
       </View>
-    </ScrollView>
+
+      <PatientPanel label={t('home.visit', language)}>
+        <View className="gap-3 md:flex-row">
+          {VISIT_LINKS.map(({ href, labelKey, hintKey, icon: Icon }) => (
+            <View key={href} className="flex-1">
+              <Link href={href} aria-label={t(labelKey, language)}>
+                <View className="min-h-24 flex-1 justify-center gap-2 rounded-soft border border-border bg-surface p-4 hover:bg-surface-sunken">
+                  <Icon size={24} className="text-accent" />
+                  <Text className="font-display text-xl text-text">{t(labelKey, language)}</Text>
+                  <Text className="text-sm leading-6 text-text-muted">{t(hintKey, language)}</Text>
+                </View>
+              </Link>
+            </View>
+          ))}
+        </View>
+      </PatientPanel>
+
+      <PatientPanel label={t('home.final', language)}>
+        <View className="flex-row items-start gap-3">
+          <ShieldCheck size={24} className="mt-1 shrink-0 text-accent" />
+          <View className="min-w-0 flex-1 gap-2">
+            <Text className="font-display text-xl text-text">{t('home.finalTitle', language)}</Text>
+            <Text className="text-base leading-7 text-text-muted">
+              {t('home.finalBody', language)}
+            </Text>
+          </View>
+        </View>
+      </PatientPanel>
+    </PatientFrame>
   );
 }

@@ -7,20 +7,30 @@ import { usePathname } from 'solito/navigation';
 import { brandLogo } from '@acme/assets/brand';
 import { navChrome } from '@acme/theme';
 import { Image, Modal, SafeArea, useAdaptiveNavigationPlacement, useSafeInsets, useInstanceStore, useStore } from '@acme/ui';
-import { ClipboardList, FileText, HelpCircle, Home, ListChecks, Menu, Mic, X } from '@acme/ui/icons';
+import { Calendar, ClipboardList, FileText, HelpCircle, Home, Languages, ListChecks, Menu, Mic, Users, X } from '@acme/ui/icons';
 import { Header, Nav, Pressable, ScrollView, Text, View } from '@acme/ui/tw';
-import { useLiveOverlay } from '../session/live-overlay';
+import { useAssistantStore } from '../assistant/store';
+import { hydrateLanguage, SUPPORTED_LANGUAGES, useLanguage, usePatientLanguage } from '../session/locale';
+import { t, type StringKey } from '../session/strings';
+import { AssistantOverlay } from './AssistantOverlay';
 import { PaCasaLiveOverlay } from './PaCasaLiveOverlay';
 
-/** The four primary patient workflows; Ayuda stays a secondary link. */
+/** The four product tabs; patient visit workflows stay reachable from the menu. */
 const DESTINATIONS = [
-  { href: '/', label: 'Inicio', short: 'Inicio', icon: Home },
-  { href: '/native', label: 'Formularios', short: 'Formularios', icon: ClipboardList },
-  { href: '/hybrid', label: 'Documentos', short: 'Documentos', icon: FileText },
-  { href: '/game', label: 'Revisar', short: 'Revisar', icon: ListChecks },
+  { href: '/', labelKey: 'nav.home', shortKey: 'nav.home.short', icon: Home },
+  { href: '/mi-plan', labelKey: 'nav.plan', shortKey: 'nav.plan.short', icon: ClipboardList },
+  { href: '/citas', labelKey: 'nav.dates', shortKey: 'nav.dates.short', icon: Calendar },
+  { href: '/apoyo', labelKey: 'nav.support', shortKey: 'nav.support.short', icon: Users },
 ] as const;
 
-const SECONDARY_DESTINATION = { href: '/immersive', label: 'Ayuda', icon: HelpCircle } as const;
+const WORKFLOW_DESTINATIONS = [
+  { href: '/native', labelKey: 'nav.forms', shortKey: 'nav.forms.short', icon: ClipboardList },
+  { href: '/hybrid', labelKey: 'nav.docs', shortKey: 'nav.docs.short', icon: FileText },
+  { href: '/game', labelKey: 'nav.review', shortKey: 'nav.review.short', icon: ListChecks },
+  { href: '/immersive', labelKey: 'nav.help', shortKey: 'nav.help.short', icon: HelpCircle },
+] as const;
+
+const SECONDARY_DESTINATION = WORKFLOW_DESTINATIONS[3];
 
 const navSize = (value: string) => Number.parseFloat(value);
 const RAIL_WIDTH = navSize(navChrome.rail);
@@ -31,21 +41,24 @@ const INDICATOR_SIZE = navSize(navChrome.indicator);
 
 function Destination({
   href,
-  label,
-  short,
+  labelKey,
+  shortKey,
   icon: Icon,
   active,
   rail,
   expanded,
 }: {
   href: string;
-  label: string;
-  short: string;
+  labelKey: StringKey;
+  shortKey: StringKey;
   icon: ComponentType<{ size?: number; strokeWidth?: number; className?: string }>;
   active: boolean;
   rail: boolean;
   expanded: boolean;
 }) {
+  const language = useLanguage();
+  const label = t(labelKey, language);
+  const short = t(shortKey, language);
   return (
     <View className={rail ? 'w-full' : 'min-w-0 flex-1'}>
       <Link href={href}>
@@ -76,23 +89,60 @@ function Destination({
 
 // The lockup artwork is a dark wordmark on transparency (992x518 source,
 // ~1.9:1): on the daylit header it sits bare — the plate is only needed if a
-// night chrome ships again.
+// night chrome ships again. It fills the header's 64px height.
 function BrandLockup() {
   return (
-    <View className="h-11 flex-row items-center justify-center px-2">
-      <Image src={brandLogo} alt="Pa'Casa" width={72} height={38} framed={false} />
+    <View className="h-full flex-row items-center justify-center px-2">
+      <Image src={brandLogo} alt="Pa'Casa" width={107} height={56} framed={false} />
     </View>
   );
 }
 
-/** The raised signature action: opens Pa'Casa Live over whatever screen is showing. */
+/** Compact language switch; each option is abbreviated in its own language. */
+const LANGUAGE_ABBR: Record<(typeof SUPPORTED_LANGUAGES)[number], string> = {
+  es: 'Esp',
+  en: 'Eng',
+};
+
+function LanguageSwitch() {
+  const language = useLanguage();
+  const setPreference = usePatientLanguage((s) => s.setPreference);
+  return (
+    <View
+      role="radiogroup"
+      aria-label={t('a11y.language', language)}
+      className="h-11 flex-row items-center gap-1 rounded-full border border-border bg-surface-raised p-1"
+    >
+      <Languages size={16} className="ml-1 text-text-muted" />
+      {SUPPORTED_LANGUAGES.map((option) => {
+        const active = language === option;
+        return (
+          <Pressable
+            key={option}
+            role="radio"
+            aria-checked={active}
+            accessibilityLabel={option === 'es' ? 'Español' : 'English'}
+            onPress={() => setPreference(option)}
+            className={`min-h-9 min-w-11 items-center justify-center rounded-full px-2 focus-visible:outline-2 focus-visible:outline-focus ${active ? 'bg-cta' : ''}`}
+          >
+            <Text className={`text-xs font-bold ${active ? 'text-on-cta' : 'text-text-muted'}`}>
+              {LANGUAGE_ABBR[option]}
+            </Text>
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+}
+
+/** The raised signature action: opens the Pa'Casa assistant over whatever screen is showing. */
 function PaCasaButton({ rail }: { rail: boolean }) {
-  const pathname = usePathname() ?? '/';
+  const language = useLanguage();
   return (
     <Pressable
       role="button"
-      aria-label="Pa'Casa: hablar con la app"
-      onPress={() => useLiveOverlay.getState().openLive(pathname, 'hablar')}
+      aria-label={t('a11y.pacasa', language)}
+      onPress={() => useAssistantStore.getState().openAssistant('chat')}
       style={rail ? undefined : { width: ACTION_SIZE, height: ACTION_SIZE, marginTop: -ACTION_RAISE }}
       className={`items-center justify-center border bg-cta shadow-raised active:bg-cta-pressed focus-visible:outline-2 focus-visible:outline-focus ${rail ? 'min-h-14 w-full gap-1 rounded-soft border-transparent' : 'shrink-0 border-4 border-surface'}`}
     >
@@ -104,6 +154,7 @@ function PaCasaButton({ rail }: { rail: boolean }) {
 
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname() ?? '/';
+  const language = useLanguage();
   const menuStore = useInstanceStore(() => ({ open: false }));
   const menuOpen = useStore(menuStore, (state) => state.open);
   const closeMenu = () => menuStore.setState({ open: false });
@@ -112,19 +163,26 @@ export function AppShell({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!menuOpen || Platform.OS !== 'web') return;
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') closeMenu();
+      if (event.key === 'Escape') menuStore.setState({ open: false });
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [menuOpen]);
+  }, [menuOpen, menuStore]);
   const placement = useAdaptiveNavigationPlacement();
   const insets = useSafeInsets();
   const isActive = (href: string) => (href === '/' ? pathname === '/' : pathname.startsWith(href));
-  const openLive = () => useLiveOverlay.getState().openLive(pathname, 'hablar');
+  const openAssistant = () => useAssistantStore.getState().openAssistant('chat');
+  // Read the stored/device language after mount so SSR and the first client
+  // render agree (hydration-safe language detection).
+  useEffect(() => hydrateLanguage(), []);
+  // Keep the DOM lang attribute in sync so screen readers pick the right voice.
+  useEffect(() => {
+    if (Platform.OS === 'web' && typeof document !== 'undefined') document.documentElement.lang = language;
+  }, [language]);
   const railWidth = placement.hardwareWidth || (placement.expanded ? EXPANDED_RAIL_WIDTH : RAIL_WIDTH) + insets.right;
   const navigation = (
     <Nav
-      aria-label="Secciones"
+      aria-label={t('nav.sections', language)}
       style={placement.rail ? { width: railWidth, paddingRight: placement.hardwareWidth ? 0 : insets.right, flexShrink: 0 } : { height: 72, flexShrink: 0 }}
       className={placement.rail ? 'h-full border-l border-border bg-surface' : 'flex-row items-center border-t border-border bg-surface px-1 pb-2'}
     >
@@ -170,31 +228,32 @@ export function AppShell({ children }: { children: ReactNode }) {
     <SafeArea edges={['top', 'bottom']} style={{ direction: 'ltr' }} className={`min-h-0 flex-1 bg-surface ${placement.rail ? 'flex-row' : ''}`}>
       <SafeArea edges={placement.rail ? ['left'] : ['left', 'right']} style={{ direction: I18nManager.isRTL ? 'rtl' : 'ltr' }} className="min-h-0 min-w-0 flex-1">
         <Header className="h-16 shrink-0 flex-row items-center justify-between gap-3 border-b border-border bg-surface px-4">
-          <Link href="/" aria-label="Pa&apos;Casa, inicio">
+          <Link href="/" aria-label={t('a11y.brand', language)}>
             <BrandLockup />
           </Link>
           {Platform.OS === 'web' ? (
-            <Nav aria-label="Header navigation" className="hidden flex-row items-center gap-1 md:flex">
+            <Nav aria-label={t('a11y.nav.header', language)} className="hidden flex-row items-center gap-1 md:flex">
               {DESTINATIONS.map((destination) => (
                 <Link key={destination.href} href={destination.href} aria-current={isActive(destination.href) ? 'page' : undefined}>
                   <View className={`min-h-11 justify-center border-b-2 px-3 ${isActive(destination.href) ? 'border-border-strong bg-surface-sunken' : 'border-transparent hover:bg-surface-sunken'}`}>
-                    <Text className={`text-sm font-semibold ${isActive(destination.href) ? 'text-text' : 'text-text-muted'}`}>{destination.label}</Text>
+                    <Text className={`text-sm font-semibold ${isActive(destination.href) ? 'text-text' : 'text-text-muted'}`}>{t(destination.labelKey, language)}</Text>
                   </View>
                 </Link>
               ))}
               <Link href={SECONDARY_DESTINATION.href} aria-current={isActive(SECONDARY_DESTINATION.href) ? 'page' : undefined}>
                 <View className={`min-h-11 justify-center border-b-2 px-3 ${isActive(SECONDARY_DESTINATION.href) ? 'border-border-strong bg-surface-sunken' : 'border-transparent hover:bg-surface-sunken'}`}>
-                  <Text className={`text-sm font-medium ${isActive(SECONDARY_DESTINATION.href) ? 'text-text' : 'text-text-muted'}`}>{SECONDARY_DESTINATION.label}</Text>
+                  <Text className={`text-sm font-medium ${isActive(SECONDARY_DESTINATION.href) ? 'text-text' : 'text-text-muted'}`}>{t(SECONDARY_DESTINATION.labelKey, language)}</Text>
                 </View>
               </Link>
             </Nav>
           ) : null}
           <View className="flex-row items-center gap-2">
+            <LanguageSwitch />
             {Platform.OS === 'web' ? (
               <Pressable
                 role="button"
-                aria-label="Pa'Casa: hablar con la app"
-                onPress={openLive}
+                aria-label={t('a11y.pacasa', language)}
+                onPress={openAssistant}
                 className="hidden min-h-11 flex-row items-center gap-2 rounded-soft border border-transparent bg-cta px-4 hover:bg-cta-pressed focus-visible:outline-2 focus-visible:outline-focus md:inline-flex"
               >
                 <Mic size={18} className="text-on-cta" />
@@ -203,7 +262,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             ) : null}
             <Pressable
               role="button"
-              aria-label="Open navigation menu"
+              aria-label={t('a11y.menu', language)}
               aria-expanded={menuOpen}
               onPress={() => menuStore.setState({ open: true })}
               className={`h-11 w-11 items-center justify-center rounded-soft border border-border bg-surface-raised focus-visible:outline-2 focus-visible:outline-focus ${Platform.OS === 'web' ? 'md:hidden' : ''}`}
@@ -220,29 +279,29 @@ export function AppShell({ children }: { children: ReactNode }) {
           <View role="dialog" aria-modal aria-label="Navigation menu" className="mx-auto w-full max-w-4xl flex-1 p-4">
             <View className="min-h-12 flex-row items-center justify-between border-b border-border pb-3">
               <BrandLockup />
-              <Pressable role="button" aria-label="Close navigation menu" onPress={closeMenu} className="h-11 w-11 items-center justify-center rounded-soft border border-border bg-surface-raised focus-visible:outline-2 focus-visible:outline-focus">
+              <Pressable role="button" aria-label={t('a11y.menu.close', language)} onPress={closeMenu} className="h-11 w-11 items-center justify-center rounded-soft border border-border bg-surface-raised focus-visible:outline-2 focus-visible:outline-focus">
                 <X size={22} className="text-text" />
               </Pressable>
             </View>
             <ScrollView className="flex-1" contentContainerClassName="gap-2 py-5">
-              <Nav aria-label="Mobile navigation" className="gap-2">
+              <Nav aria-label={t('a11y.nav', language)} className="gap-2">
                 <Pressable
                   role="button"
-                  aria-label="Pa'Casa: hablar con la app"
+                  aria-label={t('a11y.pacasa', language)}
                   onPress={() => {
                     closeMenu();
-                    openLive();
+                    openAssistant();
                   }}
                   className="min-h-14 w-full flex-row items-center gap-4 rounded-soft border border-transparent bg-cta px-4 focus-visible:outline-2 focus-visible:outline-focus"
                 >
                   <Mic size={24} className="text-on-cta" />
                   <Text className="text-lg font-semibold text-on-cta">Pa&apos;Casa</Text>
                 </Pressable>
-                {[...DESTINATIONS, SECONDARY_DESTINATION].map((destination) => (
+                {[...DESTINATIONS, ...WORKFLOW_DESTINATIONS].map((destination) => (
                   <Link key={destination.href} href={destination.href} {...(Platform.OS === 'web' ? { onClick: closeMenu } : { onPress: closeMenu })} aria-current={isActive(destination.href) ? 'page' : undefined}>
                     <View className={`min-h-14 flex-row items-center gap-4 rounded-soft border px-4 ${isActive(destination.href) ? 'border-border-strong bg-surface-sunken' : 'border-border bg-surface-raised'}`}>
                       <destination.icon size={24} className={isActive(destination.href) ? 'text-accent' : 'text-text-muted'} />
-                      <Text className="text-lg font-semibold text-text">{destination.label}</Text>
+                      <Text className="text-lg font-semibold text-text">{t(destination.labelKey, language)}</Text>
                     </View>
                   </Link>
                 ))}
@@ -252,6 +311,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </SafeArea>
       </Modal>
       <PaCasaLiveOverlay />
+      <AssistantOverlay />
     </SafeArea>
   );
 }

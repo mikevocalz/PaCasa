@@ -86,7 +86,7 @@ export function DirectionsCard({ block }: { block: DirectionsBlock }) {
     return () => {
       cancelled = true;
     };
-  }, [block.query, store, token]);
+  }, [block.label, block.query, store, token]);
 
   const found = lookup.status === 'found' ? lookup : null;
   const staticMapUrl =

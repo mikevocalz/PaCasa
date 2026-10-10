@@ -1,12 +1,15 @@
-const backendOrigin = (import.meta.env.VITE_PACASA_AUTH_URL ?? '').replace(/\/$/, '');
+import { base44AuthEndpoint } from './authEndpoint.mjs';
+
+const configuredEndpoint = (import.meta.env.VITE_PACASA_AUTH_URL ?? '').trim();
 const DEMO_KEY = 'pacasa.demo.portal.session';
-const jsonHeaders = { 'Content-Type': 'application/json' };
 
 async function request(path, options = {}) {
-  const response = await fetch(`${backendOrigin}${path}`, {
-    credentials: 'include',
+  const endpoint = base44AuthEndpoint(configuredEndpoint, path, window.location.origin);
+  const response = await fetch(endpoint, {
     ...options,
-    headers: { ...jsonHeaders, ...(options.headers ?? {}) },
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json', 'X-PaCasa-Request': '1', ...(options.headers ?? {}) },
+    signal: options.signal ?? AbortSignal.timeout(25_000),
   });
   const body = await response.json().catch(() => null);
   if (!response.ok) throw new Error(body?.message ?? body?.error?.message ?? body?.error ?? `Request failed (${response.status})`);
@@ -22,7 +25,7 @@ function writeDemoSession(value) {
   if (!value) window.sessionStorage.removeItem(DEMO_KEY);
   else window.sessionStorage.setItem(DEMO_KEY, JSON.stringify(value));
 }
-export function hasRemoteAuth() { return Boolean(backendOrigin); }
+export function hasRemoteAuth() { return Boolean(configuredEndpoint); }
 
 export async function getPortalSession() {
   if (!hasRemoteAuth()) return readDemoSession();
@@ -33,13 +36,13 @@ export async function getPortalSession() {
 }
 
 export async function signInEmail({ email, password }) {
-  if (!hasRemoteAuth()) throw new Error('El backend de Better Auth todavía no está conectado.');
+  if (!hasRemoteAuth()) throw new Error('La función de acceso de Base44 todavía no está conectada.');
   await request('/api/auth/sign-in/email', { method: 'POST', body: JSON.stringify({ email: email.trim(), password }) });
   return getPortalSession();
 }
 
 export async function signUpEmail({ name, email, password, accountType, organizationSlug }) {
-  if (!hasRemoteAuth()) throw new Error('El backend de Better Auth todavía no está conectado.');
+  if (!hasRemoteAuth()) throw new Error('La función de acceso de Base44 todavía no está conectada.');
   await request('/api/auth/sign-up/email', { method: 'POST', body: JSON.stringify({ name: name.trim(), email: email.trim(), password }) });
   await request('/api/auth/sign-in/email', { method: 'POST', body: JSON.stringify({ email: email.trim(), password }) });
   await request('/api/portal/onboard', { method: 'POST', body: JSON.stringify({ accountType, organizationSlug: organizationSlug || null }) });
@@ -51,16 +54,17 @@ export async function signOut() {
   writeDemoSession(null);
 }
 
-const demoPassword = import.meta.env.VITE_PACASA_DEMO_PASSWORD;
-const DEMO_CREDENTIALS = {
-  patient: { email: 'rosa.patient@demo.pacasa.test', password: demoPassword },
-  provider: { email: 'elena.ruiz@demo.pacasa.test', password: demoPassword },
-};
+/** Explicit consent and an authenticated Base44 session; no history or audio payload. */
+export async function translatePortalPhrase({ text, sourceLanguage, targetLanguage, consent, signal }) {
+  if (!hasRemoteAuth()) throw new Error('El traductor de Base44 todavía no está conectado.');
+  return request('/assistant', { method: 'POST', signal,
+    body: JSON.stringify({ mode: 'translate', text, sourceLanguage, targetLanguage, consent: consent === true }) });
+}
 
 export async function signInDemo(role) {
   if (hasRemoteAuth()) {
-    if (!demoPassword) throw new Error('La contraseña de demostración no está configurada.');
-    return signInEmail(DEMO_CREDENTIALS[role] ?? DEMO_CREDENTIALS.patient);
+    // A public bundle must never contain a provider password. Seeded accounts use normal sign-in.
+    throw new Error('Introduce el correo y la contraseña de prueba facilitados por tu equipo. Las credenciales no se incluyen en la aplicación.');
   }
   const provider = role === 'provider';
   const session = {

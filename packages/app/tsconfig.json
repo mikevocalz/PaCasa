@@ -9,8 +9,10 @@
     "game/**/*",
     "screens/**/*",
     "providers/**/*",
+    "session/**/*",
+    "speech/**/*",
+    "assistant/**/*",
     "state.ts",
-    "index.ts",
-    "assistant/**/*"
+    "index.ts"
   ]
 }

@@ -47,11 +47,14 @@ export const AuthProvider = ({ children }) => {
       setPortalSession(next);
       return next;
     } catch (error) {
-      setPortalSession(null);
+      // A signed-in account that cannot open this app must not shut out the
+      // demonstration entries, so they still get a session here.
+      const fallback = readDemoSession() ?? null;
+      setPortalSession(fallback);
       // 403: the account exists but has no access to this app yet.
       const status = error?.status ?? error?.statusCode;
-      setAuthError(status === 403 ? { type: 'user_not_registered' } : null);
-      return null;
+      setAuthError(!fallback && status === 403 ? { type: 'user_not_registered' } : null);
+      return fallback;
     } finally {
       setIsLoadingAuth(false);
     }
@@ -87,6 +90,9 @@ export const AuthProvider = ({ children }) => {
     return next;
   };
 
+  /** Google and friends: leaves the app for the provider's consent screen, then back to fromUrl. */
+  const loginWithProvider = (provider, fromUrl) => base44.auth.loginWithProvider(provider, fromUrl);
+
   const loginDemo = async (role) => {
     setAuthError(null);
     const next = await demoSignIn(role);
@@ -113,6 +119,7 @@ export const AuthProvider = ({ children }) => {
       register,
       resendCode,
       verifyRegistration,
+      loginWithProvider,
       loginDemo,
       logout,
       refresh,

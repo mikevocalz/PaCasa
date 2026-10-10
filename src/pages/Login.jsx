@@ -4,11 +4,12 @@ import { Stethoscope, UserRound } from 'lucide-react';
 import AuthLayout from '@/components/AuthLayout';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
+import GoogleIcon from '@/components/GoogleIcon';
 import TextField from '@/components/ui/TextField';
 import { useAuth } from '@/lib/AuthContext';
 
 export default function Login() {
-  const { isAuthenticated, profile, login, loginDemo } = useAuth();
+  const { isAuthenticated, profile, login, loginDemo, loginWithProvider } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [email, setEmail] = useState('');
@@ -45,6 +46,8 @@ export default function Login() {
       <form className="space-y-5" onSubmit={submit}>
         <header className="space-y-2"><p className="text-sm font-semibold uppercase tracking-[0.14em] text-accent-soft">Iniciar sesión</p><h2 className="font-display text-2xl text-fg">Bienvenido de nuevo</h2></header>
         {error ? <p role="alert" className="border border-red-500/50 bg-red-500/10 p-3 text-sm text-red-100">{error}</p> : null}
+        <Button tone="secondary" className="w-full" onClick={() => loginWithProvider('google', location.state?.returnTo || '/')}><GoogleIcon className="h-5 w-5" /> Continuar con Google</Button>
+        <p className="text-center text-sm text-fg-subtle">o use su correo y contraseña</p>
         <TextField id="login-email" label="Correo electrónico" inputMode="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} />
         <TextField id="login-password" label="Contraseña" type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} />
         <Button type="submit" className="w-full" disabled={pending || !email || !password}>{pending ? 'Entrando…' : 'Entrar'}</Button>

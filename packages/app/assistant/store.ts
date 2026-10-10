@@ -1,0 +1,50 @@
+import { create } from 'zustand';
+import type { AssistantLanguage, AssistantMessage, AssistantMode, AssistantRole } from './contract.ts';
+
+/** Ephemeral assistant session. Never persisted, shared with no analytics SDK. */
+export const useAssistantStore = create<{
+  open: boolean;
+  mode: AssistantMode;
+  sourceLanguage: AssistantLanguage;
+  draft: string;
+  messages: readonly AssistantMessage[];
+  busy: boolean;
+  consent: boolean;
+  error: string | null;
+  voiceNotice: string | null;
+  openAssistant: (mode?: AssistantMode) => void;
+  closeAssistant: () => void;
+  setMode: (mode: AssistantMode) => void;
+  setSourceLanguage: (language: AssistantLanguage) => void;
+  setDraft: (text: string) => void;
+  setConsent: (consent: boolean) => void;
+  setBusy: (busy: boolean) => void;
+  setError: (error: string | null) => void;
+  setVoiceNotice: (notice: string | null) => void;
+  appendMessage: (mode: AssistantMode, role: AssistantRole, text: string) => void;
+}>((set) => ({
+  open: false,
+  mode: 'chat',
+  sourceLanguage: 'en',
+  draft: '',
+  messages: [],
+  busy: false,
+  consent: false,
+  error: null,
+  voiceNotice: null,
+  openAssistant: (mode = 'chat') => set({ open: true, mode, error: null, voiceNotice: null }),
+  closeAssistant: () => set({
+    open: false, mode: 'chat', sourceLanguage: 'en', draft: '',
+    messages: [], busy: false, consent: false, error: null, voiceNotice: null,
+  }),
+  setMode: (mode) => set({ mode, draft: '', error: null, voiceNotice: null }),
+  setSourceLanguage: (sourceLanguage) => set({ sourceLanguage, error: null }),
+  setDraft: (draft) => set({ draft }),
+  setConsent: (consent) => set({ consent }),
+  setBusy: (busy) => set({ busy }),
+  setError: (error) => set({ error }),
+  setVoiceNotice: (voiceNotice) => set({ voiceNotice }),
+  appendMessage: (mode, role, text) => set((s) => ({
+    messages: [...s.messages, { id: (s.messages.at(-1)?.id ?? 0) + 1, mode, role, text }],
+  })),
+}));

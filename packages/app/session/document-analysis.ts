@@ -51,7 +51,7 @@ const FILL_IN_LINE = /^(.+?):\s*_*\s*$/;
 
 function labelOf(line: string): string | null {
   const match = FILL_IN_LINE.exec(line.trim());
-  return match ? match[1].trim() : null;
+  return match?.[1]?.trim() ?? null;
 }
 
 export function analyseDocument(document: PatientDocument): DocumentAnalysis {

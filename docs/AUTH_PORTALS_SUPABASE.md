@@ -101,6 +101,37 @@ export const auth = betterAuth({
 
 For Expo/mobile, use `@better-auth/expo` plus `expo-secure-store`; never put session tokens in Zustand persistence or AsyncStorage.
 
+## Supabase project handoff (2026-10-10)
+
+The Pa'Casa project has been identified as:
+
+- Project reference: `bjkphdrwnctszwrrqecx`
+- Project API URL: `https://bjkphdrwnctszwrrqecx.supabase.com`
+- Supabase dashboard: https://supabase.com/dashboard/project/bjkphdrwnctszwrrqecx
+- Public publishable key: present in the root, Expo, and Next `.env.example` files. It may be exposed in client bundles; it **does not grant users a Better Auth session**.
+
+**Do not confuse the three types of credential:**
+
+| Input | Role | Where it belongs |
+| --- | --- | --- |
+| Supabase API URL + `sb_publishable_...` | Optional Supabase Data API client | Public Vite/Expo/Next configuration, with RLS |
+| `sb_secret_...` | Privileged Supabase Data API key; bypasses RLS | Server-side secret store only; **not needed for Better Auth's Postgres adapter** |
+| `postgresql://...` connection URI | Actual PostgreSQL database connection | `DATABASE_URL` on the trusted Better Auth/Next server only |
+
+The Supabase secret key supplied during handoff was **not committed, logged, or placed in the frontend**. Rotate that key in the Supabase dashboard because it was shared in conversation, then store a newly issued key only if a trusted backend actually needs Supabase Data API admin access.
+
+For the current Better Auth architecture the remaining connection requirement is the **Postgres URI**, including its separately generated database password. Retrieve it from Supabase **Connect > Connection string** (direct connection or session pooler, depending on hosting), and store it as `DATABASE_URL` on the server. Neither the publishable key nor the secret key can substitute for it.
+
+Once server environment variables are installed, run this **read-only** check before migrating or seeding:
+
+```bash
+pnpm --filter web auth:doctor
+```
+
+The checker confirms basic configuration and `SELECT 1` connectivity, rejects API keys/HTTPS URLs mistaken for `DATABASE_URL`, checks for a different Supabase project reference when detectable, and never prints credentials. Success does **not** prove tables are migrated or provider isolation is correct; follow the migration, seed, and portal checks below.
+
+**Base44 deployment:** the browser app must use `VITE_PACASA_AUTH_URL` pointing to the deployed Pa'Casa Better Auth API, **not** the Supabase `https://...supabase.com` REST endpoint. The Next.js auth API cannot be served by a static Base44 export. Include `https://pacasa-83490010.base44.app` in `BETTER_AUTH_TRUSTED_ORIGINS` on the server.
+
 ## Environment contract
 
 Base44/Vite:

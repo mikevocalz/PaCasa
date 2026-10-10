@@ -51,7 +51,13 @@ export async function signOut() {
   writeDemoSession(null);
 }
 
-export function signInDemo(role) {
+const DEMO_CREDENTIALS = {
+  patient: { email: 'rosa.patient@demo.pacasa.test', password: 'PaCasa-Demo-2026!' },
+  provider: { email: 'elena.ruiz@demo.pacasa.test', password: 'PaCasa-Demo-2026!' },
+};
+
+export async function signInDemo(role) {
+  if (hasRemoteAuth()) return signInEmail(DEMO_CREDENTIALS[role] ?? DEMO_CREDENTIALS.patient);
   const provider = role === 'provider';
   const session = {
     user: { id: provider ? 'demo-provider-elena' : 'demo-patient-rosa', name: provider ? 'Dra. Elena Ruiz' : 'Rosa Velázquez', email: provider ? 'elena.ruiz@demo.pacasa.test' : 'rosa.patient@demo.pacasa.test' },

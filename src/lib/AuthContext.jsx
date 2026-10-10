@@ -47,10 +47,10 @@ export function AuthProvider({ children }) {
     return next;
   };
 
-  const loginDemo = (role) => {
-    const next = demoSignIn(role);
-    setPortalSession(next);
+  const loginDemo = async (role) => {
     setAuthError(null);
+    const next = await demoSignIn(role);
+    setPortalSession(next);
     return next;
   };
 

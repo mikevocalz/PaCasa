@@ -1,0 +1,43 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Pa'Casa tokens. Values live here; tailwind.config.js maps them to classes. */
+:root {
+  --font-display: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --page: #00041c;
+  --panel: #14182e;
+  --panel-2: #25293d;
+  --line: #3c3f51;
+  --fg: #fbfbfb;
+  --fg-muted: #ced0d1;
+  --fg-subtle: #90929c;
+  --accent: #0058f8;
+  --accent-soft: #80acfc;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-page font-body text-fg antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply font-display;
+  }
+
+  /* One visible focus treatment for every control in the app. */
+  :focus-visible {
+    outline: 2px solid var(--accent-soft);
+    outline-offset: 2px;
+  }
+}

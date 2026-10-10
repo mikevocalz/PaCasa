@@ -142,3 +142,11 @@ See [spatial architecture](docs/ARCHITECTURE.md),
 ## License
 
 MIT. See [LICENSE](LICENSE) and [third-party notices](THIRD_PARTY_NOTICES.md).
+
+## Optional text assistant backend
+
+`apps/assistant-api` is an independent development-only Gemini service.
+It generates real text translations and safe OpenUI bilingual display cards
+once a server-side `GEMINI_API_KEY` and the mobile/web endpoint URLs are
+configured. It is **not deployed or PHI-ready by default**.
+See [backend setup](apps/assistant-api/README.md).

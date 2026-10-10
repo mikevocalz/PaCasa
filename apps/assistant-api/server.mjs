@@ -68,7 +68,7 @@ export async function handleAssistantRequest(req, res, fetchModel = fetch) {
   }
   if (req.method === 'OPTIONS') {
     res.writeHead(204, {
-      'Access-Control-Allow-Origin': origin,
+      ...(origin ? { 'Access-Control-Allow-Origin': origin } : {}),
       'Access-Control-Allow-Methods': 'POST, OPTIONS',
       'Access-Control-Allow-Headers': 'content-type',
       'Access-Control-Max-Age': '3600',
@@ -115,7 +115,9 @@ export async function handleAssistantRequest(req, res, fetchModel = fetch) {
     const payload = await response.json();
     respond(res, 200, parseGeminiResponse(payload, parsed), origin);
   } catch (error) {
-    respond(res, error instanceof Error && error.message === 'request-too-large' ? 413 : 502,
+    const status = error instanceof Error && error.message === 'request-too-large' ? 413 :
+      error instanceof Error && error.message === 'invalid-json' ? 400 : 502;
+    respond(res, status,
       { error: 'Pa’Casa no pudo completar la solicitud. Inténtalo otra vez.' }, origin);
   }
 }

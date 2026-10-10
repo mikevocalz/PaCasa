@@ -45,8 +45,8 @@ export default function Login() {
       <section className="mt-7 space-y-3 border-t border-line pt-6" aria-labelledby="demo-login-title">
         <header className="space-y-1"><h3 id="demo-login-title" className="font-display text-lg text-fg">Entradas rápidas para la demo</h3><p className="text-sm leading-6 text-fg-subtle">{remoteAuthConfigured ? 'Use las cuentas sembradas en Supabase cuando el seed esté ejecutado.' : 'El backend aún no está conectado; estos botones abren una sesión demo temporal.'}</p></header>
         <div className="grid gap-3 sm:grid-cols-2">
-          <Card as="article" className="space-y-3 p-4"><UserRound className="text-emerald-300" aria-hidden /><div><h4 className="font-semibold text-fg">Paciente</h4><p className="text-sm text-fg-subtle">Rosa Velázquez</p></div><Button tone="secondary" className="w-full" onClick={() => afterLogin(loginDemo('patient'))}>Entrar como paciente</Button></Card>
-          <Card as="article" className="space-y-3 p-4"><Stethoscope className="text-sky-300" aria-hidden /><div><h4 className="font-semibold text-fg">Proveedor</h4><p className="text-sm text-fg-subtle">Dra. Elena Ruiz</p></div><Button tone="secondary" className="w-full" onClick={() => afterLogin(loginDemo('provider'))}>Entrar como proveedor</Button></Card>
+          <Card as="article" className="space-y-3 p-4"><UserRound className="text-emerald-300" aria-hidden /><div><h4 className="font-semibold text-fg">Paciente</h4><p className="text-sm text-fg-subtle">Rosa Velázquez</p></div><Button tone="secondary" className="w-full" onClick={async () => afterLogin(await loginDemo('patient'))}>Entrar como paciente</Button></Card>
+          <Card as="article" className="space-y-3 p-4"><Stethoscope className="text-sky-300" aria-hidden /><div><h4 className="font-semibold text-fg">Proveedor</h4><p className="text-sm text-fg-subtle">Dra. Elena Ruiz</p></div><Button tone="secondary" className="w-full" onClick={async () => afterLogin(await loginDemo('provider'))}>Entrar como proveedor</Button></Card>
         </div>
       </section>
     </AuthLayout>

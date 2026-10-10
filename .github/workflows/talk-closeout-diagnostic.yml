@@ -1,34 +1,61 @@
-name: Talk closeout diagnostic (temporary)
+name: Talk mainline reconciliation (temporary)
 on:
   push:
     branches: [feat/pacasa-realtime-bilingual-talk-orb]
     paths: [.github/workflows/talk-closeout-diagnostic.yml]
 permissions:
-  contents: read
+  contents: write
 jobs:
-  inspect:
+  reconcile:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-          persist-credentials: false
-      - name: Inspect merge without committing
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 12.8.1
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Merge main; stop on any unreviewed conflict
         shell: bash
         run: |
-          git config user.name 'PaCasa closeout diagnostic'
-          git config user.email 'closeout@example.invalid'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git merge --no-commit --no-ff origin/main || true
-          echo '=== Unmerged paths ==='
-          git diff --name-only --diff-filter=U
-          echo '=== Source conflict hunks (no environment or lockfile contents) ==='
-          for file in $(git diff --name-only --diff-filter=U); do
-            case "$file" in
-              *.ts|*.tsx|*.jsx|*/package.json|package.json|pnpm-workspace.yaml)
-                echo "=== $file ==="
-                git diff --cc -- "$file" | head -220
-                ;;
-            esac
-          done
-          git merge --abort || true
+          python3 - <<'PY'
+          import subprocess, pathlib
+          def git(*args):
+              return subprocess.check_output(['git', *args], text=True)
+          paths = set(git('diff', '--name-only', '--diff-filter=U').splitlines())
+          permitted = {'packages/app/assistant/store.ts', 'pnpm-lock.yaml'}
+          if not paths <= permitted:
+              raise SystemExit('Unreviewed conflicts: ' + repr(paths - permitted))
+          file = 'packages/app/assistant/store.ts'
+          if file in paths:
+              ours, theirs = git('show', ':2:' + file), git('show', ':3:' + file)
+              normalized = ours.replace('AssistantRole, AssistantMode', 'AssistantMode, AssistantRole')
+              if normalized != theirs:
+                  raise SystemExit('Store differs beyond the verified type import ordering')
+              pathlib.Path(file).write_text(theirs)
+              subprocess.check_call(['git', 'add', '--', file])
+          if 'pnpm-lock.yaml' in paths:
+              subprocess.check_call(['git', 'checkout', '--theirs', '--', 'pnpm-lock.yaml'])
+              subprocess.check_call(['git', 'add', '--', 'pnpm-lock.yaml'])
+          PY
+      - name: Regenerate and verify lockfile from combined manifests
+        run: |
+          pnpm install --lockfile-only --no-frozen-lockfile --ignore-scripts
+          pnpm install --lockfile-only --frozen-lockfile --ignore-scripts
+          node --test packages/app/talk/model.test.ts
+      - name: Commit reconciliation on the feature branch only
+        shell: bash
+        run: |
+          test -z "$(git diff --name-only --diff-filter=U)"
+          git add pnpm-lock.yaml
+          git rm .github/workflows/talk-closeout-diagnostic.yml
+          git diff --cached --check
+          git commit -m 'fix(talk): reconcile main while preserving scanner and speech dependencies'
+          git push origin HEAD:feat/pacasa-realtime-bilingual-talk-orb

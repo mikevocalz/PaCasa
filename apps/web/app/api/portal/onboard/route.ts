@@ -2,7 +2,6 @@ import { auth, authRuntimeConfigured } from '../../../../lib/auth';
 import { corsPreflight, withCors } from '../../../../lib/cors';
 import { onboardProfile, organizationsForProfile, type PortalAccountType } from '../../../../lib/portal';
 
-export const runtime = 'nodejs';
 
 export async function POST(request: Request) {
   if (!authRuntimeConfigured) {

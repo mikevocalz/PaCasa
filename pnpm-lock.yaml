@@ -490,7 +490,7 @@ importers:
   .:
     dependencies:
       '@base44/sdk':
-        specifier: ^0.8.52
+        specifier: 0.8.53
         version: 0.8.53(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1)
       '@tanstack/react-query':
         specifier: ^5.90.21
@@ -515,7 +515,7 @@ importers:
         version: 8.2.0(@types/node@26.6.5)(esbuild@0.28.1)(jiti@1.21.7)(sass@1.77.4)(terser@5.46.0)(tsx@4.22.4)(yaml@2.8.2)
     devDependencies:
       '@base44/vite-plugin':
-        specifier: ^1.0.44
+        specifier: 1.0.44
         version: 1.0.44(supports-color@8.1.1)
       '@vitejs/plugin-react':
         specifier: ^6.0.5
@@ -10529,7 +10529,7 @@ snapshots:
       '@jridgewell/gen-mapping': 0.3.13
       '@jridgewell/remapping': 2.3.5
       '@jridgewell/sourcemap-codec': 1.6.0
-      browserslist: 4.28.7
+      browserslist: 4.29.3
       chalk: 4.1.2
       debug: 4.4.3(supports-color@8.1.1)
       getenv: 2.0.0
@@ -18706,7 +18706,7 @@ snapshots:
       '@webassemblyjs/wasm-parser': 1.14.1
       acorn: 8.17.0
       acorn-import-phases: 1.0.4(acorn@8.17.0)
-      browserslist: 4.28.7
+      browserslist: 4.29.3
       chrome-trace-event: 1.0.4
       enhanced-resolve: 5.24.3
       es-module-lexer: 2.3.2
@@ -18745,7 +18745,7 @@ snapshots:
       '@webassemblyjs/wasm-parser': 1.14.1
       acorn: 8.17.0
       acorn-import-phases: 1.0.4(acorn@8.17.0)
-      browserslist: 4.28.7
+      browserslist: 4.29.3
       chrome-trace-event: 1.0.4
       enhanced-resolve: 5.24.3
       es-module-lexer: 2.3.2

@@ -9,7 +9,7 @@ interface TabContents {
   emptyTitle: string;
   emptyText: string;
   action: string;
-  mode: 'chat' | 'translate';
+  mode: 'chat';
 }
 
 function ProductTab({ details }: { details: TabContents }) {
@@ -57,5 +57,5 @@ export const ApoyoScreen = () => <ProductTab details={{
   intro: 'Un poco de ayuda, cuando la necesites.',
   emptyTitle: 'Puedes pedir que te lo expliquen de otra manera',
   emptyText: 'Escribe una frase, usa el micrófono del teclado o graba una nota en la app móvil. El asistente no sustituye a un profesional de salud ni envía formularios.',
-  action: 'Abrir traducción', mode: 'translate',
+  action: 'Abrir traducción', mode: 'chat',
 }} />;

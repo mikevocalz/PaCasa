@@ -1,0 +1,49 @@
+name: Supabase integration readiness
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  detect-secrets:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Report configured credential types
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          SUPABASE_DATABASE_URL: ${{ secrets.SUPABASE_DATABASE_URL }}
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          report() {
+            local name="$1"
+            if [ -n "${!name:-}" ]; then
+              echo "$name=set"
+            else
+              echo "$name=unset"
+            fi
+          }
+
+          report DATABASE_URL
+          report SUPABASE_DATABASE_URL
+          report SUPABASE_DB_URL
+          report SUPABASE_URL
+          report SUPABASE_ANON_KEY
+          report SUPABASE_PUBLISHABLE_KEY
+          report SUPABASE_SERVICE_ROLE_KEY
+          report SUPABASE_KEY
+
+          if [ -n "${DATABASE_URL:-}" ] || [ -n "${SUPABASE_DATABASE_URL:-}" ] || [ -n "${SUPABASE_DB_URL:-}" ]; then
+            echo "BETTER_AUTH_DATABASE_READY=true"
+          else
+            echo "BETTER_AUTH_DATABASE_READY=false"
+          fi

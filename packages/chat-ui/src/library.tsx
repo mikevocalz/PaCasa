@@ -1,6 +1,8 @@
 'use client';
 
 import { createLibrary, defineComponent, useTriggerAction } from '@openuidev/react-lang';
+import { Linking, Platform } from 'react-native';
+import { Image } from '@acme/ui';
 import { z } from 'zod/v4';
 import { Pressable, Text, View } from '@acme/ui/tw';
 import { descriptions, paCasaSchemas } from './schemas';
@@ -96,11 +98,54 @@ const Suggestion = defineComponent({
   },
 });
 
+
+const MAP_ENDPOINT = Platform.OS === 'web'
+  ? process.env.NEXT_PUBLIC_PACASA_ASSISTANT_URL
+  : process.env.EXPO_PUBLIC_PACASA_ASSISTANT_URL;
+
+const Directions = defineComponent({
+  name: 'DirectionsMap',
+  description: descriptions.DirectionsMap,
+  props: paCasaSchemas.directions,
+  component: ({ props }) => {
+    // Strict Zod coordinates above: no arbitrary model-supplied URL can execute here.
+    const coordinates = props.latitude + ',' + props.longitude;
+    const mapUrl = MAP_ENDPOINT?.replace(/\/assistant\/?$/, '/assistant/map') +
+      '?lat=' + props.latitude + '&lng=' + props.longitude;
+    const destination = 'https://www.google.com/maps/dir/?api=1&destination=' + coordinates;
+    return (
+      <View className="w-full min-w-0 overflow-hidden rounded-2xl border border-royal-400/60 bg-ink-900">
+        {MAP_ENDPOINT ? (
+          <Image framed={false} fill className="h-48 w-full" src={mapUrl} alt={'Mapa para ' + props.name} />
+        ) : (
+          <View className="min-h-24 items-center justify-center bg-ink-800 px-4">
+            <Text role="status" className="text-center text-sm text-silver-300">
+              Vista del mapa no disponible sin servidor de mapas.
+            </Text>
+          </View>
+        )}
+        <View className="gap-3 p-4">
+          <Text className="font-display text-lg leading-7 text-silver-50">{props.name}</Text>
+          <Text className="text-base leading-6 text-silver-300">{props.address}</Text>
+          <Pressable role="button" accessibilityLabel={'Cómo llegar a ' + props.name}
+            onPress={() => { void Linking.openURL(destination); }}
+            className="min-h-12 flex-row items-center justify-center rounded-xl border border-royal-300 bg-royal-500 px-4">
+            <Text className="text-base font-semibold text-silver-50">Cómo llegar · Abrir ruta</Text>
+          </Pressable>
+          <Text className="text-xs leading-5 text-silver-400">
+            Se abrirá Google Maps para elegir transporte y confirmar la ruta.
+          </Text>
+        </View>
+      </View>
+    );
+  },
+});
+
 const Response = defineComponent({
   name: 'PaCasaResponse',
   description: descriptions.PaCasaResponse,
   props: z.object({
-    children: z.array(z.union([Paragraph.ref, Translation.ref, FieldReview.ref, Suggestion.ref])).max(12),
+    children: z.array(z.union([Paragraph.ref, Translation.ref, FieldReview.ref, Suggestion.ref, Directions.ref])).max(12),
   }),
   component: ({ props, renderNode }) => (
     <View className="w-full min-w-0 gap-4">{renderNode(props.children)}</View>
@@ -110,9 +155,10 @@ const Response = defineComponent({
 /** The matching backend model library is in modelLibrary.ts (shared Zod schemas). */
 export const library = createLibrary({
   root: 'PaCasaResponse',
-  components: [Response, Paragraph, Translation, FieldReview, Suggestion],
+  components: [Response, Paragraph, Translation, FieldReview, Suggestion, Directions],
   componentGroups: [
     { name: 'Bilingual assistance', components: ['PaCasaText', 'TranslationPair'], notes: ['Explain English forms in plain Spanish.'] },
+    { name: 'Real places and directions', components: ['DirectionsMap'], notes: ['Destination location must originate from Google Places geocoding, never the model.'] },
     { name: 'User-controlled form review', components: ['FormFieldReview', 'FollowUpSuggestion'], notes: ['No action can submit, save or commit an answer.'] },
   ],
 });

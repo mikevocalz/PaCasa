@@ -23,18 +23,23 @@ const Suggestion = defineComponent({
   name: 'FollowUpSuggestion', description: descriptions.FollowUpSuggestion,
   props: paCasaSchemas.suggestion, component: () => null,
 });
+const Directions = defineComponent({
+  name: 'DirectionsMap', description: descriptions.DirectionsMap,
+  props: paCasaSchemas.directions, component: () => null,
+});
 const Response = defineComponent({
   name: 'PaCasaResponse', description: descriptions.PaCasaResponse,
   props: z.object({
-    children: z.array(z.union([Paragraph.ref, Translation.ref, FieldReview.ref, Suggestion.ref])).max(12),
+    children: z.array(z.union([Paragraph.ref, Translation.ref, FieldReview.ref, Suggestion.ref, Directions.ref])).max(12),
   }),
   component: () => null,
 });
 export const library = createLibrary({
   root: 'PaCasaResponse',
-  components: [Response, Paragraph, Translation, FieldReview, Suggestion],
+  components: [Response, Paragraph, Translation, FieldReview, Suggestion, Directions],
   componentGroups: [
     { name: 'Bilingual assistance', components: ['PaCasaText', 'TranslationPair'], notes: ['Explain English forms in plain Spanish.'] },
+    { name: 'Real places and directions', components: ['DirectionsMap'], notes: ['Only verified Google Places coordinates.'] },
     { name: 'User-controlled form review', components: ['FormFieldReview', 'FollowUpSuggestion'], notes: ['No action can submit, save or commit an answer.'] },
   ],
 });

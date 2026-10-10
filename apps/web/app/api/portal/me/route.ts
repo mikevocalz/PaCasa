@@ -2,7 +2,6 @@ import { auth, authRuntimeConfigured } from '../../../../lib/auth';
 import { corsPreflight, withCors } from '../../../../lib/cors';
 import { organizationsForProfile, resolveProfile } from '../../../../lib/portal';
 
-export const runtime = 'nodejs';
 
 export async function GET(request: Request) {
   if (!authRuntimeConfigured) {

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
   Accessibility,
+  Globe2,
   ClipboardList,
   FileText,
   HelpCircle,
@@ -15,6 +16,7 @@ import {
   Volume2,
   X,
 } from 'lucide-react';
+import { useLocale } from '@/i18n/store';
 import { resetSession, setDemoMode, setReturnTo, useSession } from '@/session/store';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
@@ -23,103 +25,103 @@ import { canListen, canSpeak, microphoneAvailable } from '@/session/voice';
 
 /** The five visible positions. Pa'Casa is the raised center action, not a tab. */
 const TABS = [
-  { to: '/', label: 'Inicio', icon: Home },
-  { to: '/formularios', label: 'Formularios', icon: ClipboardList },
-  { to: '/documentos', label: 'Documentos', icon: FileText },
-  { to: '/revisar', label: 'Revisar', icon: ListChecks },
+  { to: '/', key: 'nav.home', icon: Home },
+  { to: '/formularios', key: 'nav.forms', icon: ClipboardList },
+  { to: '/documentos', key: 'nav.documents', icon: FileText },
+  { to: '/revisar', key: 'nav.review', icon: ListChecks },
 ];
 
-/** Left drawer: secondary functionality only, never a second navigation universe. */
+/** Settings stay in overflow; the fifth/center action always opens Pa'Casa Live. */
 const DRAWER_ITEMS = [
-  { id: 'accesibilidad', label: 'Accesibilidad', icon: Accessibility },
-  { id: 'voz', label: 'Voz y audio', icon: Volume2 },
-  { id: 'funciona', label: 'Cómo funciona', icon: Info },
-  { id: 'privacidad', label: 'Privacidad', icon: HelpCircle },
-  { id: 'demo', label: 'Modo demo', icon: RotateCcw },
-  { id: 'microfono', label: 'Estado del micrófono', icon: Mic },
-  { id: 'acerca', label: 'Acerca de Pa’Casa', icon: FileText },
+  { id: 'idioma', key: 'drawer.language', icon: Globe2 },
+  { id: 'accesibilidad', key: 'drawer.accessibility', icon: Accessibility },
+  { id: 'voz', key: 'drawer.voice', icon: Volume2 },
+  { id: 'funciona', key: 'drawer.how', icon: Info },
+  { id: 'privacidad', key: 'drawer.privacy', icon: HelpCircle },
+  { id: 'demo', key: 'drawer.demo', icon: RotateCcw },
+  { id: 'microfono', key: 'drawer.microphone', icon: Mic },
+  { id: 'acerca', key: 'drawer.about', icon: FileText },
 ];
 
 function DrawerPanel({ id, onClose }) {
   const { demoMode } = useSession();
+  const { preference, setPreference, t } = useLocale();
+
+  if (id === 'idioma') {
+    return (
+      <DrawerText title={t('locale.heading')}>
+        <p>{t('locale.help')}</p>
+        <label className="block space-y-2" htmlFor="patient-language-setting">
+          <span className="block text-sm font-semibold">{t('locale.heading')}</span>
+          <select
+            id="patient-language-setting"
+            value={preference}
+            onChange={(event) => setPreference(event.target.value)}
+            className="min-h-12 w-full border border-line bg-page px-4 text-base text-fg"
+          >
+            <option value="auto">{t('locale.auto')}</option>
+            <option value="en">{t('locale.en')}</option>
+            <option value="es">{t('locale.es')}</option>
+          </select>
+        </label>
+      </DrawerText>
+    );
+  }
 
   if (id === 'accesibilidad') {
     return (
-      <DrawerText title="Accesibilidad">
-        <p>Botones grandes, textos que crecen con el sistema, contraste alto y etiquetas para lectores de pantalla.</p>
-        <p>Toda la app respeta la orientación del texto y el modo de movimiento reducido.</p>
+      <DrawerText title={t('drawer.accessibility')}>
+        <p>{t('drawer.a11yText')}</p>
+        <p>{t('drawer.a11yMotion')}</p>
       </DrawerText>
     );
   }
   if (id === 'voz') {
     return (
-      <DrawerText title="Voz y audio">
-        <p>{canSpeak() ? 'Pa’Casa puede leerle las preguntas y sus respuestas en voz alta.' : 'Este navegador no tiene voz de lectura.'}</p>
-        <p>{canListen() ? 'También puede dictar sus respuestas.' : 'El dictado no está disponible aquí; puede escribir sus respuestas.'}</p>
+      <DrawerText title={t('drawer.voice')}>
+        <p>{t(canSpeak() ? 'drawer.voiceSpeak' : 'drawer.voiceNoSpeak')}</p>
+        <p>{t(canListen() ? 'drawer.voiceListen' : 'drawer.voiceNoListen')}</p>
       </DrawerText>
     );
   }
   if (id === 'funciona') {
-    return (
-      <DrawerText title="Cómo funciona">
-        <ol className="list-decimal space-y-2 pl-5">
-          <li>Suba el formulario de la clínica, o tome una foto.</li>
-          <li>Pa’Casa encuentra las preguntas y las prepara en español.</li>
-          <li>Conteste hablando, una pregunta a la vez.</li>
-          <li>Revise sus respuestas y genere el documento.</li>
-        </ol>
-      </DrawerText>
-    );
+    return <DrawerText title={t('drawer.how')}><p>{t('drawer.howText')}</p></DrawerText>;
   }
   if (id === 'privacidad') {
-    return (
-      <DrawerText title="Privacidad">
-        <p>Esta sesión es temporal: los formularios y documentos viven en este dispositivo mientras dura la visita.</p>
-        <p>No es un expediente médico y no se guarda como historial permanente.</p>
-      </DrawerText>
-    );
+    return <DrawerText title={t('drawer.privacy')}><p>{t('drawer.privacyText')}</p></DrawerText>;
   }
   if (id === 'microfono') {
     return (
-      <DrawerText title="Estado del micrófono">
-        <p>{microphoneAvailable() ? 'El dispositivo tiene micrófono.' : 'No encontré un micrófono en este dispositivo.'}</p>
-        <p>{canListen() ? 'El dictado por voz está disponible.' : 'El dictado por voz no está disponible; use el teclado.'}</p>
+      <DrawerText title={t('drawer.microphone')}>
+        <p>{t(microphoneAvailable() ? 'drawer.micYes' : 'drawer.micNo')}</p>
+        <p>{t(canListen() ? 'drawer.voiceListen' : 'drawer.voiceNoListen')}</p>
       </DrawerText>
     );
   }
   if (id === 'demo') {
     return (
-      <DrawerText title="Modo demo">
-        <p>
-          {demoMode
-            ? 'Ahora mismo está cargada la visita de ejemplo (Rosa Velázquez).'
-            : 'La sesión está vacía: puede empezar de cero.'}
-        </p>
+      <DrawerText title={t('drawer.demo')}>
+        <p>{t('drawer.demoText')}</p>
         <div className="flex flex-wrap gap-3">
           <button
             type="button"
             onClick={() => setDemoMode(!demoMode)}
             className="min-h-12 border border-royal-400 bg-accent px-6 text-sm font-semibold uppercase tracking-[0.12em] text-silver-50"
           >
-            {demoMode ? 'Empezar una sesión vacía' : 'Cargar la visita de ejemplo'}
+            {t(demoMode ? 'drawer.demoClear' : 'drawer.demoStart')}
           </button>
           <button
             type="button"
             onClick={onClose}
             className="min-h-12 border border-line bg-panel px-6 text-sm font-semibold uppercase tracking-[0.12em] text-fg-muted"
           >
-            Cerrar
+            {t('drawer.close')}
           </button>
         </div>
       </DrawerText>
     );
   }
-  return (
-    <DrawerText title="Acerca de Pa’Casa">
-      <p>Pa’Casa lee el formulario de la clínica y se lo pregunta en español, una pregunta a la vez.</p>
-      <p>Usted puede revisar, corregir y escuchar cada respuesta antes de terminar.</p>
-    </DrawerText>
-  );
+  return <DrawerText title={t('drawer.about')}><p>{t('drawer.aboutText')}</p></DrawerText>;
 }
 
 function DrawerText({ title, children }) {
@@ -135,6 +137,7 @@ export default function PatientShell() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const { t } = useLocale();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [panel, setPanel] = useState(null);
 
@@ -172,7 +175,7 @@ export default function PatientShell() {
           <Badge tone="patient">Portal paciente</Badge>
         </div>
 
-        <nav aria-label="Navegación principal" className="hidden flex-row items-center gap-1 md:flex">
+        <nav aria-label={t('nav.primary')} className="hidden flex-row items-center gap-1 md:flex">
           {TABS.map((tab) => (
             <Link
               key={tab.to}
@@ -182,7 +185,7 @@ export default function PatientShell() {
                 isActive(tab.to) ? 'border-royal-400 text-fg' : 'border-transparent text-fg-muted hover:bg-panel'
               }`}
             >
-              {tab.label}
+              {t(tab.key)}
             </Link>
           ))}
         </nav>
@@ -190,7 +193,7 @@ export default function PatientShell() {
         <button
           type="button"
           onClick={() => setDrawerOpen(true)}
-          aria-label="Abrir el menú"
+          aria-label={t('nav.menuOpen')}
           aria-expanded={drawerOpen}
           className="flex h-11 w-11 items-center justify-center border border-line bg-panel text-fg"
         >
@@ -203,7 +206,7 @@ export default function PatientShell() {
       </main>
 
       <nav
-        aria-label="Navegación principal"
+        aria-label={t('nav.primary')}
         className="fixed inset-x-0 bottom-0 z-30 flex items-stretch border-t border-line bg-page/95 px-1 pb-2 pt-1.5 backdrop-blur md:hidden"
       >
         {TABS.slice(0, 2).map((tab) => (
@@ -214,7 +217,7 @@ export default function PatientShell() {
           <button
             type="button"
             onClick={openPaCasaLive}
-            aria-label="Pa’Casa: hablar con la app"
+            aria-label={t('nav.assistant')}
             className="-mt-6 flex h-16 w-16 items-center justify-center rounded-full border-4 border-page bg-accent text-silver-50 shadow-raised"
           >
             <Mic size={26} aria-hidden />
@@ -231,7 +234,7 @@ export default function PatientShell() {
         <div className="fixed inset-0 z-40 flex">
           <button
             type="button"
-            aria-label="Cerrar el menú"
+            aria-label={t('nav.menuClose')}
             onClick={closeDrawer}
             className="absolute inset-0 bg-ink-950/70 backdrop-blur-sm"
           />
@@ -259,7 +262,7 @@ export default function PatientShell() {
                     onClick={() => setPanel(null)}
                     className="text-sm font-semibold uppercase tracking-[0.12em] text-accent-soft"
                   >
-                    ‹ Volver
+                    ‹ {t('nav.back')}
                   </button>
                   <DrawerPanel id={panel} onClose={closeDrawer} />
                 </div>
@@ -273,7 +276,7 @@ export default function PatientShell() {
                         className="flex min-h-14 w-full items-center gap-4 border border-line bg-panel px-4 text-left text-base text-fg hover:border-accent-soft hover:bg-panel-2"
                       >
                         <item.icon size={22} className="text-accent-soft" aria-hidden />
-                        {item.label}
+                        {t(item.key)}
                       </button>
                     </li>
                   ))}
@@ -306,7 +309,7 @@ export default function PatientShell() {
                   className="flex min-h-14 w-full items-center gap-4 border border-line bg-panel px-4 text-left text-base text-fg hover:border-accent-soft hover:bg-panel-2"
                 >
                   <RotateCcw size={22} className="text-accent-soft" aria-hidden />
-                  Reiniciar sesión
+                  {t('drawer.restart')}
                 </button>
                 <p className="px-1 text-sm text-fg-subtle">
                   {canListen() ? (
@@ -329,17 +332,18 @@ export default function PatientShell() {
 }
 
 function TabItem({ tab, active }) {
+  const { t } = useLocale();
   return (
     <Link
       to={tab.to}
       aria-current={active ? 'page' : undefined}
-      aria-label={tab.label}
+      aria-label={t(tab.key)}
       className={`flex min-h-14 flex-1 flex-col items-center justify-center gap-0.5 border border-transparent px-0.5 ${
         active ? 'bg-panel-2' : 'hover:bg-panel'
       }`}
     >
       <tab.icon size={20} className={active ? 'text-accent-soft' : 'text-fg-subtle'} aria-hidden />
-      <span className={`text-xs ${active ? 'font-semibold text-fg' : 'text-fg-muted'}`}>{tab.label}</span>
+      <span className={`text-xs ${active ? 'font-semibold text-fg' : 'text-fg-muted'}`}>{t(tab.key)}</span>
     </Link>
   );
 }

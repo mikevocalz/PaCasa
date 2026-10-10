@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+import { refreshDeviceLanguage, useLocale } from '@/i18n/store';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter as Router, Navigate, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from '@/lib/AuthContext';
@@ -21,6 +23,24 @@ import Register from '@/pages/Register';
 import Revisar from '@/pages/Revisar';
 
 function PortalRoutes() {
+  const { language } = useLocale();
+
+  useEffect(() => {
+    document.documentElement.lang = language;
+  }, [language]);
+
+  useEffect(() => {
+    const refreshWhenVisible = () => {
+      if (document.visibilityState === 'visible') refreshDeviceLanguage();
+    };
+    window.addEventListener('focus', refreshDeviceLanguage);
+    document.addEventListener('visibilitychange', refreshWhenVisible);
+    return () => {
+      window.removeEventListener('focus', refreshDeviceLanguage);
+      document.removeEventListener('visibilitychange', refreshWhenVisible);
+    };
+  }, []);
+
   return (
     <Routes>
       <Route path="/login" element={<Login />} />

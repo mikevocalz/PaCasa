@@ -13,7 +13,7 @@ export function RiveStage({
   height = 280,
 }: RiveStageProps) {
   const { RiveComponent } = useRive({
-    src: source,
+    src: typeof source === 'string' ? source : '',
     artboard,
     stateMachines: stateMachine,
     autoplay,

@@ -59,6 +59,7 @@ const nextConfig: NextConfig = {
   transpilePackages: [
     '@acme/ui',
     '@acme/app',
+    '@acme/chat-ui',
     '@acme/camera',
     '@acme/assets',
     '@expo/html-elements',
@@ -66,6 +67,7 @@ const nextConfig: NextConfig = {
     'expo-drag-drop-content-view',
     '@legendapp/motion',
     '@expo/ui',
+    'expo-camera',
     'expo-image',
     'expo-modules-core',
     'expo',

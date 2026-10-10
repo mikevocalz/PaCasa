@@ -1,1 +1,1 @@
-export { ShowcaseScreen as default } from '@acme/app';
+export { PaCasaHomeScreen as default } from '@acme/app';

@@ -26,3 +26,15 @@
 
 ## Skills applied
 Project \`AGENTS.md\` and skill manifest, Margelo API-design, Vercel React best practices, Expo Speech source, Expo Speech Recognition plugin/README, Native Springs OrbOverlay/ConversationState docs. Device and CLI were not available.
+
+
+## Base44 merge-readiness gate (2026-10-10)
+
+- [x] Update `pnpm-lock.yaml` against the speech/Native Springs manifests (automated lockfile-only run; one-time workflow removed).
+- [ ] Rebase this stacked PR onto merged scanner PR #9 and main, retaining the scanner's Expo Camera web and Next prerender fixes.
+- [ ] Make the translation service route runnable from a Base44-compatible backend (or an explicitly approved non-Vercel service), with authenticated sessions, explicit consent, rate limits and PHI-safe vendor agreements before real patient use.
+- [ ] Run frozen install, TypeScript, Next/static web and native prebuild CI on rebased head; physically verify iOS/Android permissions, device mic, captions, cancel, echo prevention and TTS.
+- [ ] Verify licensing of the specific Native Springs orb shader and any upstream Shadertoy-derived assets. The package-level MIT license does not automatically settle attribution or derivative asset rights.
+- [ ] Bilingual clinical accuracy review by qualified interpreters. Talk remains turn-based, not simultaneous duplex interpretation.
+
+**No Vercel deployment:** PaCasa is hosted on Base44. The screen is not production-ready or a replacement for a qualified medical interpreter.

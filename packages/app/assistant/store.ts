@@ -10,6 +10,7 @@ export const useAssistantStore = create<{
   draft: string;
   messages: readonly AssistantMessage[];
   busy: boolean;
+  streamingText: string;
   consent: boolean;
   error: string | null;
   voiceNotice: string | null;
@@ -20,6 +21,7 @@ export const useAssistantStore = create<{
   setDraft: (text: string) => void;
   setConsent: (consent: boolean) => void;
   setBusy: (busy: boolean) => void;
+  setStreamingText: (text: string) => void;
   setError: (error: string | null) => void;
   setVoiceNotice: (notice: string | null) => void;
   appendMessage: (mode: AssistantMode, role: AssistantRole, text: string, ui?: string) => void;
@@ -30,19 +32,21 @@ export const useAssistantStore = create<{
   draft: '',
   messages: [],
   busy: false,
+  streamingText: '',
   consent: false,
   error: null,
   voiceNotice: null,
   openAssistant: (mode = 'chat') => set({ open: true, mode, error: null, voiceNotice: null }),
   closeAssistant: () => set({
     open: false, mode: 'chat', sourceLanguage: 'en', draft: '',
-    messages: [], busy: false, consent: false, error: null, voiceNotice: null,
+    messages: [], busy: false, streamingText: '', consent: false, error: null, voiceNotice: null,
   }),
-  setMode: (mode) => set({ mode, draft: '', error: null, voiceNotice: null }),
+  setMode: (mode) => set({ mode, draft: '', streamingText: '', error: null, voiceNotice: null }),
   setSourceLanguage: (sourceLanguage) => set({ sourceLanguage, error: null }),
   setDraft: (draft) => set({ draft }),
   setConsent: (consent) => set({ consent }),
   setBusy: (busy) => set({ busy }),
+  setStreamingText: (streamingText) => set({ streamingText }),
   setError: (error) => set({ error }),
   setVoiceNotice: (voiceNotice) => set({ voiceNotice }),
   appendMessage: (mode, role, text, ui) => set((s) => ({

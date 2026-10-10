@@ -6,6 +6,9 @@ import { Modal, SafeArea, VoiceRecorder } from '@acme/ui';
 import { ArrowRight, MessageCircle, Mic, ScanLine, X } from '@acme/ui/icons';
 import { Pressable, ScrollView, Text, TextInput, View } from '@acme/ui/tw';
 import { OpenUIMessage } from '@acme/chat-ui';
+import { ChatOrb } from '../assistant/ChatOrb';
+import { streamFetch } from '../assistant/stream-fetch';
+import { readAssistantStream } from '../assistant/stream';
 import { MAX_MESSAGE_CHARS, assistantReplyFromResponse, assistantUIFromResponse, makeAssistantRequest } from '../assistant/contract';
 import { ASSISTANT_STAGES, type AssistantSurfaceMode } from '../assistant/modes';
 import { useAssistantStore } from '../assistant/store';
@@ -23,7 +26,7 @@ const endpointAvailable = Boolean(ENDPOINT &&
  */
 export function AssistantOverlay({ onScan }: { onScan: () => void }) {
   const store = useAssistantStore();
-  const { open, mode, sourceLanguage, draft, busy, messages, consent, error, voiceNotice } = store;
+  const { open, mode, sourceLanguage, draft, busy, streamingText, messages, consent, error, voiceNotice } = store;
   const abortRef = useRef<AbortController | null>(null);
   useEffect(() => () => abortRef.current?.abort(), []);
 
@@ -31,6 +34,7 @@ export function AssistantOverlay({ onScan }: { onScan: () => void }) {
     abortRef.current?.abort();
     abortRef.current = null;
     store.setBusy(false);
+    store.setStreamingText('');
   };
   const close = () => {
     stopRequest();
@@ -63,27 +67,50 @@ export function AssistantOverlay({ onScan }: { onScan: () => void }) {
     const controller = new AbortController();
     abortRef.current = controller;
     store.setBusy(true);
+    store.setStreamingText('');
     store.setError(null);
     store.appendMessage(outboundMode, 'user', request.text);
     store.setDraft('');
     try {
-      const response = await fetch(ENDPOINT, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(request), signal: controller.signal,
-      });
-      if (!response.ok) throw new Error('La solicitud no se pudo completar.');
-      const payload: unknown = await response.json();
-      const reply = assistantReplyFromResponse(payload);
-      if (!reply) throw new Error('El servicio no devolvió una respuesta válida.');
-      if (!controller.signal.aborted) {
-        store.appendMessage(outboundMode, 'assistant', reply, assistantUIFromResponse(payload) ?? undefined);
+      if (outboundMode === 'chat') {
+        const streamUrl = ENDPOINT.replace(/\/assistant\/?$/, '/assistant/stream');
+        const response = await streamFetch(streamUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'text/event-stream' },
+          body: JSON.stringify(request),
+          signal: controller.signal,
+        });
+        const data = await readAssistantStream(response, (text) => {
+          if (!controller.signal.aborted) store.setStreamingText(text);
+        });
+        if (!controller.signal.aborted) {
+          store.appendMessage('chat', 'assistant', data.reply, data.ui);
+          store.setStreamingText('');
+        }
+      } else {
+        const response = await fetch(ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(request),
+          signal: controller.signal,
+        });
+        if (!response.ok) throw new Error('La solicitud no se pudo completar.');
+        const payload: unknown = await response.json();
+        const reply = assistantReplyFromResponse(payload);
+        if (!reply) throw new Error('El servicio no devolvió una respuesta válida.');
+        if (!controller.signal.aborted) {
+          store.appendMessage('translate', 'assistant', reply, assistantUIFromResponse(payload) ?? undefined);
+        }
       }
     } catch (cause) {
       if (!controller.signal.aborted) {
         store.setError(cause instanceof Error ? cause.message : 'No fue posible conectar con Pa’Casa.');
       }
     } finally {
-      if (!controller.signal.aborted) store.setBusy(false);
+      if (!controller.signal.aborted) {
+        store.setBusy(false);
+        store.setStreamingText('');
+      }
       if (abortRef.current === controller) abortRef.current = null;
     }
   };
@@ -150,6 +177,7 @@ export function AssistantOverlay({ onScan }: { onScan: () => void }) {
               </View>
             ) : (
               <>
+                {!talk ? <ChatOrb busy={busy} /> : null}
                 <View className="gap-2 rounded-2xl border border-ink-700 bg-ink-900 p-5">
                   <Text role="heading" aria-level={2} className="font-display text-xl text-silver-50">
                     {talk ? 'Inglés y español, cara a cara' : '¿Qué necesitas entender?'}
@@ -182,6 +210,12 @@ export function AssistantOverlay({ onScan }: { onScan: () => void }) {
                     ) : null}
                   </View>
                 ))}
+                {!talk && streamingText ? (
+                  <View role="status" aria-live="polite" className="mr-6 gap-2 rounded-2xl border border-ink-700 bg-ink-900 p-4">
+                    <Text className="text-xs font-semibold uppercase tracking-wider text-royal-300">Pa’Casa · en vivo</Text>
+                    <Text className="text-base leading-7 text-silver-50">{streamingText}</Text>
+                  </View>
+                ) : null}
                 {talk && Platform.OS !== 'web' ? (
                   <View className="gap-3 rounded-xl border border-ink-700 bg-ink-900 p-4">
                     <Text className="font-semibold text-silver-50">Nota de voz local</Text>

@@ -1,5 +1,6 @@
 import { createServer } from 'node:http';
 import { parseAssistantRequest, buildGeminiRequest, parseGeminiResponse, MAX_BODY_BYTES } from './core.mjs';
+import { streamGeminiAnswer } from './stream.mjs';
 
 const PORT = Number.parseInt(process.env.PORT ?? '8787', 10);
 const HOST = process.env.HOST ?? '127.0.0.1';
@@ -62,7 +63,7 @@ export async function handleAssistantRequest(req, res, fetchModel = fetch) {
     respond(res, 200, { status: 'ok', configured: Boolean(GEMINI_API_KEY) }, origin);
     return;
   }
-  if (req.url !== '/assistant') {
+  if (req.url !== '/assistant' && req.url !== '/assistant/stream') {
     respond(res, 404, { error: 'No encontrado.' }, origin);
     return;
   }
@@ -99,19 +100,36 @@ export async function handleAssistantRequest(req, res, fetchModel = fetch) {
       respond(res, 400, { error: 'La solicitud no es válida.' }, origin);
       return;
     }
+    const streaming = req.url === '/assistant/stream';
+    if (streaming && parsed.mode !== 'chat') {
+      respond(res, 400, { error: 'El modo de transmisión es para el chat.' }, origin);
+      return;
+    }
+    const modelRequest = buildGeminiRequest(parsed);
+    if (streaming) {
+      modelRequest.systemInstruction.parts[0].text +=
+        '\nIMPORTANT for the streamed response: return plain conversational text ONLY, no JSON.';
+// Streaming cannot use an application/json output constraint.
+      modelRequest.generationConfig = { maxOutputTokens: 1200 };
+    }
     const response = await fetchModel(
-      'https://generativelanguage.googleapis.com/v1beta/models/' + MODEL + ':generateContent',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + MODEL +
+        (streaming ? ':streamGenerateContent?alt=sse' : ':generateContent'),
       {
         method: 'POST',
         headers: {
           'x-goog-api-key': GEMINI_API_KEY,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(buildGeminiRequest(parsed)),
+        body: JSON.stringify(modelRequest),
         signal: AbortSignal.timeout(15_000),
       },
     );
     if (!response.ok) throw new Error('model-unavailable');
+    if (streaming) {
+      await streamGeminiAnswer(response, res, parsed, origin, ALLOWED_ORIGINS);
+      return;
+    }
     const payload = await response.json();
     respond(res, 200, parseGeminiResponse(payload, parsed), origin);
   } catch (error) {

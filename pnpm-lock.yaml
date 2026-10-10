@@ -371,6 +371,9 @@ catalogs:
     react-native-keyboard-controller:
       specifier: 1.22.6
       version: 1.22.6
+    react-native-nitro-fetch:
+      specifier: 1.8.0
+      version: 1.8.0
     react-native-nitro-image:
       specifier: 0.15.2
       version: 0.15.2
@@ -648,6 +651,9 @@ importers:
       react-native-keyboard-controller:
         specifier: 'catalog:'
         version: 1.22.6(react-native-reanimated@4.7.1(react-native-worklets@0.13.0(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(react-native@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))(react@19.3.0)(supports-color@8.1.1))(react-native@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))(react@19.3.0))(react-native@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))(react@19.3.0)
+      react-native-nitro-fetch:
+        specifier: 'catalog:'
+        version: 1.8.0(react-native-nitro-modules@0.37.1(react-native@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))(react@19.3.0))(react-native-worklets@0.13.0(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(react-native@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))(react@19.3.0)(supports-color@8.1.1))(react-native@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))(react@19.3.0)
       react-native-nitro-image:
         specifier: 'catalog:'
         version: 0.15.2(react-native-nitro-modules@0.37.1(react-native@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))(react@19.3.0))(react-native@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))(react@19.3.0)
@@ -960,6 +966,9 @@ importers:
       kinetrell:
         specifier: 'catalog:'
         version: https://codeload.github.com/mikevocalz/Kinetrell/tar.gz/344de51531ce050c4311d3feb70e4d596bdc8041(a31d619e62c82a3ec8dfc64c5e0164e4)
+      react-native-nitro-fetch:
+        specifier: 'catalog:'
+        version: 1.8.0(react-native-nitro-modules@0.37.1(react-native@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))(react@19.3.0))(react-native-worklets@0.13.0(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(react-native@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))(react@19.3.0)(supports-color@8.1.1))(react-native@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))(react@19.3.0)
       react-native-safe-area-context:
         specifier: 'catalog:'
         version: 5.10.1(react-native@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))(react@19.3.0)
@@ -7488,6 +7497,17 @@ packages:
       react-native: '*'
       react-native-reanimated: '>=3.0.0'
 
+  react-native-nitro-fetch@1.8.0:
+    resolution: {integrity: sha512-/iA7/bzKYA2nDUGwsO7WqzG+lgC/LY3/1/+q/t/LN5oe1riCqF9ay7k6ML8gWM2QHODEB+VWJdXx/5Iec24VOg==}
+    peerDependencies:
+      react: 19.3.0
+      react-native: '*'
+      react-native-nitro-modules: '>=0.37.1'
+      react-native-worklets: '>=0.8.0'
+    peerDependenciesMeta:
+      react-native-worklets:
+        optional: true
+
   react-native-nitro-image@0.15.2:
     resolution: {integrity: sha512-WiaGnORmfNIIqtRJW76TWYNet1YZx1MWDlSOxd0jfcIBN4KjkVVMDVpvO01eCfpxKVG0ez9nA2iLQkPVlGFj+A==}
     peerDependencies:
@@ -8715,6 +8735,10 @@ packages:
 
   wcwidth@1.0.1:
     resolution: {integrity: sha512-XHPEwS0q6TaxcvG85+8EYkbiCux2XtWG2mkc47Ng2A77BQu9+DqIOJldST4HgPkuea7dvKSj5VgX3P1d4rW8Tg==}
+
+  web-streams-polyfill@4.3.0:
+    resolution: {integrity: sha512-/Gnggvj9oSrEvJbDyyPtAnxBt5fGQM2iWOKQNu7ie1OxDgK40iZpyV3TKaRiEzVj1oA1UxKnEy9XPXh6PW3eVw==}
+    engines: {node: '>= 8'}
 
   web-vitals@6.2.3:
     resolution: {integrity: sha512-Dmy+vdO1UPMqXiAtZSNayhl4f794Bxfd94W4HIj2HlYtczEQfEOon969memlcpcHrTuOKLa5baFjX7WbgmOq+A==}
@@ -10230,7 +10254,7 @@ snapshots:
       '@jridgewell/gen-mapping': 0.3.13
       '@jridgewell/remapping': 2.3.5
       '@jridgewell/sourcemap-codec': 1.6.0
-      browserslist: 4.28.7
+      browserslist: 4.29.3
       chalk: 4.1.2
       debug: 4.4.3(supports-color@8.1.1)
       getenv: 2.0.0
@@ -16420,6 +16444,15 @@ snapshots:
       react-native-is-edge-to-edge: 1.3.1(react-native@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))(react@19.3.0)
       react-native-reanimated: 4.7.1(react-native-worklets@0.13.0(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(react-native@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))(react@19.3.0)(supports-color@8.1.1))(react-native@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))(react@19.3.0)
 
+  react-native-nitro-fetch@1.8.0(react-native-nitro-modules@0.37.1(react-native@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))(react@19.3.0))(react-native-worklets@0.13.0(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(react-native@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))(react@19.3.0)(supports-color@8.1.1))(react-native@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))(react@19.3.0):
+    dependencies:
+      react: 19.3.0
+      react-native: 0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1)
+      react-native-nitro-modules: 0.37.1(react-native@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))(react@19.3.0)
+      web-streams-polyfill: 4.3.0
+    optionalDependencies:
+      react-native-worklets: 0.13.0(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(react-native@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))(react@19.3.0)(supports-color@8.1.1)
+
   react-native-nitro-image@0.15.2(react-native-nitro-modules@0.37.1(react-native@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))(react@19.3.0))(react-native@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))(react@19.3.0):
     dependencies:
       react: 19.3.0
@@ -17925,6 +17958,8 @@ snapshots:
     dependencies:
       defaults: 1.0.4
 
+  web-streams-polyfill@4.3.0: {}
+
   web-vitals@6.2.3: {}
 
   webidl-conversions@3.0.1: {}
@@ -17943,7 +17978,7 @@ snapshots:
       '@webassemblyjs/wasm-parser': 1.14.1
       acorn: 8.17.0
       acorn-import-phases: 1.0.4(acorn@8.17.0)
-      browserslist: 4.28.7
+      browserslist: 4.29.3
       chrome-trace-event: 1.0.4
       enhanced-resolve: 5.24.3
       es-module-lexer: 2.3.2
@@ -17982,7 +18017,7 @@ snapshots:
       '@webassemblyjs/wasm-parser': 1.14.1
       acorn: 8.17.0
       acorn-import-phases: 1.0.4(acorn@8.17.0)
-      browserslist: 4.28.7
+      browserslist: 4.29.3
       chrome-trace-event: 1.0.4
       enhanced-resolve: 5.24.3
       es-module-lexer: 2.3.2

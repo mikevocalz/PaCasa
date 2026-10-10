@@ -65,6 +65,7 @@
     "react-native-screens": "catalog:",
     "react-native-skia": "catalog:",
     "react-native-svg": "catalog:",
+    "react-native-nitro-fetch": "catalog:",
     "react-native-vision-camera": "catalog:",
     "react-native-vision-camera-resizer": "catalog:",
     "react-native-vision-camera-worklets": "catalog:",

@@ -30,7 +30,9 @@ const config: ExpoConfig & { newArchEnabled: true } = {
       NSCameraUsageDescription:
         'Camera Lab uses the camera to find a keyboard in view. Frames are analyzed on this device and never saved.',
       NSMicrophoneUsageDescription:
-        'Pa’Casa records a voice note only when you choose Record. Review happens on your device; it is never sent automatically.',
+        'Pa’Casa usa el micrófono solo al tocar Médico o Paciente. La voz se convierte en texto para la traducción consentida.',
+      NSSpeechRecognitionUsageDescription:
+        'Pa’Casa transcribe frases cuando activas el modo Hablar.',
     },
   },
   android: {
@@ -72,6 +74,10 @@ const config: ExpoConfig & { newArchEnabled: true } = {
     ],
     'expo-image',
     'expo-secure-store',
+    ['expo-speech-recognition', {
+      microphonePermission: 'Pa’Casa utiliza el micrófono solo cuando tocas Médico o Paciente para traducir una frase.',
+      speechRecognitionPermission: 'Pa’Casa transcribe frases para convertirlas entre inglés y español con consentimiento.',
+    }],
     'react-native-webgpu',
     // Adds the device flavors (mobile, quest) and the Quest manifest: VR
     // intent category, headtracking, hand tracking and supported devices.

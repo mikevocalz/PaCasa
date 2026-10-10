@@ -197,6 +197,9 @@ catalogs:
     '@metavr/layout-window-compat':
       specifier: 1.0.0
       version: 1.0.0
+    '@native-springs/shaders':
+      specifier: github:MatthewSRC/native-springs-shaders#a0e45176f87d93f6ce1b84b256233002a062850e
+      version: https://codeload.github.com/MatthewSRC/native-springs-shaders/tar.gz/a0e45176f87d93f6ce1b84b256233002a062850e
     '@next/env':
       specifier: 16.4.0
       version: 16.4.0
@@ -332,6 +335,12 @@ catalogs:
     expo-secure-store:
       specifier: 58.0.2
       version: 58.0.2
+    expo-speech:
+      specifier: 58.0.3
+      version: 58.0.3
+    expo-speech-recognition:
+      specifier: 57.1.1
+      version: 57.1.1
     expo-splash-screen:
       specifier: 58.0.7
       version: 58.0.7
@@ -597,6 +606,9 @@ importers:
       '@metavr/layout-window-compat':
         specifier: 'catalog:'
         version: 1.0.0(react-native@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))(react@19.3.0)
+      '@native-springs/shaders':
+        specifier: 'catalog:'
+        version: https://codeload.github.com/MatthewSRC/native-springs-shaders/tar.gz/a0e45176f87d93f6ce1b84b256233002a062850e(expo@58.0.7)(react-native@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))(react@19.3.0)
       '@react-navigation/native':
         specifier: 'catalog:'
         version: 7.5.0(react-native@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))(react@19.3.0)
@@ -651,6 +663,12 @@ importers:
       expo-secure-store:
         specifier: 'catalog:'
         version: 58.0.2(expo@58.0.7)
+      expo-speech:
+        specifier: 'catalog:'
+        version: 58.0.3(expo@58.0.7)
+      expo-speech-recognition:
+        specifier: 'catalog:'
+        version: 57.1.1(expo@58.0.7)(react-native@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))(react@19.3.0)
       expo-splash-screen:
         specifier: 'catalog:'
         version: 58.0.7(expo@58.0.7)(supports-color@8.1.1)(typescript@6.0.3)
@@ -899,6 +917,12 @@ importers:
       expo-camera:
         specifier: 'catalog:'
         version: 58.0.9(@types/emscripten@1.41.6)(expo@58.0.7)(react-native-web@0.21.4(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(react-native@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))(react@19.3.0)
+      expo-speech:
+        specifier: 'catalog:'
+        version: 58.0.3(expo@58.0.7)
+      expo-speech-recognition:
+        specifier: 'catalog:'
+        version: 57.1.1(expo@58.0.7)(react-native@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))(react@19.3.0)
       gsap:
         specifier: 'catalog:'
         version: 3.15.0
@@ -1014,6 +1038,15 @@ importers:
       '@acme/ui':
         specifier: workspace:*
         version: link:../ui
+      '@native-springs/shaders':
+        specifier: 'catalog:'
+        version: https://codeload.github.com/MatthewSRC/native-springs-shaders/tar.gz/a0e45176f87d93f6ce1b84b256233002a062850e(expo@58.0.7)(react-native@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))(react@19.3.0)
+      expo-speech:
+        specifier: 'catalog:'
+        version: 58.0.3(expo@58.0.7)
+      expo-speech-recognition:
+        specifier: 'catalog:'
+        version: 57.1.1(expo@58.0.7)(react-native@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))(react@19.3.0)
       kinetrell:
         specifier: 'catalog:'
         version: https://codeload.github.com/mikevocalz/Kinetrell/tar.gz/344de51531ce050c4311d3feb70e4d596bdc8041(a31d619e62c82a3ec8dfc64c5e0164e4)
@@ -2753,6 +2786,14 @@ packages:
     peerDependencies:
       '@emnapi/core': ^1.7.1
       '@emnapi/runtime': ^1.7.1
+
+  '@native-springs/shaders@https://codeload.github.com/MatthewSRC/native-springs-shaders/tar.gz/a0e45176f87d93f6ce1b84b256233002a062850e':
+    resolution: {gitHosted: true, integrity: sha512-0HlzO3ZZqzbNrpd763Hp6gpKrVd9Mf4mlTdMIBvTk/AiXB91y+TvIkeNHackJp84wupK/Tc9frPhj2iYcuoK6g==, tarball: https://codeload.github.com/MatthewSRC/native-springs-shaders/tar.gz/a0e45176f87d93f6ce1b84b256233002a062850e}
+    version: 0.5.0
+    peerDependencies:
+      expo: '*'
+      react: 19.3.0
+      react-native: '*'
 
   '@next/env@16.4.0':
     resolution: {integrity: sha512-pyLlT5oafGlX8X7xjgGNXz5dNIDSxREm+qD6i9VLSZiZFopA/XWl8NM/KPmLx/8EG/++c49iid3gNWSQW1+2dQ==}
@@ -5991,6 +6032,18 @@ packages:
   expo-server@58.0.4:
     resolution: {integrity: sha512-MWUNrC2Gs4+JS2KUeI87GH9NMWyBt0kjBYX7lbrL3zps8iEKu2ogVhtSXO2X/I46m9LQ/mTUrfrKKWLomUghTA==}
     engines: {node: ^22.13.0 || ^24.3.0 || ^26.0.0 || >=27.0.0}
+
+  expo-speech-recognition@57.1.1:
+    resolution: {integrity: sha512-e1RalFEvc7yui9Jnf1NiEYHT0jSPeH4hbMTafj1yjvcKN7HhZ7VrQigGUhBDB9AnDNjtPugbyPuCIjwHBBOCyw==}
+    peerDependencies:
+      expo: '*'
+      react: 19.3.0
+      react-native: '*'
+
+  expo-speech@58.0.3:
+    resolution: {integrity: sha512-jdMTqWL6ciDM8aVJe2/l2g6GTVaK7i/zBOVUhTq+l0Y+DOCz3Nh4HqNrMwmIKzXrlsxRv3ejmjSQPlX1lfOTOA==}
+    peerDependencies:
+      expo: '*'
 
   expo-splash-screen@58.0.7:
     resolution: {integrity: sha512-0Jp/TutAfQOAWEH59ixgjNttccbekFx2vaxOHwQfzu2QH1F5gyyydp+oQL6yKiPDBWobR0iSVj2TfZEWyuec+w==}
@@ -11285,6 +11338,12 @@ snapshots:
       '@tybys/wasm-util': 0.10.3
     optional: true
 
+  '@native-springs/shaders@https://codeload.github.com/MatthewSRC/native-springs-shaders/tar.gz/a0e45176f87d93f6ce1b84b256233002a062850e(expo@58.0.7)(react-native@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))(react@19.3.0)':
+    dependencies:
+      expo: 58.0.7(c733edb3fc5190f64cf80ea7f17ff933)
+      react: 19.3.0
+      react-native: 0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1)
+
   '@next/env@16.4.0': {}
 
   '@next/eslint-plugin-next@16.4.0(eslint@9.39.5(jiti@2.7.0)(supports-color@8.1.1))':
@@ -15066,6 +15125,16 @@ snapshots:
       expo: 58.0.7(c733edb3fc5190f64cf80ea7f17ff933)
 
   expo-server@58.0.4: {}
+
+  expo-speech-recognition@57.1.1(expo@58.0.7)(react-native@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))(react@19.3.0):
+    dependencies:
+      expo: 58.0.7(c733edb3fc5190f64cf80ea7f17ff933)
+      react: 19.3.0
+      react-native: 0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1)
+
+  expo-speech@58.0.3(expo@58.0.7):
+    dependencies:
+      expo: 58.0.7(c733edb3fc5190f64cf80ea7f17ff933)
 
   expo-splash-screen@58.0.7(expo@58.0.7)(supports-color@8.1.1)(typescript@6.0.3):
     dependencies:

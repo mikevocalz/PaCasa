@@ -29,9 +29,14 @@ interface RecognitionAlternative {
   transcript: string;
 }
 
-interface RecognitionResultList {
+interface RecognitionResult {
   length: number;
   [index: number]: RecognitionAlternative;
+}
+
+interface RecognitionResultList {
+  length: number;
+  [index: number]: RecognitionResult;
 }
 
 interface RecognitionResultEvent {

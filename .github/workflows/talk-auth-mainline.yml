@@ -19,18 +19,30 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: '22'
-      - name: Merge main and stop on unreviewed source conflicts
+      - name: Merge main and reconcile only the reviewed configuration change
         shell: bash
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git merge --no-commit --no-ff origin/main || true
           python3 - <<'PY'
-          import subprocess
-          paths = set(subprocess.check_output(['git','diff','--name-only','--diff-filter=U'],text=True).splitlines())
-          if not paths <= {'pnpm-lock.yaml'}:
-              print('Unreviewed conflicting source paths:', sorted(paths - {'pnpm-lock.yaml'}))
-              raise SystemExit(1)
+          import subprocess, pathlib
+          def git(*args): return subprocess.check_output(['git', *args], text=True)
+          paths = set(git('diff','--name-only','--diff-filter=U').splitlines())
+          allowed = {'pnpm-lock.yaml', 'apps/mobile/app.config.ts'}
+          if not paths <= allowed:
+              raise SystemExit('Unreviewed conflicting paths: ' + repr(paths - allowed))
+          file = 'apps/mobile/app.config.ts'
+          if file in paths:
+              ours, theirs, base = git('show', ':2:' + file), git('show', ':3:' + file), git('show', ':1:' + file)
+              old = "    'expo-image',\n"
+              new = old + "    'expo-secure-store',\n"
+              if base.count(old) != 1 or base.replace(old, new) != theirs or "'expo-secure-store'" in ours:
+                  raise SystemExit('Configuration changed beyond the reviewed SecureStore insertion')
+              if "'expo-speech-recognition'" not in ours:
+                  raise SystemExit('Voice plugin unexpectedly missing')
+              pathlib.Path(file).write_text(ours.replace(old, new))
+              subprocess.check_call(['git','add','--',file])
           if 'pnpm-lock.yaml' in paths:
               subprocess.check_call(['git','checkout','--theirs','--','pnpm-lock.yaml'])
               subprocess.check_call(['git','add','--','pnpm-lock.yaml'])

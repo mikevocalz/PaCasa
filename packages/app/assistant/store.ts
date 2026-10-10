@@ -1,10 +1,11 @@
 import { create } from 'zustand';
 import type { AssistantLanguage, AssistantMessage, AssistantMode, AssistantRole } from './contract.ts';
+import type { AssistantSurfaceMode } from './modes.ts';
 
 /** Ephemeral assistant session. Never persisted, shared with no analytics SDK. */
 export const useAssistantStore = create<{
   open: boolean;
-  mode: AssistantMode;
+  mode: AssistantSurfaceMode;
   sourceLanguage: AssistantLanguage;
   draft: string;
   messages: readonly AssistantMessage[];
@@ -12,9 +13,9 @@ export const useAssistantStore = create<{
   consent: boolean;
   error: string | null;
   voiceNotice: string | null;
-  openAssistant: (mode?: AssistantMode) => void;
+  openAssistant: (mode?: AssistantSurfaceMode) => void;
   closeAssistant: () => void;
-  setMode: (mode: AssistantMode) => void;
+  setMode: (mode: AssistantSurfaceMode) => void;
   setSourceLanguage: (language: AssistantLanguage) => void;
   setDraft: (text: string) => void;
   setConsent: (consent: boolean) => void;

@@ -77,7 +77,7 @@ function AssistantButton({ rail }: { rail: boolean }) {
   return (
     <Pressable
       role="button"
-      aria-label="Abrir Pa’Casa: chat y traducción"
+      aria-label="Abrir Pa’Casa: chat, escáner y conversación"
       accessibilityHint="Abre el asistente sin cambiar de sección"
       onPress={() => openAssistant('chat')}
       style={rail ? undefined : { width: ACTION_SIZE, height: ACTION_SIZE, marginTop: -ACTION_RAISE }}
@@ -170,12 +170,12 @@ export function AppShell({ children }: { children: ReactNode }) {
                 </Link>
               ))}
               <Pressable
-                role="button" accessibilityLabel="Abrir chat y traducción"
+                role="button" accessibilityLabel="Abrir Chat, Escanear o Hablar"
                 onPress={() => openAssistant('chat')}
                 className="ml-2 min-h-11 flex-row items-center justify-center gap-2 border border-royal-400 bg-royal-500 px-4"
               >
                 <MessageCircle size={20} className="text-silver-50" />
-                <Text className="text-sm font-semibold text-silver-50">Hablar / Traducir</Text>
+                <Text className="text-sm font-semibold text-silver-50">Chat · Escanear · Hablar</Text>
               </Pressable>
             </Nav>
           ) : null}
@@ -213,12 +213,12 @@ export function AppShell({ children }: { children: ReactNode }) {
                 ))}
                 <Pressable
                   role="button"
-                  aria-label="Abrir Pa’Casa: chat y traducción"
+                  aria-label="Abrir Pa’Casa: chat, escáner y conversación"
                   onPress={() => { closeMenu(); openAssistant('chat'); }}
                   className="min-h-14 flex-row items-center gap-4 border border-royal-300 bg-royal-500 px-4"
                 >
                   <MessageCircle size={24} className="text-silver-50" />
-                  <Text className="text-lg font-semibold text-silver-50">Chat y traducción</Text>
+                  <Text className="text-lg font-semibold text-silver-50">Chat · Escanear · Hablar</Text>
                 </Pressable>
               </Nav>
             </ScrollView>

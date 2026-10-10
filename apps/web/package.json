@@ -12,7 +12,8 @@
     "typecheck": "tsc --noEmit",
     "auth:seed-demo": "node scripts/seed-demo-auth.mjs",
     "auth:migrate": "npx auth@1.7.7 migrate --config ./lib/auth.ts --yes",
-    "auth:check": "npx auth@1.7.7 check schema --config ./lib/auth.ts"
+    "auth:check": "npx auth@1.7.7 check schema --config ./lib/auth.ts",
+    "auth:doctor": "node scripts/auth-doctor.mjs"
   },
   "dependencies": {
     "@acme/app": "workspace:*",

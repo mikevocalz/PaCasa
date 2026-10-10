@@ -70,6 +70,8 @@ minimumReleaseAgeExclude:
 
 # One version per dependency, declared once. Package manifests consume catalog:.
 catalog:
+  "@openuidev/react-lang": 0.3.0
+  zod: 4.6.5
   # Expo SDK 58 stable / React Native 0.88 lane
   react: 19.3.0
   react-dom: 19.3.0

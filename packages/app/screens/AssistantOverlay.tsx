@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { Platform } from 'react-native';
 import { Modal, SafeArea, VoiceRecorder } from '@acme/ui';
-import { ArrowRight, Camera, MessageCircle, Mic, ScanLine, X } from '@acme/ui/icons';
+import { ArrowRight, MessageCircle, Mic, ScanLine, X } from '@acme/ui/icons';
 import { Pressable, ScrollView, Text, TextInput, View } from '@acme/ui/tw';
 import { OpenUIMessage } from '@acme/chat-ui';
 import { MAX_MESSAGE_CHARS, assistantReplyFromResponse, assistantUIFromResponse, makeAssistantRequest } from '../assistant/contract';
@@ -136,7 +136,7 @@ export function AssistantOverlay({ onScan }: { onScan: () => void }) {
                 {Platform.OS !== 'web' ? (
                   <Pressable role="button" accessibilityLabel="Abrir vista de cámara de prueba"
                     onPress={onScan} className="min-h-14 flex-row items-center justify-center gap-3 rounded-xl bg-royal-500 px-5">
-                    <Camera size={23} className="text-silver-50" />
+                    <ScanLine size={23} className="text-silver-50" />
                     <Text className="font-semibold text-silver-50">Abrir cámara de prueba</Text>
                   </Pressable>
                 ) : (

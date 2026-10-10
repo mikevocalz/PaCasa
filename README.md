@@ -31,7 +31,7 @@ The starter's screens, assets, Zustand stores, native plugins and platform behav
 
 ## Base44
 
-[Pa'Casa dashboard](https://app.base44.com/apps/6aca5ff33ab16f3383490010/editor/workspace/overview)
+[Live Pa'Casa app](https://pacasa-83490010.base44.app) · [Base44 dashboard](https://app.base44.com/apps/6aca5ff33ab16f3383490010/editor/workspace/overview)
 
 The source lives in this repository. Base44 hosts the exported web app; native Android/iOS/headset binaries are built separately with Expo.
 
@@ -43,7 +43,7 @@ pnpm build:base44
 pnpm base44:deploy
 ```
 
-Run the link command only on a new checkout. The local Base44 link and credentials are not committed. The CLI has its own npm installation because its Deno URL dependency is incompatible with this workspace's pnpm dependency policy. The static export disables Next server caching only for the Base44 build; normal Next development and hosting remain available.
+Run the link command only on a new checkout. The local Base44 link and credentials are not committed. The CLI has its own npm installation because its Deno URL dependency is incompatible with this workspace's pnpm dependency policy. The static export disables Next server caching only for the Base44 build; normal Next development and hosting remain available. Because Base44 serves the root HTML for deep links, the home entry recovers known routes through their exported Next payloads after hydration.
 
 ## The experience at a glance
 

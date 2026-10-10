@@ -9,7 +9,8 @@
     "start": "node scripts/next.mjs start",
     "lint": "eslint",
     "test": "node --test",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "auth:seed-demo": "node scripts/seed-demo-auth.ts"
   },
   "dependencies": {
     "@acme/app": "workspace:*",

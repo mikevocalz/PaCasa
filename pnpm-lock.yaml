@@ -1056,7 +1056,7 @@ importers:
         specifier: 'catalog:'
         version: 19.3.0
       react:
-        specifier: 'catalog:'
+        specifier: 19.3.0
         version: 19.3.0
       react-native:
         specifier: 'catalog:'

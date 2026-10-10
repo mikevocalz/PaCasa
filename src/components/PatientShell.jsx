@@ -16,6 +16,9 @@ import {
   X,
 } from 'lucide-react';
 import { resetSession, setDemoMode, setReturnTo, useSession } from '@/session/store';
+import Badge from '@/components/ui/Badge';
+import Button from '@/components/ui/Button';
+import { useAuth } from '@/lib/AuthContext';
 import { canListen, canSpeak, microphoneAvailable } from '@/session/voice';
 
 /** The five visible positions. Pa'Casa is the raised center action, not a tab. */
@@ -131,6 +134,7 @@ function DrawerText({ title, children }) {
 export default function PatientShell() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [panel, setPanel] = useState(null);
 
@@ -158,12 +162,15 @@ export default function PatientShell() {
   return (
     <div className="flex min-h-screen flex-col bg-page">
       <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center justify-between gap-3 border-b border-line bg-page/95 px-4 backdrop-blur">
-        <Link to="/" aria-label="Pa’Casa, inicio" className="flex items-center gap-3">
-          <span className="flex h-8 w-8 items-center justify-center border border-royal-400 bg-accent font-display text-lg text-silver-50">
-            P
-          </span>
-          <span className="font-display text-lg text-fg">Pa’Casa</span>
-        </Link>
+        <div className="flex min-w-0 items-center gap-3">
+          <Link to="/" aria-label="Pa’Casa, inicio" className="flex items-center gap-3">
+            <span className="flex h-8 w-8 items-center justify-center border border-royal-400 bg-accent font-display text-lg text-silver-50">
+              P
+            </span>
+            <span className="font-display text-lg text-fg">Pa’Casa</span>
+          </Link>
+          <Badge tone="patient">Portal paciente</Badge>
+        </div>
 
         <nav aria-label="Navegación principal" className="hidden flex-row items-center gap-1 md:flex">
           {TABS.map((tab) => (
@@ -274,6 +281,22 @@ export default function PatientShell() {
               )}
 
               <div className="mt-6 space-y-3 border-t border-line pt-5">
+                <div className="space-y-1 border border-line bg-page p-4">
+                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-accent-soft">Paciente</p>
+                  <p className="font-semibold text-fg">{user?.name ?? 'Cuenta Pa’Casa'}</p>
+                  <p className="text-sm text-fg-subtle">{user?.email}</p>
+                </div>
+                <Button
+                  tone="secondary"
+                  className="w-full"
+                  onClick={async () => {
+                    await logout();
+                    closeDrawer();
+                    navigate('/login', { replace: true });
+                  }}
+                >
+                  Cerrar sesión
+                </Button>
                 <button
                   type="button"
                   onClick={() => {

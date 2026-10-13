@@ -198,8 +198,8 @@ catalogs:
       specifier: 1.0.0
       version: 1.0.0
     '@native-springs/shaders':
-      specifier: github:MatthewSRC/native-springs-shaders#a0e45176f87d93f6ce1b84b256233002a062850e
-      version: https://codeload.github.com/MatthewSRC/native-springs-shaders/tar.gz/a0e45176f87d93f6ce1b84b256233002a062850e
+      specifier: 0.5.0
+      version: 0.5.0
     '@next/env':
       specifier: 16.4.0
       version: 16.4.0
@@ -608,7 +608,7 @@ importers:
         version: 1.0.0(react-native@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))(react@19.3.0)
       '@native-springs/shaders':
         specifier: 'catalog:'
-        version: https://codeload.github.com/MatthewSRC/native-springs-shaders/tar.gz/a0e45176f87d93f6ce1b84b256233002a062850e(expo@58.0.7)(react-native@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))(react@19.3.0)
+        version: 0.5.0(expo@58.0.7)(react-native@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))(react@19.3.0)
       '@react-navigation/native':
         specifier: 'catalog:'
         version: 7.5.0(react-native@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))(react@19.3.0)
@@ -1040,7 +1040,7 @@ importers:
         version: link:../ui
       '@native-springs/shaders':
         specifier: 'catalog:'
-        version: https://codeload.github.com/MatthewSRC/native-springs-shaders/tar.gz/a0e45176f87d93f6ce1b84b256233002a062850e(expo@58.0.7)(react-native@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))(react@19.3.0)
+        version: 0.5.0(expo@58.0.7)(react-native@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))(react@19.3.0)
       expo-speech:
         specifier: 'catalog:'
         version: 58.0.3(expo@58.0.7)
@@ -2787,9 +2787,8 @@ packages:
       '@emnapi/core': ^1.7.1
       '@emnapi/runtime': ^1.7.1
 
-  '@native-springs/shaders@https://codeload.github.com/MatthewSRC/native-springs-shaders/tar.gz/a0e45176f87d93f6ce1b84b256233002a062850e':
-    resolution: {gitHosted: true, integrity: sha512-0HlzO3ZZqzbNrpd763Hp6gpKrVd9Mf4mlTdMIBvTk/AiXB91y+TvIkeNHackJp84wupK/Tc9frPhj2iYcuoK6g==, tarball: https://codeload.github.com/MatthewSRC/native-springs-shaders/tar.gz/a0e45176f87d93f6ce1b84b256233002a062850e}
-    version: 0.5.0
+  '@native-springs/shaders@0.5.0':
+    resolution: {integrity: sha512-uk0P61Hb7F+FJVtBAEDswfVH51tIswljUXjvrb6PYQfTpQ3pXe6vK6OqFH/yNHEySq0jFW+r/qgkf7m+QDs4iA==}
     peerDependencies:
       expo: '*'
       react: 19.3.0
@@ -11338,7 +11337,7 @@ snapshots:
       '@tybys/wasm-util': 0.10.3
     optional: true
 
-  '@native-springs/shaders@https://codeload.github.com/MatthewSRC/native-springs-shaders/tar.gz/a0e45176f87d93f6ce1b84b256233002a062850e(expo@58.0.7)(react-native@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))(react@19.3.0)':
+  '@native-springs/shaders@0.5.0(expo@58.0.7)(react-native@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/metro-config@0.88.0-rc.4(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))(react@19.3.0)':
     dependencies:
       expo: 58.0.7(c733edb3fc5190f64cf80ea7f17ff933)
       react: 19.3.0

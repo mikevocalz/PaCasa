@@ -1,13 +1,14 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { Platform } from 'react-native';
+import { AppState, Platform } from 'react-native';
 import { ExpoSpeechRecognitionModule, useSpeechRecognitionEvent } from 'expo-speech-recognition';
 import * as Speech from 'expo-speech';
-import { playUtterance, type UtterancePlayback } from '@acme/ui/voice';
+import { playUtterance } from '@acme/ui/voice';
 import { assistantReplyFromResponse, makeAssistantRequest } from '../assistant/contract';
 import { boundedUtterance, spokenLanguageForSpeaker, spokenTranslationLocale, speechLocaleForSpeaker, type TalkSpeaker } from './model';
 import { createTurnLease } from './turn-lease';
+import { createVoicePlayback } from './voice-playback';
 import { useTalkStore } from './store';
 
 const ENDPOINT = Platform.OS === 'web' ? process.env.NEXT_PUBLIC_PACASA_ASSISTANT_URL : process.env.EXPO_PUBLIC_PACASA_ASSISTANT_URL;
@@ -23,8 +24,8 @@ export function useTalkSession(active: boolean) {
   const requestRef = useRef<AbortController | null>(null);
   const recognition = useRef<{ live: boolean; token: number | null; end: (() => void) | null }>({ live: false, token: null, end: null });
   const closing = useRef<Promise<void> | null>(null);
-  const voice = useRef<UtterancePlayback | null>(null);
-  const stopVoice = () => { voice.current?.stop(); voice.current = null; };
+  const voice = useRef(createVoicePlayback()).current;
+  const stopVoice = () => voice.stop();
   const valid = (token: number) => activeRef.current && lease.current(token) && useTalkStore.getState().consent;
 
   const haltRecognition = (): Promise<void> => {
@@ -57,7 +58,10 @@ export function useTalkSession(active: boolean) {
   useEffect(() => {
     activeRef.current = active;
     if (!active) cancel();
-    return () => { activeRef.current = false; cancel(); };
+    const subscription = AppState.addEventListener('change', (next) => {
+      if (next !== 'active') cancel();
+    });
+    return () => { subscription.remove(); activeRef.current = false; cancel(); };
     // Resources are terminated when leaving this screen, not on each store update.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [active]);
@@ -73,24 +77,20 @@ export function useTalkSession(active: boolean) {
     // device's own TTS is the fallback when voice is not configured, the
     // request fails, or playback is blocked. No silent dead air either way.
     const deviceSpeak = () => {
-      if (!valid(token)) return;
+      if (!valid(token) || useTalkStore.getState().muted) return;
       Speech.speak(text, { language: spokenTranslationLocale(speaker), rate: 0.88,
         onDone: finish, onStopped: finish, onError: fail });
     };
     if (!SPEAK_ENDPOINT) { deviceSpeak(); return; }
-    void (async () => {
-      try {
-        const response = await fetch(SPEAK_ENDPOINT, { method: 'POST', credentials: 'include',
+    void voice.speak({
+      request: (signal) => fetch(SPEAK_ENDPOINT, { method: 'POST', credentials: 'include',
           headers: { 'Content-Type': 'application/json', Accept: 'audio/mpeg', 'X-PaCasa-Request': '1' },
-          body: JSON.stringify({ text, consent: true }), signal: AbortSignal.timeout(20_000) });
-        if (!response.ok || !valid(token)) { deviceSpeak(); return; }
-        const playback = playUtterance(await response.arrayBuffer());
-        voice.current = playback;
-        const played = await playback.done;
-        voice.current = null;
-        if (!played) deviceSpeak(); else finish();
-      } catch { deviceSpeak(); }
-    })();
+          body: JSON.stringify({ text, consent: true }), signal }),
+      play: playUtterance,
+      current: () => valid(token) && !useTalkStore.getState().muted,
+      fallback: deviceSpeak,
+      finish,
+    });
   };
   const translate = async (raw: string) => {
     const store = useTalkStore.getState();

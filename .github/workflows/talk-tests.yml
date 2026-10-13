@@ -1,0 +1,19 @@
+name: Talk language and cancellation tests
+on:
+  pull_request:
+    paths: ['packages/app/talk/**', '.github/workflows/talk-tests.yml']
+  push:
+    branches: [main]
+    paths: ['packages/app/talk/**', '.github/workflows/talk-tests.yml']
+permissions:
+  contents: read
+jobs:
+  talk-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - run: node --test packages/app/talk/*.test.ts

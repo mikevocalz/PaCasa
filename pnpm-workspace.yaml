@@ -103,7 +103,9 @@ catalog:
   # apps/mobile/babel.config.js names this preset, so the app must declare it;
   # the Gradle JS bundle step resolves it from the app, not through expo.
   babel-preset-expo: 58.0.12
-  "@native-springs/shaders": github:MatthewSRC/native-springs-shaders#a0e45176f87d93f6ce1b84b256233002a062850e
+  # Published artifact includes OrbOverlay and matches the former Git pin
+  # a0e45176; no Git prepare step or host rsync installation is needed.
+  "@native-springs/shaders": 0.5.0
   react-native-executorch: 0.10.0
   react-native-nitro-fetch: 1.8.0
   react-native-audio-api: audio-api-nightly

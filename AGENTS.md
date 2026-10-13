@@ -13,3 +13,15 @@ Carry these product requirements forward when editing the starter:
 - Native/config plugins must merge manifest metadata and layout entries. Verify generated variants and manifests; add regression coverage for configuration loss.
 - Register Viro scene resources only when the renderer is present and a scene mounts. A missing native renderer should show an honest fallback, not startup MaterialManager errors.
 - Do not claim device/headset validation from a browser check. Record which platform actually ran.
+
+## Required tailored foldable skill
+
+For foldable, dual-screen, tablet, adaptive-pane, Inspector, resizing or shared XR layout work, read **mikevocalz-foldable-layouts** in full before implementation or review:
+
+https://github.com/mikevocalz/universal-spatial-starter/blob/256a97b132803fd2fb8049f7a120cef9cb641f41/.agents/skills/mikevocalz-foldable-layouts/SKILL.md
+
+Canonical commit: `256a97b132803fd2fb8049f7a120cef9cb641f41`; Git blob SHA: `69a051ad0a924f778ed54f9222fe8af0c5eef701`. Fetch the pinned source through repository tools, or read an identical local copy. This references the shared skill; it does not claim a local installation. Record intentional pin changes and report any source-loading failure.
+
+The tailored skill preserves the product contracts above: physical-right native rails even on folded covers/tabletop and in RTL; web header/bottom-tab behavior without a rail; Zustand and stable sessions; screen-specific Workspace/Inspector ratios; safe measured hinge geometry and authored stage aspect ratios. It adds 18 acceptance scenarios and Android/Apple/web/XR adapter rules, not a SwiftUI app rewrite or a Liquid Glass redesign.
+
+Preserve the existing specialist skills, semantic UI and Kinetrell policy. No Tamagui or Bento. No dependency upgrades, runtime changes, merges or deployments solely for this skills-only task. Report actual tests and platform evidence; browser/simulator checks do not establish physical-device support.

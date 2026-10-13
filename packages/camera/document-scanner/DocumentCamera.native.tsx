@@ -36,31 +36,31 @@ export function DocumentCamera({ active, onExtracted, onError, onProgress }: Doc
   };
   if (!hasPermission) {
     return (
-      <View className="gap-3 rounded-xl border border-ink-600 p-4">
-        <Text className="text-base text-silver-300">Autoriza la cámara para leer el documento localmente.</Text>
+      <View className="gap-3 rounded-soft border border-border bg-surface-raised p-4">
+        <Text className="text-base text-text-muted">Autoriza la cámara para leer el documento localmente.</Text>
         <Pressable role="button" accessibilityLabel="Autorizar cámara" onPress={() => { void requestPermission(); }}
-          className="min-h-12 items-center justify-center rounded-xl bg-royal-500 px-4">
-          <Text className="font-semibold text-silver-50">Activar cámara</Text>
+          className="min-h-12 items-center justify-center rounded-soft bg-cta px-4">
+          <Text className="font-semibold text-on-cta">Activar cámara</Text>
         </Pressable>
       </View>
     );
   }
-  if (!device) return <Text role="alert" className="text-silver-300">No se encontró cámara trasera.</Text>;
+  if (!device) return <Text role="alert" className="text-text-muted">No se encontró cámara trasera.</Text>;
   return (
     <View className="gap-3">
-      <View className="overflow-hidden rounded-2xl border-2 border-royal-400">
+      <View className="overflow-hidden rounded-soft border-2 border-accent">
         <Camera device={device} isActive={active} outputs={[photos]}
           style={{ width: '100%', height: 280 }} enableNativeTapToFocusGesture />
       </View>
-      <Text className="text-sm text-silver-300">
+      <Text className="text-sm text-text-muted">
         OCR en tu dispositivo · {ocr.isReady ? 'Modelo listo' :
           ocr.error ? 'Modelo no disponible' : 'Preparando modelo: ' + Math.round(ocr.downloadProgress) + '%'}
       </Text>
       {ocr.error ? <Text role="alert" className="text-sm text-danger">{ocr.error.message}</Text> : null}
       <Pressable role="button" accessibilityLabel="Capturar y reconocer documento sin subir la imagen"
         disabled={!active || !ocr.isReady || capturing.current} onPress={() => { void capture(); }}
-        className="min-h-14 items-center justify-center rounded-xl bg-royal-500 px-4 disabled:opacity-40">
-        <Text className="font-semibold text-silver-50">Capturar · Leer en dispositivo</Text>
+        className="min-h-14 items-center justify-center rounded-soft bg-cta px-4 disabled:opacity-40">
+        <Text className="font-semibold text-on-cta">Capturar · Leer en dispositivo</Text>
       </Pressable>
     </View>
   );

@@ -12,8 +12,8 @@
 
 ## Dependencies and compatibility
 - \`expo-speech@58.0.3\` for SDK58, \`expo-speech-recognition@57.1.1\` (upstream built using Expo56; **SDK58/RN0.88 compatibility unverified**).
-- NPM @native-springs/shaders 0.3.2 **does not have OrbOverlay**. Pinned GitHub commit \`a0e45176f87d93f6ce1b84b256233002a062850e\` reporting v0.5.0; run its \`prepare\` and verify iOS/Android native build. Upstream cites a Shadertoy author with unspecified shader license; **clear redistribution/commercial rights before shipping**.
-- Run \`pnpm install\`, regenerate \`pnpm-lock.yaml\`, approve Git dependency builds, rebuild iOS pods/Android Gradle, then device test. Authoring was through GitHub connector only, not local builds/CLI.
+- `@native-springs/shaders@0.5.0` is pinned to the published npm artifact, which includes OrbOverlay and matches the former Git pin. See [dependency verification](NATIVE_SPRINGS_DEPENDENCY.md). Upstream cites a Shadertoy author with unspecified shader license; **clear redistribution/commercial rights before shipping**.
+- Use `pnpm install --frozen-lockfile`; the shader package needs no Git build permission or `rsync`. Rebuild iOS pods/Android Gradle and device-test the native module before release.
 - Browser speech recognition and TTS voice availability vary; always display text and offer manual fallback.
 - Base service env \`NEXT_PUBLIC_PACASA_ASSISTANT_URL\` or \`EXPO_PUBLIC_PACASA_ASSISTANT_URL\`; HTTPS except localhost.
 - PHI/clinical production needs verified Supabase Better Auth roles, BAA/vendor review, encryption, audit/retention and consent policies; standalone service currently development-only. Use a qualified medical interpreter for clinical decisions.

@@ -56,8 +56,10 @@ const config: ExpoConfig & { newArchEnabled: true } = {
     [
       'expo-splash-screen',
       {
-        image: './assets/images/splash-icon.png',
-        imageWidth: 200,
+        image: './assets/images/picasa-logo.png',
+        // Wider than the old square mark: the lockup is ~1.9:1, so 260dp
+        // keeps it prominent without stretching past phone widths.
+        imageWidth: 260,
         resizeMode: 'contain',
         backgroundColor: palette.ink[50],
         dark: { backgroundColor: palette.ink[50] },

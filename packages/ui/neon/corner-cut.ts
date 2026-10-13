@@ -53,5 +53,5 @@ export function insetCut(cut: number, inset: number): number {
   return Math.max(0, cut - inset * (Math.SQRT2 - 1));
 }
 
-/** px for the opt-in `rounded` prop: the theme's `rounded-soft` step (0.625rem). */
-export const ROUND_RADIUS = 10;
+/** px for the opt-in `rounded` prop: the theme's `rounded-soft` step (0.75rem). */
+export const ROUND_RADIUS = 12;

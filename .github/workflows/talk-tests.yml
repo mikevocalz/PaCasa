@@ -16,4 +16,4 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: '22'
-      - run: node --test packages/app/talk/model.test.ts packages/app/talk/turn-lease.test.ts
+      - run: node --test packages/app/talk/*.test.ts

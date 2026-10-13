@@ -6,6 +6,7 @@ import { groundQuestion, PHRASES, SUGGESTED_QUESTIONS } from '@/session/domain';
 import { currentQuestion, formProgress, pendingAnswers, setAnswer, setConfirmed, useSession } from '@/session/store';
 import { canListen, canSpeak, listen, speak, stopSpeaking } from '@/session/voice';
 import { ActionButton, BigAction } from '@/components/patient-ui';
+import { DirectionsCard } from '@/components/DirectionsCard';
 import { useLocale } from '@/i18n/store';
 import { speechLanguage } from '@/i18n/locale.mjs';
 import { translateForRecipient } from '@/i18n/translate.mjs';
@@ -448,6 +449,8 @@ function Preguntar({ form, next, onClose }) {
               ) : null}
             </div>
           ) : null}
+
+          {answer.directions ? <DirectionsCard block={answer.directions} /> : null}
 
           <div className="flex flex-wrap gap-3">
             {answer.readAloud && canSpeak() ? (

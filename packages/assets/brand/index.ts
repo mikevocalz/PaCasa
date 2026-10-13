@@ -1,0 +1,1 @@
+export { brandLogo } from './logo';

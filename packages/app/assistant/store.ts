@@ -37,9 +37,11 @@ export const useAssistantStore = create<{
   error: null,
   voiceNotice: null,
   openAssistant: (mode = 'chat') => set({ open: true, mode, error: null, voiceNotice: null }),
+  // Consent survives open/close: it is a session grant, not per-message UI
+  // state. The transcript still clears on close.
   closeAssistant: () => set({
     open: false, mode: 'chat', sourceLanguage: 'en', draft: '',
-    messages: [], busy: false, streamingText: '', consent: false, error: null, voiceNotice: null,
+    messages: [], busy: false, streamingText: '', error: null, voiceNotice: null,
   }),
   setMode: (mode) => set({ mode, draft: '', streamingText: '', error: null, voiceNotice: null }),
   setSourceLanguage: (sourceLanguage) => set({ sourceLanguage, error: null }),

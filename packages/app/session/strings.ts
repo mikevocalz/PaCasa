@@ -1,0 +1,97 @@
+import type { PatientLanguage } from './locale';
+
+/** [es, en] copy for shell chrome and product surfaces. Workflow screens stay Spanish-first. */
+const STRINGS = {
+  'nav.home': ['Inicio', 'Home'],
+  'nav.plan': ['Mi plan', 'My plan'],
+  'nav.dates': ['Citas', 'Appointments'],
+  'nav.support': ['Apoyo', 'Support'],
+  'nav.forms': ['Formularios', 'Forms'],
+  'nav.docs': ['Documentos', 'Documents'],
+  'nav.review': ['Revisar', 'Review'],
+  'nav.help': ['Ayuda', 'Help'],
+  'nav.home.short': ['Inicio', 'Home'],
+  'nav.plan.short': ['Plan', 'Plan'],
+  'nav.dates.short': ['Citas', 'Visits'],
+  'nav.support.short': ['Apoyo', 'Support'],
+  'nav.forms.short': ['Formularios', 'Forms'],
+  'nav.docs.short': ['Documentos', 'Docs'],
+  'nav.review.short': ['Revisar', 'Review'],
+  'nav.help.short': ['Ayuda', 'Help'],
+  'nav.sections': ['Secciones', 'Sections'],
+  'a11y.brand': ["Pa'Casa, inicio", "Pa'Casa, home"],
+  'a11y.pacasa': ["Pa'Casa: hablar con la app", "Pa'Casa: talk to the app"],
+  'a11y.menu': ['Abrir menú de navegación', 'Open navigation menu'],
+  'a11y.menu.close': ['Cerrar menú de navegación', 'Close navigation menu'],
+  'a11y.nav': ['Navegación móvil', 'Mobile navigation'],
+  'a11y.nav.header': ['Navegación principal', 'Main navigation'],
+  'a11y.language': ['Idioma de la app', 'App language'],
+  'assistant.chat': ['Chat', 'Chat'],
+  'assistant.scan': ['Escanear', 'Scan'],
+  'assistant.talk': ['Hablar', 'Talk'],
+  'assistant.title': ['Tu asistente', 'Your assistant'],
+  'assistant.close': ['Cerrar Pa’Casa', 'Close Pa’Casa'],
+  'assistant.modes': ['Chat, escanear o hablar', 'Chat, scan, or talk'],
+  'live.hablar': ['Hablar', 'Speak'],
+  'live.traducir': ['Traducir', 'Translate'],
+  'live.preguntar': ['Preguntar', 'Ask'],
+  'home.eyebrow': ['Pa’Casa · Inicio', 'Pa’Casa · Home'],
+  'home.title': ['Tu voz. Tus respuestas. A tu ritmo.', 'Your voice. Your answers. At your pace.'],
+  'home.lead': [
+    'Habla en español, entiende lo que te preguntan y revisa cada respuesta antes de usarla.',
+    'Speak Spanish, understand what they ask you, and review each answer before using it.',
+  ],
+  'home.ask': ['Pregúntale a Pa’Casa', 'Ask Pa’Casa'],
+  'home.askHint': ['Entiende una pregunta o un formulario.', 'Understand a question or a form.'],
+  'home.talk': ['Hablar y traducir', 'Talk and translate'],
+  'home.talkHint': ['Traduce frases entre médico y paciente.', 'Translate phrases between clinician and patient.'],
+  'home.visit': ['Visita de hoy', "Today's visit"],
+  'home.forms': ['Formularios', 'Forms'],
+  'home.formsHint': ['Conteste pregunta por pregunta.', 'Answer one question at a time.'],
+  'home.docs': ['Documentos', 'Documents'],
+  'home.docsHint': ['Vea de dónde salió cada pregunta.', 'See where each question came from.'],
+  'home.review': ['Revisar', 'Review'],
+  'home.reviewHint': ['Confirme cada respuesta antes de usarla.', 'Confirm each answer before using it.'],
+  'home.final': ['Tú tienes la última palabra', 'You have the final word'],
+  'home.finalTitle': ['Nada se confirma sin ti', 'Nothing is confirmed without you'],
+  'home.finalBody': [
+    'Pa’Casa muestra cada respuesta y espera tu confirmación. Esta sesión es temporal, no es un expediente médico y no sustituye a un intérprete o profesional de salud.',
+    'Pa’Casa shows each answer and waits for your confirmation. This session is temporary, is not a medical record, and does not replace an interpreter or health professional.',
+  ],
+  'tab.plan.title': ['Mi plan', 'My plan'],
+  'tab.plan.intro': ['Revisa lo que necesitas completar, paso a paso y sin prisa.', 'Review what you need to complete, step by step and unhurried.'],
+  'tab.plan.emptyTitle': ['Todavía no hay un plan', 'There is no plan yet'],
+  'tab.plan.emptyText': [
+    'Esta versión no almacena formularios ni planes. Pa’Casa puede ayudarte a entender una pregunta; tú confirmas cada respuesta.',
+    'This version does not store forms or plans. Pa’Casa can help you understand a question; you confirm each answer.',
+  ],
+  'tab.plan.action': ['Pedir ayuda', 'Ask for help'],
+  'tab.dates.title': ['Citas', 'Appointments'],
+  'tab.dates.intro': [
+    'Un lugar para prepararte para una cita y entender las preguntas que te hagan.',
+    'A place to prepare for an appointment and understand the questions they may ask you.',
+  ],
+  'tab.dates.emptyTitle': ['No hay citas guardadas', 'No saved appointments'],
+  'tab.dates.emptyText': [
+    'No hay calendario conectado y no se han guardado citas. Pide a Pa’Casa que te ayude a entender instrucciones.',
+    'No calendar is connected and no appointments are saved. Ask Pa’Casa to help you understand instructions.',
+  ],
+  'tab.dates.action': ['Consultar a Pa’Casa', 'Ask Pa’Casa'],
+  'tab.support.title': ['Apoyo', 'Support'],
+  'tab.support.intro': ['Un poco de ayuda, cuando la necesites.', 'A little help, whenever you need it.'],
+  'tab.support.emptyTitle': [
+    'Puedes pedir que te lo expliquen de otra manera',
+    'You can ask to have it explained another way',
+  ],
+  'tab.support.emptyText': [
+    'Traduce frases sencillas o pregunta por una parte del formulario. En temas médicos importantes, pide un intérprete profesional.',
+    'Translate simple phrases or ask about a part of the form. For important medical topics, ask for a professional interpreter.',
+  ],
+  'tab.support.action': ['Abrir traducción', 'Open translation'],
+} as const satisfies Record<string, readonly [string, string]>;
+
+export type StringKey = keyof typeof STRINGS;
+
+export function t(key: StringKey, language: PatientLanguage): string {
+  return STRINGS[key][language === 'en' ? 1 : 0];
+}

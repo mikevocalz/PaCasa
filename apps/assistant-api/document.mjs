@@ -15,7 +15,7 @@ export async function readDocumentJson(req) {
 }
 export function parseDocumentRequest(data) {
   if (!data || typeof data !== 'object' || Array.isArray(data) ||
-      data.consent !== true || !['image/jpeg', 'image/png'].includes(data.mimeType) ||
+      data.consent !== true || !['image/jpeg', 'image/png', 'application/pdf'].includes(data.mimeType) ||
       typeof data.imageBase64 !== 'string' || data.imageBase64.length === 0 ||
       data.imageBase64.length > MAX_IMAGE_BASE64 ||
       !/^[A-Za-z0-9+/]+={0,2}$/.test(data.imageBase64)) return null;

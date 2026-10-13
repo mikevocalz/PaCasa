@@ -22,23 +22,23 @@ built for older adults who would rather speak than navigate an English form.
 | Mi Plan | `/mi-plan` | Prepare a step-by-step plan without claiming data was saved |
 | Citas | `/citas` | Prepare for an appointment (no calendar connection yet) |
 | Apoyo | `/apoyo` | Help, limitations, accessible language |
-| **Pa'Casa** raised center button | Root-level overlay, **not a tab** | **Preguntar** (Chat) and **Traducir** (English ↔ Spanish) |
+| **Pa'Casa** raised center button | Root-level overlay, **not a tab** | **Hablar**, **Traducir**, and **Preguntar** |
 
 The center action is visible in the phone dock (native and narrow web), in
 the physical-right rail on tablets/foldables/headsets, and in the desktop
-web header. Closing the full-screen assistant returns to the prior tab.
+web header. Closing the full-screen overlay returns to the prior tab.
 
-The former center **Scan** button is no longer part of global navigation.
-The existing Camera Lab is accessible from inside the native assistant,
-explicitly labelled as a preview: **it does not yet read forms.**
+The former center **Scan** button is no longer part of global navigation,
+and the legacy assistant/Camera Lab internals are not mounted in the patient
+shell. Document upload uses the platform's real capabilities: web offers a
+file input; native reports that this build has no document picker.
 
-The assistant currently supports a text request/response contract and local
-voice-note recording/review on native. It does **not** invent translation
-results, automatically transcribe recordings, fill an English PDF or submit
-documents. The text service requires a separately hosted backend URL and
-informed user opt-in. Conversations are ephemeral and cleared on close.
-See [the implementation contract](docs/PACASA_ASSISTANT.md) before enabling
-live services.
+Pa'Casa Live does **not** invent OCR fields, automatically transcribe
+recordings, fill an English PDF, submit documents, or provide medical advice.
+Hablar proposes a spoken or typed answer only after showing it to the user;
+Traducir uses the checked-in front-desk phrasebook; Preguntar answers from
+the current session and shows source provenance. Conversations and forms are
+ephemeral and cleared on close or reset.
 
 ## Goal and non-goals
 
@@ -128,11 +128,12 @@ pnpm base44:deploy
 
 Never commit Base44 credentials or local link state.
 
-## Spatial lab
+## Preserved workflow routes
 
-The previous five-screen starter remains accessible as a development
-reference under `/lab`, `/native`, `/hybrid`, `/game`, and
-`/immersive`. It is not part of the four-tab product navigation.
+The five preserved starter slugs remain deep-linkable while carrying the
+patient visit workflow: `/lab` is the form-first visit entry, `/native` is
+Formularios, `/hybrid` is Documentos, `/game` is Revisar, and `/immersive`
+is Ayuda. They are secondary destinations, not additional product tabs.
 
 See [spatial architecture](docs/ARCHITECTURE.md),
 [adaptive layouts](docs/RESPONSIVE-SHELL.md),

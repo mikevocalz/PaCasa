@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start": "node server.mjs",
-    "dev": "node --watch server.mjs",
+    "dev": "node --watch --env-file-if-exists=../../.env.local server.mjs",
     "test": "node --test 'test/*.test.mjs'"
   }
 }
